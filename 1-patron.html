@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SSEP — Patrón Streaming Sensor-to-Explanation Pipeline</title>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,300;1,6..72,400&family=Geist:wght@300;400;500;600;700;800;900&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff; --ink:#0c0c0b; --ink2:#2d2d2b; --ink3:#787870;
+  --rule:#e4e4de; --rule2:#f5f5ef;
+
+  /* 5 capas + transversal */
+  --l1:#c0390b; --l1-l:#fdeee9;   /* Ingestion */
+  --l2:#1a5c3a; --l2-l:#e4f5ec;   /* Model */
+  --l3:#1c6ea4; --l3-l:#eef2fb;   /* Explanation */
+  --l4:#7b2d8b; --l4-l:#f5eaf9;   /* Decision */
+  --l5:#b45309; --l5-l:#fef3e2;   /* Governance */
+  --sec:#0a2540; --sec-l:#e8eef5; /* Security transversal */
+
+  --mono:'Geist Mono',monospace;
+  --head:'Geist',sans-serif;
+  --body:'Newsreader',Georgia,serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--body);background:var(--bg);color:var(--ink);line-height:1.7;font-size:17px;}
+
+nav{background:var(--ink);position:sticky;top:0;z-index:200;}
+.nav-in{max-width:1180px;margin:0 auto;display:flex;align-items:center;padding:10px 28px;gap:4px;flex-wrap:wrap;}
+.nav-logo{font-family:var(--head);font-size:13px;font-weight:800;color:white;margin-right:14px;letter-spacing:-.3px;}
+.nav-a{font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.38);text-decoration:none;padding:4px 9px;border-radius:3px;transition:all .12s;white-space:nowrap;}
+.nav-a:hover{background:rgba(255,255,255,.1);color:white;}
+
+.hero{background:var(--ink);color:white;position:relative;overflow:hidden;}
+.hero-stripe{height:5px;background:linear-gradient(90deg,
+  var(--l1) 0 16.6%,var(--l2) 16.6% 33.3%,var(--l3) 33.3% 50%,
+  var(--l4) 50% 66.6%,var(--l5) 66.6% 83.3%,var(--sec) 83.3% 100%);}
+.hero-in{max-width:1180px;margin:0 auto;padding:78px 28px 64px;}
+.hero-eye{font-family:var(--mono);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.28);margin-bottom:20px;}
+.hero h1{font-family:var(--head);font-size:clamp(38px,5.4vw,66px);font-weight:900;line-height:.95;letter-spacing:-1.8px;margin-bottom:22px;}
+.hero h1 .accent{color:#5ba3ff;}
+.hero h1 .smaller{font-size:.55em;font-weight:500;color:rgba(255,255,255,.35);letter-spacing:-.5px;display:block;margin-top:14px;}
+.hero-desc{font-family:var(--body);font-size:18px;font-style:italic;font-weight:300;color:rgba(255,255,255,.5);max-width:680px;line-height:1.65;margin-bottom:44px;}
+.hero-meta{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;background:rgba(255,255,255,.06);border-radius:12px;overflow:hidden;}
+@media(max-width:700px){.hero-meta{grid-template-columns:1fr 1fr;}}
+.hm{padding:18px 16px;background:rgba(255,255,255,.03);}
+.hm-k{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:6px;}
+.hm-v{font-family:var(--head);font-size:13px;font-weight:600;line-height:1.3;}
+.hm-v span{color:rgba(255,255,255,.5);font-weight:400;}
+
+.layout{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:220px 1fr;gap:0;}
+@media(max-width:900px){.layout{grid-template-columns:1fr;}}
+.sidebar{border-right:1px solid var(--rule);padding:28px 14px;position:sticky;top:48px;height:calc(100vh - 48px);overflow-y:auto;}
+@media(max-width:900px){.sidebar{display:none;}}
+.sb-section{margin-bottom:22px;}
+.sb-hdr{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin-bottom:8px;padding-left:8px;}
+.sb-a{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:5px;font-family:var(--head);font-size:12px;font-weight:500;text-decoration:none;color:var(--ink2);transition:background .12s;margin-bottom:1px;}
+.sb-a:hover{background:var(--rule2);}
+.sb-a.active{background:var(--rule2);}
+.sb-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.sb-a .layer-num{font-family:var(--mono);font-size:10px;color:var(--ink3);width:16px;}
+
+.content{padding:0 0 80px;}
+.chapter{padding:0 44px;}
+@media(max-width:680px){.chapter{padding:0 20px;}}
+.ch-hdr{padding:58px 0 26px;border-bottom:2px solid var(--ink);margin-bottom:34px;display:flex;align-items:flex-end;gap:16px;}
+.ch-n{font-family:var(--head);font-size:70px;font-weight:900;line-height:1;color:var(--rule);letter-spacing:-3px;flex-shrink:0;}
+.ch-title{font-family:var(--head);font-size:26px;font-weight:800;letter-spacing:-.5px;line-height:1.0;}
+.ch-sub{font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:1.5px;text-transform:uppercase;margin-top:5px;}
+
+p{margin-bottom:20px;color:var(--ink2);line-height:1.78;font-weight:300;}
+strong{color:var(--ink);font-weight:600;}
+em{font-style:italic;}
+h3{font-family:var(--head);font-size:19px;font-weight:700;margin:38px 0 12px;letter-spacing:-.3px;}
+h4{font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin:22px 0 8px;}
+a{color:var(--l3);}
+
+ol,ul{margin:0 0 20px 22px;color:var(--ink2);}
+li{margin-bottom:8px;line-height:1.7;font-weight:300;}
+li strong{color:var(--ink);}
+
+.callout{margin:22px 0;padding:16px 20px;border-radius:6px;border-left:4px solid;font-size:15px;line-height:1.68;font-family:var(--head);}
+.callout.ok{background:var(--l2-l);border-color:var(--l2);color:#0a3020;}
+.callout.info{background:var(--l3-l);border-color:var(--l3);color:#0d3258;}
+.callout.warn{background:var(--l5-l);border-color:var(--l5);color:#5c2d00;}
+.callout.danger{background:var(--l1-l);border-color:var(--l1);color:#5c1a05;}
+.clbl{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;font-weight:600;margin-bottom:5px;display:block;}
+
+/* Layers diagram */
+.layers-viz{margin:34px 0;border:1.5px solid var(--ink);border-radius:14px;overflow:hidden;}
+.layers-hdr{background:var(--ink);color:white;padding:12px 20px;font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;display:flex;justify-content:space-between;}
+.layers-body{padding:28px 24px;background:#fafaf8;}
+.layer{display:grid;grid-template-columns:52px 1fr;gap:16px;align-items:center;margin-bottom:3px;padding:14px 18px;border-radius:8px;border:1.5px solid;}
+.layer:last-child{margin-bottom:0;}
+.layer-n{font-family:var(--head);font-size:38px;font-weight:900;line-height:1;letter-spacing:-2px;}
+.layer-t{font-family:var(--head);font-size:16px;font-weight:700;line-height:1.2;}
+.layer-d{font-family:var(--head);font-size:12px;color:var(--ink3);margin-top:3px;}
+.layer.l1{background:var(--l1-l);border-color:var(--l1);}
+.layer.l1 .layer-n,.layer.l1 .layer-t{color:var(--l1);}
+.layer.l2{background:var(--l2-l);border-color:var(--l2);}
+.layer.l2 .layer-n,.layer.l2 .layer-t{color:var(--l2);}
+.layer.l3{background:var(--l3-l);border-color:var(--l3);}
+.layer.l3 .layer-n,.layer.l3 .layer-t{color:var(--l3);}
+.layer.l4{background:var(--l4-l);border-color:var(--l4);}
+.layer.l4 .layer-n,.layer.l4 .layer-t{color:var(--l4);}
+.layer.l5{background:var(--l5-l);border-color:var(--l5);}
+.layer.l5 .layer-n,.layer.l5 .layer-t{color:var(--l5);}
+.layer.sec{background:var(--sec-l);border-color:var(--sec);border-style:dashed;margin-top:12px;}
+.layer.sec .layer-n,.layer.sec .layer-t{color:var(--sec);}
+
+/* Generic table */
+.tbl{margin:20px 0;border:1.5px solid var(--ink);border-radius:12px;overflow:hidden;font-family:var(--head);}
+.tbl-hdr{background:var(--ink);color:white;display:grid;padding:0;}
+.tbl-hdr>div{padding:10px 14px;font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;}
+.tbl-row{display:grid;border-bottom:1px solid var(--rule);}
+.tbl-row:last-child{border-bottom:none;}
+.tbl-row>div{padding:12px 14px;font-size:13.5px;color:var(--ink2);border-right:1px solid var(--rule);line-height:1.5;}
+.tbl-row>div:last-child{border-right:none;}
+.tbl-tech{font-size:13px;font-weight:700;color:var(--ink);font-family:var(--head);}
+.tbl-row:nth-child(even){background:var(--rule2);}
+.c3{grid-template-columns:180px 1fr 1fr;}
+.c4{grid-template-columns:160px 1fr 1fr 1fr;}
+@media(max-width:680px){.tbl-hdr,.tbl-row{grid-template-columns:1fr!important;} .tbl-row>div,.tbl-hdr>div{border-right:none;border-bottom:1px solid var(--rule);}}
+
+/* Force boxes */
+.force{display:grid;grid-template-columns:50px 1fr;gap:14px;align-items:start;margin-bottom:20px;}
+.force-n{font-family:var(--head);font-size:40px;font-weight:900;line-height:1;letter-spacing:-2px;color:var(--rule);}
+.force-t{font-family:var(--head);font-size:16px;font-weight:700;color:var(--ink);margin-bottom:6px;}
+.force-d{font-size:15px;color:var(--ink2);line-height:1.65;font-family:var(--body);font-weight:300;}
+
+/* Component block */
+.cmp{margin:28px 0;border:1.5px solid var(--rule);border-radius:12px;overflow:hidden;}
+.cmp-hdr{padding:14px 20px;color:white;font-family:var(--head);display:flex;align-items:center;gap:12px;}
+.cmp-hdr-n{font-family:var(--mono);font-size:10px;opacity:.6;}
+.cmp-hdr-t{font-size:15px;font-weight:700;letter-spacing:-.2px;}
+.cmp-hdr-r{margin-left:auto;font-family:var(--mono);font-size:9px;opacity:.65;letter-spacing:1.5px;text-transform:uppercase;}
+.cmp-body{padding:18px 22px;background:white;}
+.cmp-body p{font-size:14.5px;line-height:1.68;margin-bottom:12px;}
+.cmp-body ul{font-size:14px;margin-bottom:14px;}
+.cmp-body ul li{line-height:1.6;}
+.cmp-hdr.l1{background:var(--l1);} .cmp.l1{border-color:var(--l1);}
+.cmp-hdr.l2{background:var(--l2);} .cmp.l2{border-color:var(--l2);}
+.cmp-hdr.l3{background:var(--l3);} .cmp.l3{border-color:var(--l3);}
+.cmp-hdr.l4{background:var(--l4);} .cmp.l4{border-color:var(--l4);}
+.cmp-hdr.l5{background:var(--l5);} .cmp.l5{border-color:var(--l5);}
+.cmp-hdr.sec{background:var(--sec);} .cmp.sec{border-color:var(--sec);}
+.cmp-note{font-family:var(--mono);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);margin-top:14px;padding-top:12px;border-top:1px dashed var(--rule);}
+
+/* Pull quote */
+.pq{margin:40px 0;padding:26px 32px;border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);font-family:var(--head);font-size:clamp(17px,2.2vw,21px);font-weight:700;line-height:1.3;text-align:center;letter-spacing:-.3px;}
+
+/* Flow code block */
+.cw{border:1px solid var(--rule);border-radius:10px;overflow:hidden;margin:20px 0;}
+.ct{display:flex;align-items:center;justify-content:space-between;padding:8px 16px;background:var(--ink);}
+.cf{font-family:var(--mono);font-size:10px;color:rgba(255,255,255,.4);letter-spacing:1px;}
+.clt{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.2);}
+pre{background:#f8f8f4;padding:18px 20px;overflow-x:auto;margin:0;}
+pre code{font-family:var(--mono);font-size:12.5px;line-height:1.75;background:none;padding:0;color:var(--ink2);white-space:pre;}
+
+footer{background:var(--ink);color:rgba(255,255,255,.28);padding:22px 28px;font-family:var(--mono);font-size:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
+.ft-dots{display:flex;gap:5px;}
+.ft-dot{width:8px;height:8px;border-radius:50%;}
+
+code{font-family:var(--mono);font-size:12.5px;background:var(--rule2);padding:2px 6px;border-radius:3px;color:var(--l1);}
+</style>
+</head>
+<body>
+  <nav>
+    <div class="nav-in">
+      <a class="nav-logo" href="index.html">SSEP</a>
+      <a class="nav-a" href="0-base.html">0 · Base</a>
+      <a class="nav-a" href="0.5-plan.html">0.5 · Plan</a>
+      <a class="nav-a" href="0.6-setup.html">0.6 · Setup</a>
+      <a class="nav-a" href="0.7-escalado.html">0.7 · Escalado</a>
+      <a class="nav-a" href="1-patron.html">1 · Patrón</a>
+      <a class="nav-a" href="2-implementacion.html">2 · Implementación</a>
+      <a class="nav-a" href="3-metalkube.html">3 · MetalKube</a>
+    </div>
+  </nav>
+<div class="hero">
+  <div class="hero-stripe"></div>
+  <div class="hero-in">
+    <div class="hero-eye">Documento 1 · Patrón arquitectónico · v0.2</div>
+    <h1>Streaming Sensor-to-Explanation<br><span class="accent">Pipeline</span> with Continuous<br>Drift Governance.
+      <span class="smaller">Alias SSEP · Pipeline Sensor→Explicación · "Escuchar, entender, explicar, vigilar"</span>
+    </h1>
+    <p class="hero-desc">
+      Un patrón para construir sistemas que ingieren señales físicas continuas, las clasifican con un modelo ML, generan explicaciones grounded en documentación experta, deciden con asistencia humana, y se auto-monitorean para detectar cuándo dejan de funcionar.
+    </p>
+    <div class="hero-meta">
+      <div class="hm"><div class="hm-k">Clasificación</div><div class="hm-v">Integración + <span>Gobierno de modelos</span></div></div>
+      <div class="hm"><div class="hm-k">Alcance</div><div class="hm-v">Agnóstico de dominio <span>y tecnología</span></div></div>
+      <div class="hm"><div class="hm-k">Capas</div><div class="hm-v">5 + 1 transversal</div></div>
+      <div class="hm"><div class="hm-k">Estado</div><div class="hm-v">v0.2 <span>— consolidado</span></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+
+<div class="sidebar">
+  <div class="sb-section">
+    <div class="sb-hdr">Contenido</div>
+    <a class="sb-a" href="#contexto"><span class="layer-num">01</span>Contexto</a>
+    <a class="sb-a" href="#problema"><span class="layer-num">02</span>Problema</a>
+    <a class="sb-a" href="#solucion"><span class="layer-num">03</span>Solución</a>
+    <a class="sb-a" href="#componentes"><span class="layer-num">04</span>Componentes</a>
+    <a class="sb-a" href="#dinamica"><span class="layer-num">05</span>Dinámica</a>
+    <a class="sb-a" href="#variaciones"><span class="layer-num">06</span>Variaciones</a>
+    <a class="sb-a" href="#tradeoffs"><span class="layer-num">07</span>Trade-offs</a>
+    <a class="sb-a" href="#antipatrones"><span class="layer-num">08</span>Anti-patrones</a>
+    <a class="sb-a" href="#relacionados"><span class="layer-num">09</span>Relacionados</a>
+    <a class="sb-a" href="#exito"><span class="layer-num">10</span>Criterios de éxito</a>
+  </div>
+  <div class="sb-section">
+    <div class="sb-hdr">Capas</div>
+    <a class="sb-a" href="#capa-1"><span class="sb-dot" style="background:var(--l1)"></span>Ingestion</a>
+    <a class="sb-a" href="#capa-2"><span class="sb-dot" style="background:var(--l2)"></span>Model</a>
+    <a class="sb-a" href="#capa-3"><span class="sb-dot" style="background:var(--l3)"></span>Explanation</a>
+    <a class="sb-a" href="#capa-4"><span class="sb-dot" style="background:var(--l4)"></span>Decision</a>
+    <a class="sb-a" href="#capa-5"><span class="sb-dot" style="background:var(--l5)"></span>Governance</a>
+    <a class="sb-a" href="#capa-sec"><span class="sb-dot" style="background:var(--sec)"></span>Security (transversal)</a>
+  </div>
+</div>
+
+<div class="content">
+
+<!-- 01 CONTEXTO -->
+<div id="contexto" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">01</div>
+    <div>
+      <div class="ch-title">Contexto</div>
+      <div class="ch-sub">Cuándo aplica · cuándo NO aplica</div>
+    </div>
+  </div>
+
+  <p>El patrón SSEP aplica cuando concurren <strong>todas</strong> estas condiciones. No es un patrón universal — es un patrón específico para un tipo de problema que aparece repetidamente en dominios industriales, médicos, financieros y agronómicos.</p>
+
+  <h4>Señales de que aplica</h4>
+  <ol>
+    <li>Existe una <strong>señal física continua</strong> (audio, vibración, temperatura, imagen, telemetría, transacciones) generada por múltiples fuentes distribuidas.</li>
+    <li>Un <strong>modelo ML</strong> puede clasificar el estado de esas fuentes con precisión útil, pero <strong>no puede explicar</strong> por qué.</li>
+    <li>Existe <strong>conocimiento experto documentado</strong> (manuales, guías, normativa, casos previos) que un humano consultaría para decidir qué hacer.</li>
+    <li>El <strong>coste de un falso negativo es alto</strong> (fallo no detectado = pérdida económica, riesgo físico, daño reputacional).</li>
+    <li>El <strong>coste de un falso positivo también importa</strong> (fatiga de alertas, intervenciones innecesarias).</li>
+    <li>Las condiciones de producción <strong>difieren inevitablemente</strong> de las de entrenamiento.</li>
+    <li>Un <strong>operador humano</strong> toma la decisión final, asistido por el sistema, no reemplazado por él.</li>
+    <li>Existe un <strong>LLM base de propósito general</strong> que puede <strong>especializarse</strong> con datos del dominio para reducir coste, latencia o tasa de alucinación.</li>
+    <li>El sistema opera en un <strong>entorno regulado</strong> (SOC2, ISO 27001, HIPAA) donde la <strong>soberanía de datos</strong> es un requisito, no una preferencia.</li>
+    <li>Los flujos de decisión pueden ser <strong>multi-paso</strong> (clasificar → diagnosticar → decidir urgencia → generar orden de trabajo) y requieren <strong>estado persistente</strong> entre pasos.</li>
+  </ol>
+
+  <h4>Señales de que NO aplica</h4>
+  <ul>
+    <li>La señal es puntual, no continua (ej: un formulario que se envía una vez).</li>
+    <li>El modelo puede actuar autónomamente sin supervisión humana.</li>
+    <li>No existe documentación experta que consultar — el RAG no aportaría nada.</li>
+    <li>El coste de un error es despreciable.</li>
+    <li>Las condiciones de producción son idénticas a las de entrenamiento y se espera que lo sigan siendo.</li>
+    <li>No hay requisitos de cumplimiento ni auditoría — la observabilidad SaaS es admisible.</li>
+    <li>No hay volumen suficiente para justificar el coste operacional del stack completo.</li>
+  </ul>
+
+  <div class="callout warn">
+    <span class="clbl">⚠ Decisión crítica</span>
+    Si faltan las condiciones 4 y 5 (coste alto de falso negativo <em>y</em> falso positivo), el patrón es <strong>sobredimensionado</strong>. Un sistema de clasificación simple con revisión manual es suficiente. SSEP se justifica por la asimetría de costes y la necesidad de explicación grounded.
+  </div>
+</div>
+
+<!-- 02 PROBLEMA -->
+<div id="problema" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">02</div>
+    <div>
+      <div class="ch-title">Problema</div>
+      <div class="ch-sub">Cinco fuerzas en tensión</div>
+    </div>
+  </div>
+
+  <p>Los sistemas de monitoreo automático fracasan sistemáticamente en producción por cinco fuerzas simultáneas. Cada una es resoluble por separado. El problema es resolverlas todas sin que ninguna consuma la complejidad total del sistema.</p>
+
+  <div class="force">
+    <div class="force-n">01</div>
+    <div>
+      <div class="force-t">La brecha semántica</div>
+      <div class="force-d">El modelo produce un número (<code>label=3, confidence=0.87</code>). El operador necesita una decisión (<em>¿paro la máquina? ¿espero? ¿a quién llamo?</em>). Entre ambos hay un salto que ningún clasificador resuelve por sí solo.</div>
+    </div>
+  </div>
+
+  <div class="force">
+    <div class="force-n">02</div>
+    <div>
+      <div class="force-t">La brecha de distribución</div>
+      <div class="force-d">El modelo se entrenó con datos de laboratorio o históricos. En producción la señal cambia: sensores envejecen, condiciones ambientales varían, aparecen modos de fallo no vistos. <strong>El modelo falla despacio y en silencio.</strong></div>
+    </div>
+  </div>
+
+  <div class="force">
+    <div class="force-n">03</div>
+    <div>
+      <div class="force-t">La brecha de confianza</div>
+      <div class="force-d">Un operador que recibe 200 alertas al día y 30 son falsas deja de mirarlas. Un sistema que no comunica su propia incertidumbre se convierte en ruido de fondo.</div>
+    </div>
+  </div>
+
+  <div class="force">
+    <div class="force-n">04</div>
+    <div>
+      <div class="force-t">La brecha de feedback</div>
+      <div class="force-d">Las correcciones que el operador hace en el campo (<em>esta alerta era falsa, esta era real pero clasificada mal</em>) se pierden si no hay un mecanismo explícito para capturarlas y devolverlas al ciclo de entrenamiento.</div>
+    </div>
+  </div>
+
+  <div class="force">
+    <div class="force-n">05</div>
+    <div>
+      <div class="force-t">La brecha de soberanía y control</div>
+      <div class="force-d">El LLM que genera las explicaciones suele ser un SaaS. En entornos regulados, enviar el prompt y el completion completos a un tercero es una brecha de cumplimiento. La especialización del modelo y el auto-alojamiento de la observabilidad no son optimizaciones — son <strong>requisitos de admisibilidad</strong>.</div>
+    </div>
+  </div>
+</div>
+
+<!-- 03 SOLUCIÓN -->
+<div id="solucion" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">03</div>
+    <div>
+      <div class="ch-title">Solución</div>
+      <div class="ch-sub">Cinco capas apiladas · una transversal de seguridad</div>
+    </div>
+  </div>
+
+  <p>Una arquitectura de cinco capas apiladas verticalmente, con una capa transversal de seguridad y una de observabilidad. Cada capa resuelve una brecha específica del problema.</p>
+
+  <div class="layers-viz">
+    <div class="layers-hdr"><span>Arquitectura SSEP v0.2</span><span>5 capas + 1 transversal</span></div>
+    <div class="layers-body">
+      <div class="layer l5">
+        <div class="layer-n">5</div>
+        <div>
+          <div class="layer-t">Governance</div>
+          <div class="layer-d">Drift detection · feedback loop · auditoría · almacenamiento analítico</div>
+        </div>
+      </div>
+      <div class="layer l4">
+        <div class="layer-n">4</div>
+        <div>
+          <div class="layer-t">Decision</div>
+          <div class="layer-d">Routing · thresholds · deduplicación · orquestación de agentes</div>
+        </div>
+      </div>
+      <div class="layer l3">
+        <div class="layer-n">3</div>
+        <div>
+          <div class="layer-t">Explanation</div>
+          <div class="layer-d">Retrieval · reranking · síntesis grounded · verificación</div>
+        </div>
+      </div>
+      <div class="layer l2">
+        <div class="layer-n">2</div>
+        <div>
+          <div class="layer-t">Model</div>
+          <div class="layer-d">Clasificación calibrada · incertidumbre · especialización (fine-tuning)</div>
+        </div>
+      </div>
+      <div class="layer l1">
+        <div class="layer-n">1</div>
+        <div>
+          <div class="layer-t">Ingestion</div>
+          <div class="layer-d">Captura · pre-procesado en edge · transporte · control de flujo</div>
+        </div>
+      </div>
+      <div class="layer sec">
+        <div class="layer-n">↕</div>
+        <div>
+          <div class="layer-t">Security — transversal</div>
+          <div class="layer-d">Input validation · output guardrails · auditoría de eventos</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3>Cinco reglas estructurales</h3>
+
+  <ol>
+    <li>Las capas 1→2→3 forman el <strong>path síncrono</strong> (la respuesta al operador). Las capas 4 y 5 el <strong>path de gobierno</strong> (meta-información sobre el sistema). Nunca se mezclan en el mismo plano temporal.</li>
+    <li>La capa 3 <strong>nunca decide</strong>. Solo explica lo que la capa 2 predijo. Mezclar generación con decisión es el anti-patrón más común de este diseño.</li>
+    <li>La capa 5 <strong>no bloquea</strong> las capas 1-2-3. Si el sistema de drift cae, la predicción sigue saliendo. El gobierno es observacional, no transaccional.</li>
+    <li>La <strong>seguridad es transversal</strong>: input validation antes de la capa 3, output validation después. Ninguna capa decide por sí sola si un input es malicioso.</li>
+    <li>La <strong>observabilidad es transversal</strong>: cada capa emite trazas al mismo sistema con el mismo <code>trace_id</code> propagado desde el sensor físico.</li>
+  </ol>
+</div>
+
+<!-- 04 COMPONENTES -->
+<div id="componentes" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">04</div>
+    <div>
+      <div class="ch-title">Componentes</div>
+      <div class="ch-sub">Rol y responsabilidades de cada capa</div>
+    </div>
+  </div>
+
+  <!-- Capa 1 -->
+  <div id="capa-1" class="cmp l1">
+    <div class="cmp-hdr l1">
+      <span class="cmp-hdr-n">CAPA 01</span>
+      <span class="cmp-hdr-t">Ingestion</span>
+      <span class="cmp-hdr-r">Síncrono</span>
+    </div>
+    <div class="cmp-body">
+      <p><strong>Rol:</strong> capturar la señal física en su origen, reducirla a un formato transportable, moverla al sistema de cómputo.</p>
+      <h4>Responsabilidades</h4>
+      <ul>
+        <li><strong>Captura</strong> — leer la señal del sensor (audio, vibración, imagen, lectura).</li>
+        <li><strong>Pre-procesado en origen</strong> — transformar la señal cruda en features o representaciones compactas <em>antes</em> de transmitirla.</li>
+        <li><strong>Transporte</strong> — mover los eventos de forma fiable, ordenada por fuente, con capacidad de replay.</li>
+        <li><strong>Control de flujo</strong> — evitar que un pico de eventos tumbe el sistema aguas abajo.</li>
+        <li><strong>Tolerancia a fallos de transporte</strong> — mensajes malformados no deben bloquear el pipeline.</li>
+      </ul>
+      <div class="cmp-note">Lo que esta capa NO hace: clasificar · decidir · explicar</div>
+    </div>
+  </div>
+
+  <!-- Capa 2 -->
+  <div id="capa-2" class="cmp l2">
+    <div class="cmp-hdr l2">
+      <span class="cmp-hdr-n">CAPA 02</span>
+      <span class="cmp-hdr-t">Model</span>
+      <span class="cmp-hdr-r">Síncrono</span>
+    </div>
+    <div class="cmp-body">
+      <p><strong>Rol:</strong> convertir la representación de la señal en una predicción calibrada, consciente de su incertidumbre, y — opcionalmente — especializada para el dominio.</p>
+      <h4>Responsabilidades</h4>
+      <ul>
+        <li><strong>Clasificación</strong> — asignar la señal a una de N categorías.</li>
+        <li><strong>Calibración</strong> — las probabilidades deben ser interpretables como frecuencias reales. Un 0.9 debe significar que 9 de cada 10 veces con esa confianza, el modelo acierta.</li>
+        <li><strong>Cuantificación de incertidumbre</strong> — distinguir entre "no sé" (epistémica) y "esto es ambiguo" (aleatoria).</li>
+        <li><strong>Versionado del modelo</strong> — cada predicción trazable a la versión exacta que la produjo.</li>
+        <li><strong>Especialización</strong> — el modelo base general puede fine-tunearse con datos del dominio. <em>No es obligatorio.</em> Es una optimización cuando el modelo general alcanza su techo de calidad, coste o latencia.</li>
+      </ul>
+      <div class="cmp-note">Lo que esta capa NO hace: explicar · decidir · aprender online</div>
+    </div>
+  </div>
+
+  <!-- Capa 3 -->
+  <div id="capa-3" class="cmp l3">
+    <div class="cmp-hdr l3">
+      <span class="cmp-hdr-n">CAPA 03</span>
+      <span class="cmp-hdr-t">Explanation</span>
+      <span class="cmp-hdr-r">Síncrono</span>
+    </div>
+    <div class="cmp-body">
+      <p><strong>Rol:</strong> traducir la predicción en una explicación grounded en documentación del dominio, en lenguaje natural.</p>
+      <h4>Responsabilidades</h4>
+      <ul>
+        <li><strong>Detección de dominio</strong> — ¿la consulta pertenece a este sistema o es ruido?</li>
+        <li><strong>Retrieval</strong> — recuperar los fragmentos relevantes a esta predicción concreta.</li>
+        <li><strong>Filtrado de relevancia</strong> — descartar fragmentos poco relevantes <em>antes</em> de generar la respuesta.</li>
+        <li><strong>Síntesis</strong> — generar una explicación que cite explícitamente las fuentes.</li>
+        <li><strong>Verificación de grounding</strong> — comprobar que la respuesta no inventa información.</li>
+        <li><strong>Abstención</strong> — si no hay documentación suficiente, decirlo explícitamente en lugar de generar.</li>
+      </ul>
+      <div class="cmp-note">Lo que esta capa NO hace: decidir · alertar · modificar la predicción</div>
+    </div>
+  </div>
+
+  <!-- Capa 4 -->
+  <div id="capa-4" class="cmp l4">
+    <div class="cmp-hdr l4">
+      <span class="cmp-hdr-n">CAPA 04</span>
+      <span class="cmp-hdr-t">Decision</span>
+      <span class="cmp-hdr-r">Síncrono + Agente</span>
+    </div>
+    <div class="cmp-body">
+      <p><strong>Rol:</strong> convertir la predicción y su explicación en una acción concreta y en el nivel de urgencia correcto.</p>
+      <h4>Responsabilidades</h4>
+      <ul>
+        <li><strong>Routing</strong> — decidir qué camino debe tomar cada evento (respuesta inmediata, revisión, log silencioso).</li>
+        <li><strong>Thresholds de acción</strong> — cuándo una predicción genera alerta, revisión humana o log.</li>
+        <li><strong>Deduplicación</strong> — múltiples eventos del mismo origen en una ventana = una sola alerta.</li>
+        <li><strong>Escalado</strong> — niveles de urgencia con canales distintos.</li>
+        <li><strong>Abstención explícita</strong> — cuando el modelo declara alta incertidumbre, el sistema <em>no alerta</em>, pero registra para revisión.</li>
+        <li><strong>Orquestación de agente</strong> — para casos que requieren múltiples pasos, la capa 4 puede implementar un grafo de estados con checkpointing persistente, interrupción para human-in-the-loop, y trazabilidad de cada nodo.</li>
+        <li><strong>Reconciliación de proveedores</strong> — cuando hay múltiples LLM (local + cloud + fine-tuned), la capa 4 decide cuál usar según coste, latencia y criticidad.</li>
+      </ul>
+      <div class="cmp-note">Lo que esta capa NO hace: generar explicaciones · modificar predicciones · aprender</div>
+    </div>
+  </div>
+
+  <!-- Capa 5 -->
+  <div id="capa-5" class="cmp l5">
+    <div class="cmp-hdr l5">
+      <span class="cmp-hdr-n">CAPA 05</span>
+      <span class="cmp-hdr-t">Governance</span>
+      <span class="cmp-hdr-r">Background</span>
+    </div>
+    <div class="cmp-body">
+      <p><strong>Rol:</strong> vigilar que el sistema sigue funcionando en producción, cerrar el loop con el mundo real, y dejar evidencia auditable.</p>
+      <h4>Responsabilidades</h4>
+      <ul>
+        <li><strong>Drift de datos</strong> — detectar cuándo las señales de entrada se parecen cada vez menos a las de entrenamiento.</li>
+        <li><strong>Drift de concepto</strong> — detectar cuándo la relación señal→etiqueta está cambiando.</li>
+        <li><strong>Feedback de campo</strong> — capturar las correcciones que los operadores hacen y almacenarlas como nuevas etiquetas.</li>
+        <li><strong>Evaluación de la explicación</strong> — medir si las respuestas de la capa 3 siguen siendo útiles, correctas y grounded.</li>
+        <li><strong>Almacenamiento analítico</strong> — además del almacenamiento operacional, mantener un almacén columnar para preguntas históricas: coste por usuario/mes, distribución de predicciones por día, evidencia de auditoría.</li>
+        <li><strong>Seguridad auditada</strong> — cada intento de injection bloqueado, cada output rechazado, cada acceso a secretos, registrado con usuario, severidad y timestamp.</li>
+        <li><strong>Evaluación de especialización</strong> — si se fine-tunea el LLM, comparar métricas entre modelo base y fine-tuned antes de promover.</li>
+        <li><strong>Versionado end-to-end</strong> — vincular datos + modelo + prompt + configuración en cada iteración.</li>
+        <li><strong>Gates de promoción + rollback automático</strong>.</li>
+      </ul>
+      <div class="cmp-note">Lo que esta capa NO hace: bloquear el path síncrono · decidir por sí sola</div>
+    </div>
+  </div>
+
+  <!-- Security -->
+  <div id="capa-sec" class="cmp sec">
+    <div class="cmp-hdr sec">
+      <span class="cmp-hdr-n">TRANSV.</span>
+      <span class="cmp-hdr-t">Security</span>
+      <span class="cmp-hdr-r">Input + Output</span>
+    </div>
+    <div class="cmp-body">
+      <p><strong>Rol:</strong> proteger el sistema contra inputs maliciosos y outputs peligrosos.</p>
+      <h4>Responsabilidades</h4>
+      <ul>
+        <li><strong>Validación de entrada</strong> — detección heurística de patrones conocidos, clasificación con modelo pequeño para casos sospechosos, logging de cada bloqueo.</li>
+        <li><strong>Validación de salida</strong> — validación estructural con schema estricto para endpoints que devuelven datos estructurados.</li>
+        <li><strong>Guardrails declarativos</strong> — flujos predefinidos que el modelo no puede violar (no revelar el system prompt, no hablar de temas fuera de dominio).</li>
+        <li><strong>Auditoría</strong> — cada evento de seguridad registrado con la misma trazabilidad que una predicción.</li>
+      </ul>
+      <div class="cmp-note">Lo que esta capa NO hace: routing · generar explicaciones · sustituir al LLM</div>
+    </div>
+  </div>
+</div>
+
+<!-- 05 DINÁMICA -->
+<div id="dinamica" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">05</div>
+    <div>
+      <div class="ch-title">Dinámica</div>
+      <div class="ch-sub">Flujo end-to-end · path síncrono vs path de gobierno</div>
+    </div>
+  </div>
+
+  <h3>Path síncrono — una señal, una respuesta</h3>
+
+  <div class="cw">
+    <div class="ct"><span class="cf">flujo end-to-end</span><span class="clt">pseudocódigo</span></div>
+    <pre><code>1. Sensor emite señal
+2. Ingestion: pre-procesa en edge → evento {source_id, features, timestamp}
+3. Security: input validation → bloquear o pasar
+4. Model: clasifica → {label, confidence, uncertainty}
+5. Decision: evalúa thresholds
+      ├─ alta confianza + alta urgencia   → alerta inmediata + Explanation
+      ├─ confianza media                  → Explanation + revisión
+      ├─ baja confianza o alta incert.    → log + revisión silenciosa
+      └─ caso multi-paso                  → Agent graph
+                                              (clasificar → diagnosticar
+                                               → human gate → workorder)
+6. Explanation: retrieval + síntesis + verificación
+7. Security: output validation → schema, PII, secrets
+8. Operador recibe: {label, confidence, explicación, fuentes, acción}</code></pre>
+  </div>
+
+  <p><strong>SLA típico:</strong> milisegundos (ingesta) + milisegundos (modelo) + segundos (explicación) = respuesta completa en &lt;5s en el percentil 95.</p>
+
+  <h3>Path de gobierno — background, no bloquea</h3>
+
+  <div class="cw">
+    <div class="ct"><span class="cf">gobierno continuo</span><span class="clt">pseudocódigo</span></div>
+    <pre><code>1. Cada predicción se loguea con trace_id
+2. Governance muestrea (ej: 20%) para evaluación profunda
+3. Operadores confirman/corrigen predicciones → feedback almacenado
+4. Periódicamente (diario/semanal):
+      ├─ comparar distribuciones → drift score
+      ├─ evaluar calidad RAG → faithfulness, precision, recall
+      ├─ si hay modelo fine-tuned → comparar base vs fine-tuned
+      └─ si algún gate falla → reentrenamiento o rollback
+5. Auditoría continua:
+      └─ queries analíticas: coste, acceso a secretos, drift</code></pre>
+  </div>
+
+  <p><strong>SLA típico:</strong> minutos a días. El sistema nunca espera a la capa 5 para responder.</p>
+
+  <div class="pq">
+    El path síncrono tiene SLA de segundos. El path de gobierno opera en horas o días. Confundir ambos es el error estructural más común.
+  </div>
+</div>
+
+<!-- 06 VARIACIONES -->
+<div id="variaciones" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">06</div>
+    <div>
+      <div class="ch-title">Variaciones por dominio</div>
+      <div class="ch-sub">Lo que cambia · lo que permanece</div>
+    </div>
+  </div>
+
+  <p>Las cinco capas son invariantes. Lo que cambia es <strong>qué instancia cada capa</strong>:</p>
+
+  <div class="tbl">
+    <div class="tbl-hdr c4">
+      <div>Capa</div>
+      <div>Motores industriales</div>
+      <div>Diagnóstico médico</div>
+      <div>Fraude financiero</div>
+    </div>
+    <div class="tbl-row c4">
+      <div class="tbl-tech">Ingestion</div>
+      <div>Audio → mel-spectrograma en edge</div>
+      <div>Imagen DICOM + historia clínica</div>
+      <div>Transacciones en streaming</div>
+    </div>
+    <div class="tbl-row c4">
+      <div class="tbl-tech">Model</div>
+      <div>CNN audio, 10-30 clases de fallo</div>
+      <div>CNN imagen + tabular, multi-label</div>
+      <div>Gradient boosting + reglas</div>
+    </div>
+    <div class="tbl-row c4">
+      <div class="tbl-tech">Explanation</div>
+      <div>RAG sobre manuales de fabricante</div>
+      <div>RAG sobre guías clínicas + literatura</div>
+      <div>RAG sobre normativa + casos previos</div>
+    </div>
+    <div class="tbl-row c4">
+      <div class="tbl-tech">Decision</div>
+      <div>Alerta PagerDuty + revisión técnica</div>
+      <div>Flag para segunda opinión médica</div>
+      <div>Bloqueo + revisión manual</div>
+    </div>
+    <div class="tbl-row c4">
+      <div class="tbl-tech">Governance</div>
+      <div>Drift por condiciones ambientales</div>
+      <div>Drift por cambio de población</div>
+      <div>Drift por evasión de reglas</div>
+    </div>
+    <div class="tbl-row c4">
+      <div class="tbl-tech">Security</div>
+      <div>Injection en queries de técnicos</div>
+      <div>PII en historiales clínicos</div>
+      <div>Manipulación de reglas de bloqueo</div>
+    </div>
+  </div>
+
+  <h4>Lo que permanece constante</h4>
+  <ul>
+    <li>La separación path síncrono vs path de gobierno.</li>
+    <li>La regla de que Explanation no decide.</li>
+    <li>La regla de que Governance no bloquea.</li>
+    <li>La abstención explícita cuando el modelo no está seguro.</li>
+    <li>El feedback loop con el operador humano como cierre.</li>
+    <li>La seguridad como capa transversal, no como capa apilada.</li>
+  </ul>
+</div>
+
+<!-- 07 TRADE-OFFS -->
+<div id="tradeoffs" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">07</div>
+    <div>
+      <div class="ch-title">Trade-offs</div>
+      <div class="ch-sub">Lo que ganas · lo que pagas</div>
+    </div>
+  </div>
+
+  <h3>Lo que ganas</h3>
+  <ul>
+    <li><strong>Trazabilidad end-to-end</strong> — cualquier decisión reconstruible desde el sensor físico hasta la explicación.</li>
+    <li><strong>Fallo silencioso imposible</strong> — el drift detection convierte el fallo lento en una alerta explícita.</li>
+    <li><strong>Operador asistido, no reemplazado</strong> — el sistema propone, el humano decide.</li>
+    <li><strong>Reutilizable</strong> — las cinco capas se reaplican a cualquier dominio que cumpla el contexto.</li>
+    <li><strong>Cumplimiento auditable</strong> — soberanía de datos + evidencia de seguridad + versionado de modelos.</li>
+  </ul>
+
+  <h3>Lo que pagas</h3>
+  <ul>
+    <li><strong>Complejidad operacional alta</strong> — son cinco sistemas, no uno. Cada capa tiene su propio ciclo de vida.</li>
+    <li><strong>Latencia acumulada</strong> — el path síncrono incluye un LLM. No es un sistema de control reactivo (&lt;10ms). Es un sistema de asistencia.</li>
+    <li><strong>Coste del LLM en el path crítico</strong> — la capa 3 cuesta dinero por cada explicación generada.</li>
+    <li><strong>Necesitas datos etiquetados</strong> — sin feedback loop real, el sistema no mejora.</li>
+    <li><strong>Requiere disciplina de equipo</strong> — cinco capas con responsabilidades claras fallan si un equipo las mezcla.</li>
+    <li><strong>Coste de formación</strong> — operar Kafka, LangGraph, Evidently, Langfuse y ClickHouse requiere seniority real.</li>
+  </ul>
+</div>
+
+<!-- 08 ANTI-PATRONES -->
+<div id="antipatrones" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">08</div>
+    <div>
+      <div class="ch-title">Anti-patrones</div>
+      <div class="ch-sub">Cómo se ve cuando está mal implementado</div>
+    </div>
+  </div>
+
+  <div class="tbl">
+    <div class="tbl-hdr c3">
+      <div>Anti-patrón</div>
+      <div>Síntoma</div>
+      <div>Por qué es malo</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">If-else disfrazado de routing</div>
+      <div>La capa 4 decide según campos del payload, no según lógica del clasificador</div>
+      <div>No escala, no aprende, no se puede auditar</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">LLM-as-judge en path crítico</div>
+      <div>El verifier bloquea la respuesta al usuario</div>
+      <div>Latencia ×3, coste ×3, sin ganancia real</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">RAG sin reranker</div>
+      <div>Threshold bajo (0.2-0.3), muchos chunks recuperados</div>
+      <div>El synthesizer recibe ruido, la respuesta alucina</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Drift detection reactivo</div>
+      <div>Se descubre el drift cuando un operador reporta fallos</div>
+      <div>El sistema ya falló en silencio durante semanas</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Datos de entrenamiento sintéticos sin validación</div>
+      <div>El modelo funciona en demo, falla en producción</div>
+      <div>La distribución sintética no captura el mundo real</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Feedback implícito</div>
+      <div>Se asume que el operador confirma, pero no hay UI para capturarlo</div>
+      <div>El loop nunca se cierra</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Modelo sin calibración</div>
+      <div>Un 0.9 del modelo no significa 90% de acierto real</div>
+      <div>Los thresholds de la capa 4 son arbitrarios</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Governance bloqueante</div>
+      <div>El path síncrono espera al drift check</div>
+      <div>Un sistema de asistencia se convierte en frágil</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">LLM en path crítico sin guardrails</div>
+      <div>El LLM recibe cualquier input directo</div>
+      <div>Cualquier injection compromete el sistema</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Fine-tuning antes de RAG estable</div>
+      <div>Se entrena el LLM sin saber si el RAG funciona</div>
+      <div>Se aprende a diagnosticar sobre base rota</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Observabilidad SaaS con datos de cliente</div>
+      <div>Traces completos en servidores de terceros</div>
+      <div>Brecha de cumplimiento SOC2/ISO27001</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Prometheus como única fuente de verdad</div>
+      <div>No hay analytics históricos</div>
+      <div>No puedes responder "cuánto costó marzo"</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Sin checkpointing en agentes</div>
+      <div>Un agente que espera aprobación humana se pierde</div>
+      <div>El operador nunca completa el flujo</div>
+    </div>
+  </div>
+</div>
+
+<!-- 09 RELACIONADOS -->
+<div id="relacionados" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">09</div>
+    <div>
+      <div class="ch-title">Patrones relacionados</div>
+      <div class="ch-sub">Cómo se combinan con otros patrones conocidos</div>
+    </div>
+  </div>
+
+  <ul>
+    <li><strong>Event Sourcing</strong> — la capa 1 puede implementarse como log de eventos inmutable, permitiendo replay.</li>
+    <li><strong>Circuit Breaker</strong> — necesario en la capa 3 para tolerar caída de proveedores LLM.</li>
+    <li><strong>CQRS</strong> — natural en la separación path síncrono vs path de gobierno.</li>
+    <li><strong>Sidecar / Ambassador</strong> — útil para el Request Classifier de la capa 4.</li>
+    <li><strong>Golden Dataset / Evaluation Set</strong> — prerequisito para la capa 5.</li>
+    <li><strong>Human-in-the-loop</strong> — la capa 4 y 5 lo requieren explícitamente.</li>
+    <li><strong>Backpressure</strong> — obligatorio en la capa 1 si los sensores superan la capacidad de cómputo.</li>
+    <li><strong>Saga Pattern</strong> — aplicable en la orquestación de agentes cuando hay compensación entre pasos.</li>
+    <li><strong>Feature Store</strong> — aparece cuando >3 modelos comparten features.</li>
+  </ul>
+</div>
+
+<!-- 10 CRITERIOS -->
+<div id="exito" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">10</div>
+    <div>
+      <div class="ch-title">Criterios de éxito</div>
+      <div class="ch-sub">Cómo saber si el patrón está correctamente implementado</div>
+    </div>
+  </div>
+
+  <p>Un sistema que implementa SSEP correctamente cumple estas trece condiciones:</p>
+
+  <ol>
+    <li><strong>Puedo responder "¿por qué el sistema dijo esto?"</strong> para cualquier predicción de los últimos 90 días.</li>
+    <li><strong>El drift de datos se detecta antes de que un operador humano note el fallo</strong> en producción.</li>
+    <li><strong>Cada versión desplegada tiene un gate de promoción con métricas explícitas</strong>, no "lo probamos y va bien".</li>
+    <li><strong>Un falso positivo cuesta menos de 30 segundos de atención del operador</strong> (explicación clara + acción sugerida).</li>
+    <li><strong>El feedback de campo se incorpora al siguiente ciclo de entrenamiento</strong> sin intervención manual de ingeniería.</li>
+    <li><strong>Si el proveedor LLM cae, el sistema sigue prediciendo</strong> (solo se degrada la explicación).</li>
+    <li><strong>La capa de explicación puede abstenerse</strong> y decir "no tengo información suficiente" sin inventar.</li>
+    <li><strong>Cada request al LLM tiene un trace completo</strong> (input, output, tokens, coste, latencia, cache hit, proveedor) consultable por usuario y sesión.</li>
+    <li><strong>La calidad del RAG se mide en producción</strong> (faithfulness, precision, recall) y sus scores se vinculan a los traces.</li>
+    <li><strong>Los intentos de prompt injection se bloquean antes de llegar al LLM</strong> y se registran como eventos auditables.</li>
+    <li><strong>Las respuestas estructuradas no pasan al cliente si no validan el schema</strong> — fallo controlado en lugar de salida malformada.</li>
+    <li><strong>Las preguntas históricas de coste, drift y compliance se responden en &lt;1s</strong> sobre millones de filas.</li>
+    <li><strong>Si se fine-tunea el LLM, hay una comparación explícita base vs fine-tuned</strong> con las mismas métricas antes de promover.</li>
+  </ol>
+
+  <div class="callout ok">
+    <span class="clbl">✓ Regla de oro</span>
+    Si no puedes responder las trece preguntas con evidencia, no has implementado el patrón — has implementado una parte. El patrón completo incluye las cinco capas, la transversal de seguridad, y el gobierno continuo.
+  </div>
+</div>
+
+</div>
+</div>
+
+<footer>
+  SSEP · Patrón Streaming Sensor-to-Explanation Pipeline · v0.2 · Documento 1 de 3
+  <div class="ft-dots">
+    <div class="ft-dot" style="background:var(--l1)"></div>
+    <div class="ft-dot" style="background:var(--l2)"></div>
+    <div class="ft-dot" style="background:var(--l3)"></div>
+    <div class="ft-dot" style="background:var(--l4)"></div>
+    <div class="ft-dot" style="background:var(--l5)"></div>
+    <div class="ft-dot" style="background:var(--sec)"></div>
+  </div>
+</footer>
+
+</body>
+</html>

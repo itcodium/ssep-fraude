@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SSEP — Base Arquitectónica Reutilizable</title>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,300;1,6..72,400&family=Geist:wght@300;400;500;600;700;800;900&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff; --ink:#0c0c0b; --ink2:#2d2d2b; --ink3:#787870;
+  --rule:#e4e4de; --rule2:#f5f5ef;
+  --l1:#c0390b; --l1-l:#fdeee9;
+  --l2:#1a5c3a; --l2-l:#e4f5ec;
+  --l3:#1c6ea4; --l3-l:#eef2fb;
+  --l4:#7b2d8b; --l4-l:#f5eaf9;
+  --l5:#b45309; --l5-l:#fef3e2;
+  --sec:#0a2540; --sec-l:#e8eef5;
+  --mono:'Geist Mono',monospace;
+  --head:'Geist',sans-serif;
+  --body:'Newsreader',Georgia,serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--body);background:var(--bg);color:var(--ink);line-height:1.7;font-size:17px;}
+
+nav{background:var(--ink);position:sticky;top:0;z-index:200;}
+.nav-in{max-width:1180px;margin:0 auto;display:flex;align-items:center;padding:10px 28px;gap:4px;flex-wrap:wrap;}
+.nav-logo{font-family:var(--head);font-size:13px;font-weight:800;color:white;margin-right:14px;letter-spacing:-.3px;text-decoration:none;}
+.nav-a{font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.38);text-decoration:none;padding:4px 9px;border-radius:3px;transition:all .12s;white-space:nowrap;}
+.nav-a:hover{background:rgba(255,255,255,.1);color:white;}
+.nav-a.active{background:rgba(255,255,255,.15);color:white;}
+
+.hero{background:var(--ink);color:white;position:relative;overflow:hidden;}
+.hero-stripe{height:5px;background:linear-gradient(90deg,
+  var(--l1) 0 33.3%,var(--l2) 33.3% 66.6%,var(--l3) 66.6% 100%);}
+.hero-in{max-width:1180px;margin:0 auto;padding:70px 28px 56px;}
+.hero-eye{font-family:var(--mono);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.28);margin-bottom:18px;}
+.hero h1{font-family:var(--head);font-size:clamp(36px,5.2vw,62px);font-weight:900;line-height:.95;letter-spacing:-1.8px;margin-bottom:20px;}
+.hero h1 .accent{color:#5ba3ff;}
+.hero h1 .smaller{font-size:.5em;font-weight:500;color:rgba(255,255,255,.35);letter-spacing:-.5px;display:block;margin-top:14px;}
+.hero-desc{font-family:var(--body);font-size:18px;font-style:italic;font-weight:300;color:rgba(255,255,255,.55);max-width:680px;line-height:1.65;margin-bottom:36px;}
+.hero-note{font-family:var(--mono);font-size:11px;letter-spacing:1px;color:rgba(255,255,255,.35);padding:12px 16px;border-left:2px solid rgba(255,255,255,.2);max-width:680px;line-height:1.6;}
+.hero-note b{color:#5ba3ff;font-weight:500;}
+
+.layout{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:200px 1fr;gap:0;}
+@media(max-width:900px){.layout{grid-template-columns:1fr;}}
+.sidebar{border-right:1px solid var(--rule);padding:28px 14px;position:sticky;top:48px;height:calc(100vh - 48px);overflow-y:auto;}
+@media(max-width:900px){.sidebar{display:none;}}
+.sb-hdr{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin-bottom:8px;padding-left:8px;}
+.sb-a{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:5px;font-family:var(--head);font-size:12px;font-weight:500;text-decoration:none;color:var(--ink2);transition:background .12s;margin-bottom:1px;}
+.sb-a:hover{background:var(--rule2);}
+.sb-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+
+.content{padding:0 0 60px;}
+.chapter{padding:0 44px;}
+@media(max-width:680px){.chapter{padding:0 20px;}}
+.ch-hdr{padding:52px 0 22px;border-bottom:2px solid var(--ink);margin-bottom:30px;display:flex;align-items:flex-end;gap:16px;}
+.ch-n{font-family:var(--head);font-size:64px;font-weight:900;line-height:1;color:var(--rule);letter-spacing:-3px;flex-shrink:0;}
+.ch-title{font-family:var(--head);font-size:24px;font-weight:800;letter-spacing:-.5px;line-height:1.0;}
+.ch-sub{font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:1.5px;text-transform:uppercase;margin-top:5px;}
+
+p{margin-bottom:18px;color:var(--ink2);line-height:1.78;font-weight:300;}
+strong{color:var(--ink);font-weight:600;}
+h3{font-family:var(--head);font-size:18px;font-weight:700;margin:32px 0 12px;letter-spacing:-.3px;}
+h4{font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin:20px 0 8px;}
+ul,ol{margin:0 0 18px 22px;color:var(--ink2);}
+li{margin-bottom:7px;line-height:1.7;font-weight:300;}
+li strong{color:var(--ink);}
+a{color:var(--l3);}
+
+.base-viz{margin:30px 0;border:1.5px solid var(--ink);border-radius:14px;overflow:hidden;}
+.base-hdr{background:var(--ink);color:white;padding:12px 22px;font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;display:flex;justify-content:space-between;}
+.base-body{padding:26px 24px;background:#fafaf8;}
+.blayer{display:grid;grid-template-columns:52px 1fr 200px;gap:16px;align-items:center;margin-bottom:3px;padding:16px 20px;border-radius:8px;border:1.5px solid;}
+.blayer:last-child{margin-bottom:0;}
+.blayer-n{font-family:var(--head);font-size:38px;font-weight:900;line-height:1;letter-spacing:-2px;}
+.blayer-t{font-family:var(--head);font-size:15px;font-weight:700;line-height:1.2;}
+.blayer-d{font-family:var(--head);font-size:12px;color:var(--ink3);margin-top:3px;}
+.blayer-c{font-family:var(--mono);font-size:10.5px;color:var(--ink3);text-align:right;letter-spacing:.3px;line-height:1.5;}
+.blayer-c b{color:var(--ink2);font-weight:500;}
+@media(max-width:680px){.blayer{grid-template-columns:44px 1fr;} .blayer-c{display:none;}}
+.blayer.l1{background:var(--l1-l);border-color:var(--l1);} .blayer.l1 .blayer-n,.blayer.l1 .blayer-t{color:var(--l1);}
+.blayer.l2{background:var(--l2-l);border-color:var(--l2);} .blayer.l2 .blayer-n,.blayer.l2 .blayer-t{color:var(--l2);}
+.blayer.l3{background:var(--l3-l);border-color:var(--l3);} .blayer.l3 .blayer-n,.blayer.l3 .blayer-t{color:var(--l3);}
+.blayer.ext{background:var(--rule2);border-color:var(--rule);border-style:dashed;margin-top:12px;} .blayer.ext .blayer-n,.blayer.ext .blayer-t{color:var(--ink3);}
+
+.contract{margin:18px 0;border:1.5px solid var(--rule);border-radius:10px;overflow:hidden;}
+.contract-hdr{background:var(--rule2);padding:10px 18px;font-family:var(--mono);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);display:flex;justify-content:space-between;}
+.contract-body{background:#f8f8f4;padding:18px 20px;font-family:var(--mono);font-size:12.5px;line-height:1.75;color:var(--ink2);overflow-x:auto;white-space:pre;}
+.contract-body b{color:var(--l1);font-weight:500;}
+.contract-body i{color:var(--ink3);font-style:normal;}
+
+.rules{margin:22px 0;}
+.rule{display:grid;grid-template-columns:44px 1fr;gap:16px;padding:16px 0;border-bottom:1px solid var(--rule);}
+.rule:last-child{border-bottom:none;}
+.rule-n{font-family:var(--head);font-size:30px;font-weight:900;line-height:1;color:var(--rule);letter-spacing:-1.5px;}
+.rule-t{font-family:var(--head);font-size:15px;font-weight:700;color:var(--ink);margin-bottom:4px;}
+.rule-d{font-size:14.5px;color:var(--ink2);line-height:1.65;font-family:var(--body);font-weight:300;}
+
+.ladder{margin:24px 0;border:1.5px solid var(--ink);border-radius:12px;overflow:hidden;}
+.ladder-hdr{background:var(--ink);color:white;display:grid;grid-template-columns:130px 1fr 120px;padding:0;}
+.ladder-hdr>div{padding:10px 16px;font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;}
+.ladder-row{display:grid;grid-template-columns:130px 1fr 120px;border-bottom:1px solid var(--rule);}
+.ladder-row:last-child{border-bottom:none;}
+.ladder-row>div{padding:14px 16px;font-size:13px;color:var(--ink2);border-right:1px solid var(--rule);line-height:1.55;font-family:var(--head);}
+.ladder-row>div:last-child{border-right:none;}
+.ladder-row:nth-child(even){background:var(--rule2);}
+.ladder-step{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--ink);letter-spacing:.5px;}
+.ladder-doc{font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:.5px;}
+@media(max-width:680px){.ladder-hdr,.ladder-row{grid-template-columns:1fr!important;} .ladder-row>div,.ladder-hdr>div{border-right:none;border-bottom:1px solid var(--rule);}}
+
+.matrix{margin:20px 0;border:1.5px solid var(--ink);border-radius:12px;overflow:hidden;font-family:var(--head);}
+.matrix-hdr{background:var(--ink);color:white;display:grid;grid-template-columns:110px 1fr 1fr 1fr;padding:0;}
+.matrix-hdr>div{padding:10px 14px;font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;}
+.matrix-row{display:grid;grid-template-columns:110px 1fr 1fr 1fr;border-bottom:1px solid var(--rule);}
+.matrix-row:last-child{border-bottom:none;}
+.matrix-row>div{padding:12px 14px;font-size:12.5px;color:var(--ink2);border-right:1px solid var(--rule);line-height:1.5;}
+.matrix-row>div:last-child{border-right:none;}
+.matrix-row:nth-child(even){background:var(--rule2);}
+.matrix-lbl{font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--ink3);}
+@media(max-width:680px){.matrix-hdr,.matrix-row{grid-template-columns:1fr!important;} .matrix-row>div,.matrix-hdr>div{border-right:none;border-bottom:1px solid var(--rule);}}
+
+.callout{margin:22px 0;padding:16px 20px;border-radius:6px;border-left:4px solid;font-size:15px;line-height:1.68;font-family:var(--head);}
+.callout.ok{background:var(--l2-l);border-color:var(--l2);color:#0a3020;}
+.callout.info{background:var(--l3-l);border-color:var(--l3);color:#0d3258;}
+.callout.warn{background:var(--l5-l);border-color:var(--l5);color:#5c2d00;}
+.clbl{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;font-weight:600;margin-bottom:5px;display:block;}
+
+.pq{margin:36px 0;padding:24px 32px;border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);font-family:var(--head);font-size:clamp(17px,2.2vw,20px);font-weight:700;line-height:1.3;text-align:center;letter-spacing:-.3px;}
+
+footer{background:var(--ink);color:rgba(255,255,255,.28);padding:22px 28px;font-family:var(--mono);font-size:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
+.ft-dots{display:flex;gap:5px;}
+.ft-dot{width:8px;height:8px;border-radius:50%;}
+code{font-family:var(--mono);font-size:12.5px;background:var(--rule2);padding:2px 6px;border-radius:3px;color:var(--l1);}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-in">
+    <a class="nav-logo" href="index.html">SSEP</a>
+    <a class="nav-a active" href="0-base.html">0 · Base</a>
+    <a class="nav-a" href="0.5-plan.html">0.5 · Plan</a>
+    <a class="nav-a" href="0.6-setup.html">0.6 · Setup</a>
+    <a class="nav-a" href="0.7-escalado.html">0.7 · Escalado</a>
+    <a class="nav-a" href="1-patron.html">1 · Patrón</a>
+    <a class="nav-a" href="2-implementacion.html">2 · Implementación</a>
+    <a class="nav-a" href="3-metalkube.html">3 · MetalKube</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-stripe"></div>
+  <div class="hero-in">
+    <div class="hero-eye">Documento 0 · Base Arquitectónica Reutilizable · v0.2</div>
+    <h1>La arquitectura mínima<br>que se puede <span class="accent">reutilizar</span>.
+      <span class="smaller">3 capas · 2 contratos · 3 reglas · punto de partida del patrón SSEP</span>
+    </h1>
+    <p class="hero-desc">
+      El patrón SSEP completo son 5 capas. Esta base son las 3 síncronas esenciales, la arquitectura mínima que se puede aplicar a cualquier problema y sobre la que se construye todo lo demás.
+    </p>
+    <div class="hero-note">
+      <b>Propósito:</b> eliminar la complejidad del patrón completo hasta que quepa en un portátil. Todo lo que no esté aquí es extensión, no base.
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+
+<div class="sidebar">
+  <div class="sb-hdr">Contenido</div>
+  <a class="sb-a" href="#proposito"><span class="sb-dot" style="background:var(--ink3)"></span>Propósito</a>
+  <a class="sb-a" href="#contexto"><span class="sb-dot" style="background:var(--l1)"></span>Contexto</a>
+  <a class="sb-a" href="#arquitectura"><span class="sb-dot" style="background:var(--l2)"></span>Arquitectura</a>
+  <a class="sb-a" href="#contratos"><span class="sb-dot" style="background:var(--l3)"></span>Contratos</a>
+  <a class="sb-a" href="#reglas"><span class="sb-dot" style="background:var(--l4)"></span>Reglas</a>
+  <a class="sb-a" href="#extensiones"><span class="sb-dot" style="background:var(--l5)"></span>Extensiones</a>
+  <a class="sb-a" href="#aplicabilidad"><span class="sb-dot" style="background:var(--sec)"></span>Aplicabilidad</a>
+  <a class="sb-a" href="#siguiente"><span class="sb-dot" style="background:var(--ink)"></span>Siguiente paso</a>
+</div>
+
+<div class="content">
+
+<!-- 00 PROPOSITO -->
+<div id="proposito" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">00</div>
+    <div>
+      <div class="ch-title">Propósito</div>
+      <div class="ch-sub">Por qué existe este documento</div>
+    </div>
+  </div>
+
+  <p>El <a href="1-patron.html">Doc 1</a> describe el patrón SSEP completo: 5 capas, 6 herramientas transversales, sistema industrial. Ese es el destino. Este documento es el <strong>punto de partida</strong>.</p>
+
+  <p>La base tiene un solo objetivo: <strong>demostrar que el flujo señal → clasificación → explicación tiene sentido en tu dominio</strong>. Si no lo tiene, ninguna cantidad de Kafka, Qdrant o LangGraph lo va a arreglar.</p>
+
+  <div class="callout info">
+    <span class="clbl">Regla del documento</span>
+    Si algo de este documento no se puede implementar con <strong>3 funciones Python y 3 carpetas</strong>, no es base — es extensión. Las extensiones viven en los <a href="0.7-escalado.html">Docs 0.6</a>, <a href="0.7-escalado.html">0.7</a>, <a href="1-patron.html">1</a>, <a href="2-implementacion.html">2</a> y <a href="3-metalkube.html">3</a>.
+  </div>
+</div>
+
+<!-- 01 CONTEXTO -->
+<div id="contexto" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">01</div>
+    <div>
+      <div class="ch-title">Contexto</div>
+      <div class="ch-sub">Cuándo aplica · cuándo NO aplica</div>
+    </div>
+  </div>
+
+  <p>El patrón SSEP aplica cuando concurren <strong>todas</strong> estas condiciones. No es un patrón universal — es específico para un tipo de problema que aparece repetidamente en dominios industriales, médicos, financieros y agronómicos.</p>
+
+  <h4>Señales de que aplica</h4>
+  <ol>
+    <li>Existe una <strong>señal física continua</strong> (audio, vibración, temperatura, imagen, telemetría, transacciones) generada por múltiples fuentes distribuidas.</li>
+    <li>Un <strong>modelo ML</strong> puede clasificar el estado de esas fuentes con precisión útil, pero <strong>no puede explicar</strong> por qué.</li>
+    <li>Existe <strong>conocimiento experto documentado</strong> (manuales, guías, normativa, casos previos) que un humano consultaría para decidir qué hacer.</li>
+    <li>El <strong>coste de un falso negativo es alto</strong> (fallo no detectado = pérdida económica, riesgo físico, daño reputacional).</li>
+    <li>El <strong>coste de un falso positivo también importa</strong> (fatiga de alertas, intervenciones innecesarias).</li>
+    <li>Las condiciones de producción <strong>difieren inevitablemente</strong> de las de entrenamiento.</li>
+    <li>Un <strong>operador humano</strong> toma la decisión final, asistido por el sistema, no reemplazado por él.</li>
+    <li>Existe un <strong>LLM base de propósito general</strong> que puede especializarse con datos del dominio.</li>
+    <li>El sistema opera en un <strong>entorno regulado</strong> (SOC2, ISO 27001, HIPAA) donde la soberanía de datos es un requisito.</li>
+    <li>Los flujos de decisión pueden ser <strong>multi-paso</strong> y requieren estado persistente entre pasos.</li>
+  </ol>
+
+  <h4>Señales de que NO aplica</h4>
+  <ul>
+    <li>La señal es puntual, no continua.</li>
+    <li>El modelo puede actuar autónomamente sin supervisión humana.</li>
+    <li>No existe documentación experta que consultar — el RAG no aportaría nada.</li>
+    <li>El coste de un error es despreciable.</li>
+    <li>Las condiciones de producción son idénticas a las de entrenamiento.</li>
+    <li>No hay requisitos de cumplimiento ni auditoría.</li>
+    <li>No hay volumen suficiente para justificar el coste operacional completo.</li>
+  </ul>
+
+  <div class="callout warn">
+    <span class="clbl">⚠ Decisión crítica</span>
+    Si faltan las condiciones 4 y 5 (coste alto de falso negativo <em>y</em> falso positivo), el patrón es <strong>sobredimensionado</strong>. Un sistema de clasificación simple con revisión manual es suficiente. SSEP se justifica por la asimetría de costes y la necesidad de explicación grounded.
+  </div>
+</div>
+
+<!-- 02 ARQUITECTURA -->
+<div id="arquitectura" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">02</div>
+    <div>
+      <div class="ch-title">Arquitectura Base</div>
+      <div class="ch-sub">3 capas · 1 flujo síncrono</div>
+    </div>
+  </div>
+
+  <p>La base reduce las 5 capas del patrón SSEP a las <strong>3 capas síncronas esenciales</strong>. Las otras 2 capas del patrón (Decision y Governance) se añaden después — son extensiones que se justifican cuando el sistema demuestra valor sin ellas.</p>
+
+  <div class="base-viz">
+    <div class="base-hdr"><span>Arquitectura Base Reutilizable</span><span>3 capas + extensiones</span></div>
+    <div class="base-body">
+
+      <div class="blayer l1">
+        <div class="blayer-n">1</div>
+        <div>
+          <div class="blayer-t">Ingesta</div>
+          <div class="blayer-d">Recibe la señal cruda · la normaliza · produce un evento</div>
+        </div>
+        <div class="blayer-c"><b>Entrada:</b> señal<br><b>Salida:</b> evento</div>
+      </div>
+
+      <div class="blayer l2">
+        <div class="blayer-n">2</div>
+        <div>
+          <div class="blayer-t">Modelo</div>
+          <div class="blayer-d">Clasifica el evento · produce una etiqueta con confianza</div>
+        </div>
+        <div class="blayer-c"><b>Entrada:</b> evento<br><b>Salida:</b> predicción</div>
+      </div>
+
+      <div class="blayer l3">
+        <div class="blayer-n">3</div>
+        <div>
+          <div class="blayer-t">Explicación</div>
+          <div class="blayer-d">Recupera documentos · genera explicación grounded · se abstiene si no hay fuentes</div>
+        </div>
+        <div class="blayer-c"><b>Entrada:</b> predicción<br><b>Salida:</b> explicación</div>
+      </div>
+
+      <div class="blayer ext">
+        <div class="blayer-n">↕</div>
+        <div>
+          <div class="blayer-t">Extensiones (Docs 1, 2, 3)</div>
+          <div class="blayer-d">Decision · Governance · Security · Observabilidad · Analytics</div>
+        </div>
+        <div class="blayer-c"><b>No son base</b><br>Se añaden después</div>
+      </div>
+
+    </div>
+  </div>
+
+  <p><strong>Lo que la base NO tiene:</strong> Kafka, Qdrant, LangGraph, Langfuse, Evidently, ClickHouse, guardrails, drift detection, agentes, fine-tuning. Todo eso son extensiones que se justifican <em>después</em> de que la base funcione.</p>
+
+  <div class="callout ok">
+    <span class="clbl">✓ La base es un contrato, no una infraestructura</span>
+    La base define <strong>qué pasa entre capas</strong>, no <strong>cómo se implementa cada capa</strong>. Eso la hace reutilizable: cada dominio rellena las 3 capas con su contenido, pero los contratos se mantienen.
+  </div>
+</div>
+
+<!-- 03 CONTRATOS -->
+<div id="contratos" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">03</div>
+    <div>
+      <div class="ch-title">Contratos entre capas</div>
+      <div class="ch-sub">Lo único que la base define con precisión</div>
+    </div>
+  </div>
+
+  <p>Los contratos son la parte más importante de la base. Definen la <strong>forma exacta</strong> de los datos que cada capa entrega a la siguiente. Si cambias un contrato, cambias la arquitectura.</p>
+
+  <div class="contract">
+    <div class="contract-hdr"><span>Capa 1 → Capa 2</span><span>evento</span></div>
+    <div class="contract-body">{
+  <b>source_id</b>:  string,      <i># identidad del origen</i>
+  <b>timestamp</b>:  ISO8601,     <i># cuándo se capturó</i>
+  <b>features</b>:   object,      <i># representación compacta de la señal</i>
+  <b>metadata</b>:   object       <i># contexto adicional (opcional)</i>
+}</div>
+  </div>
+
+  <div class="contract">
+    <div class="contract-hdr"><span>Capa 2 → Capa 3</span><span>predicción</span></div>
+    <div class="contract-body">{
+  <b>label</b>:         string,   <i># clase asignada</i>
+  <b>confidence</b>:    float,    <i># 0.0 – 1.0, calibrada</i>
+  <b>uncertainty</b>:   float,    <i># 0.0 – 1.0, epistémica</i>
+  <b>model_version</b>: string,   <i># trazabilidad</i>
+  <b>source_id</b>:     string    <i># heredado de la capa 1</i>
+}</div>
+  </div>
+
+  <div class="contract">
+    <div class="contract-hdr"><span>Capa 3 → Consumidor</span><span>explicación</span></div>
+    <div class="contract-body">{
+  <b>explanation</b>:    string,   <i># texto grounded en fuentes</i>
+  <b>sources</b>:        array,    <i># documentos citados</i>
+  <b>grounding_score</b>: float,   <i># 0.0 – 1.0, adherencia a fuentes</i>
+  <b>label</b>:          string    <i># etiqueta original, sin modificar</i>
+}</div>
+  </div>
+
+  <p><strong>Por qué estos contratos y no otros:</strong> la capa 3 necesita <code>confidence</code> <em>y</em> <code>uncertainty</code> porque son cosas distintas — una predicción puede ser confiada pero epistémicamente incierta. La capa 3 devuelve <code>grounding_score</code> porque el consumidor necesita saber si la explicación está respaldada. Y devuelve el <code>label</code> sin modificarlo porque <em>la capa 3 nunca decide</em>.</p>
+</div>
+
+<!-- 04 REGLAS -->
+<div id="reglas" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">04</div>
+    <div>
+      <div class="ch-title">Reglas invariantes</div>
+      <div class="ch-sub">3 reglas · se cumplen en cualquier dominio</div>
+    </div>
+  </div>
+
+  <p>Estas tres reglas son lo que distingue esta arquitectura de cualquier pipeline ML convencional. Si se rompen, la base deja de ser reutilizable.</p>
+
+  <div class="rules">
+    <div class="rule">
+      <div class="rule-n">1</div>
+      <div>
+        <div class="rule-t">Cada capa tiene una sola responsabilidad</div>
+        <div class="rule-d">Ingesta no clasifica. Modelo no explica. Explicación no decide. Cualquier intento de mezclar responsabilidades convierte la arquitectura en un monolito disfrazado de pipeline.</div>
+      </div>
+    </div>
+    <div class="rule">
+      <div class="rule-n">2</div>
+      <div>
+        <div class="rule-t">La capa de explicación nunca modifica la predicción</div>
+        <div class="rule-d">Puede enriquecerla con contexto, pero no puede cambiar la etiqueta ni la confianza. Si el sistema empieza a "corregir" al modelo desde la capa 3, se pierde la trazabilidad y el modelo deja de ser auditable.</div>
+      </div>
+    </div>
+    <div class="rule">
+      <div class="rule-n">3</div>
+      <div>
+        <div class="rule-t">Si no hay fuentes, la capa 3 se abstiene explícitamente</div>
+        <div class="rule-d">El sistema debe poder decir "no tengo información suficiente" en lugar de generar. Esta es la diferencia entre un sistema útil y un generador de alucinaciones. La abstención es una respuesta válida, no un fallo.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pq">
+    Tres reglas. Si se cumplen, el sistema es auditable, compone, y crece sin rehacerse. Si se rompen, cualquier complejidad que se añada encima amplifica el problema original.
+  </div>
+</div>
+
+<!-- 05 EXTENSIONES -->
+<div id="extensiones" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">05</div>
+    <div>
+      <div class="ch-title">Cómo se extiende</div>
+      <div class="ch-sub">De la base al sistema completo · 9 peldaños</div>
+    </div>
+  </div>
+
+  <p>La base no crece "hacia arriba" (más capas apiladas). Crece "hacia los lados" (más componentes dentro de cada capa existente). Esto es lo que mantiene la arquitectura reutilizable: las capas son fijas, los componentes cambian.</p>
+
+  <div class="ladder">
+    <div class="ladder-hdr">
+      <div>Peldaño</div>
+      <div>Qué se añade a la base</div>
+      <div>Doc</div>
+    </div>
+    <div class="ladder-row">
+      <div class="ladder-step">00 · BASE</div>
+      <div>3 capas · 3 contratos · 3 reglas · implementación mínima de referencia</div>
+      <div class="ladder-doc">este doc</div>
+    </div>
+    <div class="ladder-row">
+      <div class="ladder-step">01 · Modelo real</div>
+      <div>Reemplazar el clasificador trivial por un modelo entrenado (aunque sea pequeño)</div>
+      <div class="ladder-doc"><a href="0.6-setup.html">0.6 §4</a></div>
+    </div>
+    <div class="ladder-row">
+      <div class="ladder-step">02 · RAG real</div>
+      <div>Añadir embeddings + búsqueda vectorial (pgvector, FAISS, Chroma)</div>
+      <div class="ladder-doc"><a href="0.6-setup.html">0.6 §5</a></div>
+    </div>
+    <div class="ladder-row">
+      <div class="ladder-step">03 · LLM real</div>
+      <div>Reemplazar la plantilla de texto por un LLM (Ollama local o API)</div>
+      <div class="ladder-doc"><a href="0.6-setup.html">0.6 §6</a></div>
+    </div>
+    <div class="ladder-row">
+      <div class="ladder-step">04 · Observabilidad</div>
+      <div>Añadir Langfuse con <code>@observe()</code> · trazas por request</div>
+      <div class="ladder-doc"><a href="0.6-setup.html">0.6 §7</a></div>
+    </div>
+    <div class="ladder-row">
+      <div class="ladder-step">05 · Evaluación</div>
+      <div>Añadir RAGAS sobre 20-100 queries · baseline de calidad</div>
+      <div class="ladder-doc"><a href="0.6-setup.html">0.6 §8</a></div>
+    </div>
+    <div class="ladder-row">
+      <div class="ladder-step">06 · Decision</div>
+      <div>Añadir routing + alertas · solo cuando haya valor demostrado</div>
+      <div class="ladder-doc"><a href="2-implementacion.html">2 §4</a></div>
+    </div>
+    <div class="ladder-row">
+      <div class="ladder-step">07 · Governance</div>
+      <div>Drift + feedback loop · solo cuando haya datos reales</div>
+      <div class="ladder-doc"><a href="2-implementacion.html">2 §5</a></div>
+    </div>
+    <div class="ladder-row">
+      <div class="ladder-step">08 · Escala</div>
+      <div>Kafka + Flink + Qdrant + K8s + ClickHouse · solo cuando el volumen lo justifique</div>
+      <div class="ladder-doc"><a href="0.7-escalado.html">0.7</a></div>
+    </div>
+  </div>
+
+  <div class="callout warn">
+    <span class="clbl">⚠ Regla de crecimiento</span>
+    Cada peldaño se añade <strong>solo cuando el peldaño anterior está validado</strong>. El error más común es saltar del peldaño 0 al 5 y terminar con un sistema complejo que no funciona en el peldaño 0.
+  </div>
+</div>
+
+<!-- 06 APLICABILIDAD -->
+<div id="aplicabilidad" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">06</div>
+    <div>
+      <div class="ch-title">Aplicabilidad</div>
+      <div class="ch-sub">La misma base · 3 dominios distintos</div>
+    </div>
+  </div>
+
+  <p>Lo que hace reutilizable a la base es que las <strong>3 capas no cambian entre dominios</strong>. Lo único que cambia es qué se mete dentro de cada capa. Esta tabla lo muestra:</p>
+
+  <div class="matrix">
+    <div class="matrix-hdr">
+      <div>Capa</div>
+      <div>Motores</div>
+      <div>Fraude</div>
+      <div>Médico</div>
+    </div>
+    <div class="matrix-row">
+      <div class="matrix-lbl">1 · Ingesta</div>
+      <div>audio → mel-spectrograma</div>
+      <div>transacción → features tabulares</div>
+      <div>imagen + historia → tensor + vector</div>
+    </div>
+    <div class="matrix-row">
+      <div class="matrix-lbl">2 · Modelo</div>
+      <div>CNN sobre audio</div>
+      <div>XGBoost + reglas</div>
+      <div>CNN imagen + tabular</div>
+    </div>
+    <div class="matrix-row">
+      <div class="matrix-lbl">3 · Explicación</div>
+      <div>manuales de fabricante</div>
+      <div>normativa + precedentes</div>
+      <div>guías clínicas + literatura</div>
+    </div>
+    <div class="matrix-row">
+      <div class="matrix-lbl">Contrato 1→2</div>
+      <div colspan="3" style="grid-column:2 / 5;color:var(--ink3);font-family:var(--mono);font-size:11px;">mismo evento {source_id, timestamp, features, metadata}</div>
+    </div>
+    <div class="matrix-row">
+      <div class="matrix-lbl">Contrato 2→3</div>
+      <div colspan="3" style="grid-column:2 / 5;color:var(--ink3);font-family:var(--mono);font-size:11px;">misma predicción {label, confidence, uncertainty, model_version, source_id}</div>
+    </div>
+    <div class="matrix-row">
+      <div class="matrix-lbl">Contrato 3→C</div>
+      <div colspan="3" style="grid-column:2 / 5;color:var(--ink3);font-family:var(--mono);font-size:11px;">misma explicación {explanation, sources, grounding_score, label}</div>
+    </div>
+  </div>
+
+  <p>Los tres dominios comparten los mismos contratos y las mismas reglas. Solo cambia el <em>contenido</em> de cada capa. Esa es la prueba de que la arquitectura es reutilizable.</p>
+</div>
+
+<!-- 07 SIGUIENTE -->
+<div id="siguiente" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">07</div>
+    <div>
+      <div class="ch-title">Siguiente paso</div>
+      <div class="ch-sub">De la arquitectura al código</div>
+    </div>
+  </div>
+
+  <p>Esta arquitectura no sirve de nada hasta que corre. El siguiente paso es implementarla en su forma más pequeña posible: la <strong>Implementación Mínima de Referencia (IMR)</strong>.</p>
+
+  <div class="callout ok">
+    <span class="clbl">✓ Qué es la IMR</span>
+    La IMR es la implementación en código de esta base. <strong>3 archivos Python, 3 carpetas, ~150 líneas.</strong> Corre en cualquier portátil sin infraestructura. Demuestra el flujo end-to-end con datos sintéticos y documentos de ejemplo.
+  </div>
+
+  <p>Una vez la IMR funciona en tu dominio, tienes tres caminos:</p>
+
+  <ul>
+    <li><strong>Si aporta valor</strong> → subir al <a href="0.6-setup.html">Peldaño 1</a> y empezar la escalera de extensiones.</li>
+    <li><strong>Si no aporta valor</strong> → el problema no necesita esta arquitectura. Detente aquí, has ahorrado meses.</li>
+    <li><strong>Si aporta valor parcial</strong> → ajusta la base (contratos, reglas) antes de escalar. La base está pensada para adaptarse a dominios.</li>
+  </ul>
+
+  <div class="pq">
+    La base arquitectónica es un marco, no un sistema. Su trabajo es decirte rápido si el patrón SSEP aplica a tu problema. El resto de documentos solo tienen sentido después de que esta base te haya dado un "sí".
+  </div>
+
+  <h3>Documentos siguientes en el set</h3>
+  <ul>
+    <li><strong><a href="0.5-plan.html">Doc 0.5 · Plan</a></strong> — Tareas y tiempos por fase y por peldaño.</li>
+    <li><strong><a href="0.6-setup.html">Doc 0.6 · Setup (P0-P5)</a></strong> — Comandos concretos para instalar cada peldaño.</li>
+    <li><strong><a href="0.7-escalado.html">Doc 0.7 · Escalado (P6-P10)</a></strong> — Herramientas para producción industrial.</li>
+    <li><strong><a href="1-patron.html">Doc 1 · Patrón</a></strong> — El patrón completo con las 5 capas.</li>
+    <li><strong><a href="2-implementacion.html">Doc 2 · Implementación</a></strong> — Catálogo de herramientas por capa.</li>
+    <li><strong><a href="3-metalkube.html">Doc 3 · MetalKube</a></strong> — Caso concreto end-to-end.</li>
+  </ul>
+</div>
+
+</div>
+</div>
+
+<footer>
+  SSEP · Base Arquitectónica Reutilizable · Documento 0 de 8
+  <div class="ft-dots">
+    <div class="ft-dot" style="background:var(--l1)"></div>
+    <div class="ft-dot" style="background:var(--l2)"></div>
+    <div class="ft-dot" style="background:var(--l3)"></div>
+    <div class="ft-dot" style="background:var(--ink3)"></div>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SSEP — Plan de Implementación de la Base</title>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,300;1,6..72,400&family=Geist:wght@300;400;500;600;700;800;900&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff; --ink:#0c0c0b; --ink2:#2d2d2b; --ink3:#787870;
+  --rule:#e4e4de; --rule2:#f5f5ef;
+  --l1:#c0390b; --l1-l:#fdeee9;
+  --l2:#1a5c3a; --l2-l:#e4f5ec;
+  --l3:#1c6ea4; --l3-l:#eef2fb;
+  --l4:#7b2d8b; --l4-l:#f5eaf9;
+  --l5:#b45309; --l5-l:#fef3e2;
+  --sec:#0a2540; --sec-l:#e8eef5;
+  --mono:'Geist Mono',monospace;
+  --head:'Geist',sans-serif;
+  --body:'Newsreader',Georgia,serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--body);background:var(--bg);color:var(--ink);line-height:1.7;font-size:17px;}
+
+nav{background:var(--ink);position:sticky;top:0;z-index:200;}
+.nav-in{max-width:1180px;margin:0 auto;display:flex;align-items:center;padding:10px 28px;gap:4px;flex-wrap:wrap;}
+.nav-logo{font-family:var(--head);font-size:13px;font-weight:800;color:white;margin-right:14px;letter-spacing:-.3px;}
+.nav-a{font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.38);text-decoration:none;padding:4px 9px;border-radius:3px;transition:all .12s;white-space:nowrap;}
+.nav-a:hover{background:rgba(255,255,255,.1);color:white;}
+
+.hero{background:var(--ink);color:white;position:relative;overflow:hidden;}
+.hero-stripe{height:5px;background:linear-gradient(90deg,
+  var(--l1) 0 33.3%,var(--l2) 33.3% 66.6%,var(--l3) 66.6% 100%);}
+.hero-in{max-width:1180px;margin:0 auto;padding:70px 28px 56px;}
+.hero-eye{font-family:var(--mono);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.28);margin-bottom:18px;}
+.hero h1{font-family:var(--head);font-size:clamp(36px,5.2vw,60px);font-weight:900;line-height:.95;letter-spacing:-1.8px;margin-bottom:20px;}
+.hero h1 .accent{color:#5ba3ff;}
+.hero h1 .smaller{font-size:.5em;font-weight:500;color:rgba(255,255,255,.35);letter-spacing:-.5px;display:block;margin-top:14px;}
+.hero-desc{font-family:var(--body);font-size:18px;font-style:italic;font-weight:300;color:rgba(255,255,255,.55);max-width:680px;line-height:1.65;margin-bottom:36px;}
+.hero-meta{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;background:rgba(255,255,255,.06);border-radius:12px;overflow:hidden;}
+@media(max-width:700px){.hero-meta{grid-template-columns:1fr 1fr;}}
+.hm{padding:18px 16px;background:rgba(255,255,255,.03);}
+.hm-k{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:6px;}
+.hm-v{font-family:var(--head);font-size:13px;font-weight:600;line-height:1.3;}
+.hm-v span{color:rgba(255,255,255,.5);font-weight:400;}
+
+.layout{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:200px 1fr;gap:0;}
+@media(max-width:900px){.layout{grid-template-columns:1fr;}}
+.sidebar{border-right:1px solid var(--rule);padding:28px 14px;position:sticky;top:48px;height:calc(100vh - 48px);overflow-y:auto;}
+@media(max-width:900px){.sidebar{display:none;}}
+.sb-hdr{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin-bottom:8px;padding-left:8px;}
+.sb-a{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:5px;font-family:var(--head);font-size:12px;font-weight:500;text-decoration:none;color:var(--ink2);transition:background .12s;margin-bottom:1px;}
+.sb-a:hover{background:var(--rule2);}
+.sb-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+
+.content{padding:0 0 60px;}
+.chapter{padding:0 44px;}
+@media(max-width:680px){.chapter{padding:0 20px;}}
+.ch-hdr{padding:52px 0 22px;border-bottom:2px solid var(--ink);margin-bottom:30px;display:flex;align-items:flex-end;gap:16px;}
+.ch-n{font-family:var(--head);font-size:64px;font-weight:900;line-height:1;color:var(--rule);letter-spacing:-3px;flex-shrink:0;}
+.ch-title{font-family:var(--head);font-size:24px;font-weight:800;letter-spacing:-.5px;line-height:1.0;}
+.ch-sub{font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:1.5px;text-transform:uppercase;margin-top:5px;}
+
+p{margin-bottom:18px;color:var(--ink2);line-height:1.78;font-weight:300;}
+strong{color:var(--ink);font-weight:600;}
+h3{font-family:var(--head);font-size:18px;font-weight:700;margin:32px 0 12px;letter-spacing:-.3px;padding-left:14px;border-left:3px solid var(--ink);}
+h4{font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin:20px 0 8px;}
+ul,ol{margin:0 0 18px 22px;color:var(--ink2);}
+li{margin-bottom:7px;line-height:1.7;font-weight:300;}
+li strong{color:var(--ink);}
+
+/* Timeline horizontal */
+.timeline{margin:32px 0;border:1.5px solid var(--ink);border-radius:14px;overflow:hidden;}
+.timeline-hdr{background:var(--ink);color:white;padding:12px 22px;font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;display:flex;justify-content:space-between;}
+.timeline-body{padding:0;}
+.tl-row{display:grid;grid-template-columns:180px 1fr 130px;border-bottom:1px solid var(--rule);}
+.tl-row:last-child{border-bottom:none;}
+.tl-lbl{padding:16px 20px;background:var(--rule2);border-right:1px solid var(--rule);font-family:var(--head);}
+.tl-lbl-t{font-size:13px;font-weight:700;color:var(--ink);line-height:1.25;}
+.tl-lbl-s{font-family:var(--mono);font-size:9px;letter-spacing:1px;color:var(--ink3);text-transform:uppercase;margin-top:4px;}
+.tl-body{padding:16px 22px;font-family:var(--head);font-size:13.5px;color:var(--ink2);line-height:1.55;}
+.tl-time{padding:16px 20px;font-family:var(--mono);font-size:12px;color:var(--ink);background:white;border-left:1px solid var(--rule);text-align:right;font-weight:500;letter-spacing:.5px;}
+.tl-time b{display:block;font-size:15px;font-weight:700;color:var(--l1);}
+.tl-time span{font-size:10px;color:var(--ink3);letter-spacing:1px;text-transform:uppercase;font-weight:400;}
+@media(max-width:680px){.tl-row{grid-template-columns:1fr!important;} .tl-lbl,.tl-time{border:none;border-bottom:1px solid var(--rule);}}
+
+/* Fase cards */
+.fase{margin:24px 0;border:1.5px solid;border-radius:12px;overflow:hidden;}
+.fase-hdr{padding:14px 22px;color:white;display:flex;align-items:center;gap:14px;font-family:var(--head);}
+.fase-hdr-n{font-family:var(--mono);font-size:11px;opacity:.65;letter-spacing:2px;}
+.fase-hdr-t{font-size:16px;font-weight:800;letter-spacing:-.2px;}
+.fase-hdr-time{margin-left:auto;font-family:var(--mono);font-size:11px;letter-spacing:1px;opacity:.85;}
+.fase-body{padding:0;background:white;}
+.fase-task{display:grid;grid-template-columns:44px 1fr 130px;border-bottom:1px solid var(--rule);}
+.fase-task:last-child{border-bottom:none;}
+.fase-task-n{padding:14px 0;font-family:var(--mono);font-size:11px;color:var(--ink3);text-align:center;background:var(--rule2);border-right:1px solid var(--rule);letter-spacing:.5px;}
+.fase-task-b{padding:14px 18px;font-family:var(--head);font-size:13.5px;color:var(--ink2);line-height:1.55;}
+.fase-task-b b{color:var(--ink);font-weight:600;}
+.fase-task-b code{font-family:var(--mono);font-size:11.5px;background:var(--rule2);padding:1px 5px;border-radius:3px;color:var(--l1);}
+.fase-task-time{padding:14px 18px;font-family:var(--mono);font-size:11px;color:var(--ink3);text-align:right;letter-spacing:.5px;}
+@media(max-width:680px){.fase-task{grid-template-columns:36px 1fr;} .fase-task-time{grid-column:2;text-align:left;padding:8px 18px 14px;border-top:1px dashed var(--rule);}}
+
+.fase.f-a{border-color:var(--l1);} .fase.f-a .fase-hdr{background:var(--l1);}
+.fase.f-b{border-color:var(--l2);} .fase.f-b .fase-hdr{background:var(--l2);}
+.fase.f-c{border-color:var(--l3);} .fase.f-c .fase-hdr{background:var(--l3);}
+.fase.f-p1{border-color:var(--l4);} .fase.f-p1 .fase-hdr{background:var(--l4);}
+.fase.f-p2{border-color:var(--l5);} .fase.f-p2 .fase-hdr{background:var(--l5);}
+.fase.f-p3{border-color:#5c34c0;} .fase.f-p3 .fase-hdr{background:#5c34c0;}
+.fase.f-p4{border-color:var(--sec);} .fase.f-p4 .fase-hdr{background:var(--sec);}
+.fase.f-p5{border-color:#0d7a5f;} .fase.f-p5 .fase-hdr{background:#0d7a5f;}
+
+/* Tables */
+.tbl{margin:20px 0;border:1.5px solid var(--ink);border-radius:12px;overflow:hidden;font-family:var(--head);}
+.tbl-hdr{background:var(--ink);color:white;display:grid;padding:0;}
+.tbl-hdr>div{padding:10px 14px;font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;}
+.tbl-row{display:grid;border-bottom:1px solid var(--rule);}
+.tbl-row:last-child{border-bottom:none;}
+.tbl-row>div{padding:12px 14px;font-size:13px;color:var(--ink2);border-right:1px solid var(--rule);line-height:1.5;}
+.tbl-row>div:last-child{border-right:none;}
+.tbl-tech{font-size:13px;font-weight:700;color:var(--ink);font-family:var(--head);}
+.tbl-row:nth-child(even){background:var(--rule2);}
+.c3{grid-template-columns:200px 1fr 1fr;}
+.c4{grid-template-columns:180px 1fr 1fr 1fr;}
+@media(max-width:680px){.tbl-hdr,.tbl-row{grid-template-columns:1fr!important;} .tbl-row>div,.tbl-hdr>div{border-right:none;border-bottom:1px solid var(--rule);}}
+
+/* Callout */
+.callout{margin:22px 0;padding:16px 20px;border-radius:6px;border-left:4px solid;font-size:15px;line-height:1.68;font-family:var(--head);}
+.callout.ok{background:var(--l2-l);border-color:var(--l2);color:#0a3020;}
+.callout.info{background:var(--l3-l);border-color:var(--l3);color:#0d3258;}
+.callout.warn{background:var(--l5-l);border-color:var(--l5);color:#5c2d00;}
+.callout.danger{background:var(--l1-l);border-color:var(--l1);color:#5c1a05;}
+.clbl{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;font-weight:600;margin-bottom:5px;display:block;}
+
+/* Total cards */
+.totals{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:24px 0;}
+@media(max-width:680px){.totals{grid-template-columns:1fr;}}
+.total-card{border:1.5px solid var(--rule);border-radius:12px;padding:20px;background:white;font-family:var(--head);}
+.total-card-t{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--rule);}
+.total-card-num{font-family:var(--head);font-size:34px;font-weight:900;line-height:1;letter-spacing:-1.5px;color:var(--ink);margin-bottom:6px;}
+.total-card-num span{font-size:14px;font-weight:500;color:var(--ink3);letter-spacing:0;margin-left:4px;}
+.total-card-desc{font-size:12.5px;color:var(--ink2);line-height:1.55;}
+
+/* Critical path items */
+.critical{margin:22px 0;border:1.5px solid var(--l1);border-radius:12px;overflow:hidden;}
+.critical-hdr{background:var(--l1);color:white;padding:12px 20px;font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;}
+.critical-body{padding:0;background:white;}
+.critical-item{padding:16px 20px;border-bottom:1px solid var(--rule);font-family:var(--head);}
+.critical-item:last-child{border-bottom:none;}
+.critical-t{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:4px;display:flex;gap:10px;align-items:center;}
+.critical-n{font-family:var(--mono);font-size:11px;background:var(--l1-l);color:var(--l1);padding:2px 8px;border-radius:3px;letter-spacing:1px;}
+.critical-d{font-size:13.5px;color:var(--ink2);line-height:1.6;}
+
+/* Decision rules */
+.rules{margin:22px 0;}
+.rule{display:grid;grid-template-columns:44px 1fr;gap:16px;padding:16px 0;border-bottom:1px solid var(--rule);}
+.rule:last-child{border-bottom:none;}
+.rule-n{font-family:var(--head);font-size:30px;font-weight:900;line-height:1;color:var(--rule);letter-spacing:-1.5px;}
+.rule-t{font-family:var(--head);font-size:15px;font-weight:700;color:var(--ink);margin-bottom:4px;}
+.rule-d{font-size:14.5px;color:var(--ink2);line-height:1.65;font-family:var(--body);font-weight:300;}
+
+/* Pull quote */
+.pq{margin:36px 0;padding:24px 32px;border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);font-family:var(--head);font-size:clamp(17px,2.2vw,20px);font-weight:700;line-height:1.3;text-align:center;letter-spacing:-.3px;}
+
+footer{background:var(--ink);color:rgba(255,255,255,.28);padding:22px 28px;font-family:var(--mono);font-size:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
+.ft-dots{display:flex;gap:5px;}
+.ft-dot{width:8px;height:8px;border-radius:50%;}
+
+code{font-family:var(--mono);font-size:12.5px;background:var(--rule2);padding:2px 6px;border-radius:3px;color:var(--l1);}
+</style>
+</head>
+<body>
+  <nav>
+    <div class="nav-in">
+      <a class="nav-logo" href="index.html">SSEP</a>
+      <a class="nav-a" href="0-base.html">0 · Base</a>
+      <a class="nav-a" href="0.5-plan.html">0.5 · Plan</a>
+      <a class="nav-a" href="0.6-setup.html">0.6 · Setup</a>
+      <a class="nav-a" href="0.7-escalado.html">0.7 · Escalado</a>
+      <a class="nav-a" href="1-patron.html">1 · Patrón</a>
+      <a class="nav-a" href="2-implementacion.html">2 · Implementación</a>
+      <a class="nav-a" href="3-metalkube.html">3 · MetalKube</a>
+    </div>
+  </nav>
+
+<div class="hero">
+  <div class="hero-stripe"></div>
+  <div class="hero-in">
+    <div class="hero-eye">Plan de implementación · Base Arquitectónica Reutilizable · v0.1</div>
+    <h1>Tareas y tiempos<br>para llegar del <span class="accent">Doc 0</span><br>al sistema útil.
+      <span class="smaller">3 fases · 5 peldaños · 1 mes de trabajo senior</span>
+    </h1>
+    <p class="hero-desc">
+      Este documento desglosa en tareas concretas y tiempos realistas el camino desde la base arquitectónica (Doc 0) hasta un sistema end-to-end con evaluación. Es un plan de trabajo, no una estimación teórica.
+    </p>
+    <div class="hero-meta">
+      <div class="hm"><div class="hm-k">Referencia</div><div class="hm-v">Doc 0 <span>· Base arquitectónica</span></div></div>
+      <div class="hm"><div class="hm-k">Alcance</div><div class="hm-v">Fases A-C <span>+ Peldaños 1-5</span></div></div>
+      <div class="hm"><div class="hm-k">Perfil base</div><div class="hm-v">Senior Python <span>+ ML básico</span></div></div>
+      <div class="hm"><div class="hm-k">Duración</div><div class="hm-v">~1 mes <span>· 22-32 días</span></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+
+<div class="sidebar">
+  <div class="sb-hdr">Contenido</div>
+  <a class="sb-a" href="#intro"><span class="sb-dot" style="background:var(--ink3)"></span>Intro</a>
+  <a class="sb-a" href="#vista"><span class="sb-dot" style="background:var(--ink)"></span>Vista general</a>
+  <a class="sb-a" href="#fase-a"><span class="sb-dot" style="background:var(--l1)"></span>Fase A · Diseño</a>
+  <a class="sb-a" href="#fase-b"><span class="sb-dot" style="background:var(--l2)"></span>Fase B · IMR</a>
+  <a class="sb-a" href="#fase-c"><span class="sb-dot" style="background:var(--l3)"></span>Fase C · Validación</a>
+  <a class="sb-a" href="#peldaños"><span class="sb-dot" style="background:var(--l4)"></span>Peldaños 1-5</a>
+  <a class="sb-a" href="#totales"><span class="sb-dot" style="background:var(--ink)"></span>Totales</a>
+  <a class="sb-a" href="#critico"><span class="sb-dot" style="background:var(--l1)"></span>Camino crítico</a>
+  <a class="sb-a" href="#paralelo"><span class="sb-dot" style="background:var(--l5)"></span>Paralelización</a>
+  <a class="sb-a" href="#decision"><span class="sb-dot" style="background:var(--sec)"></span>Decisiones</a>
+  <a class="sb-a" href="#perfiles"><span class="sb-dot" style="background:var(--l2)"></span>Perfiles</a>
+</div>
+
+<div class="content">
+
+<!-- INTRO -->
+<div id="intro" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">00</div>
+    <div>
+      <div class="ch-title">Cómo leer este plan</div>
+      <div class="ch-sub">Tres supuestos · tres advertencias</div>
+    </div>
+  </div>
+
+  <p>Este documento asume tres cosas:</p>
+
+  <ul>
+    <li><strong>Un perfil base concreto:</strong> desarrollador senior con experiencia en Python, ML básico y backend. Ajusto tiempos para otros perfiles al final.</li>
+    <li><strong>Un dominio ya elegido.</strong> Si aún no sabes si aplicas la base a motores, fraude o médico, esta estimación no aplica.</li>
+    <li><strong>Dedicación a tiempo parcial realista.</strong> Los tiempos incluyen interrupciones normales, no son días de 12 horas sin fricción.</li>
+  </ul>
+
+  <div class="callout warn">
+    <span class="clbl">⚠ Advertencia sobre los bloqueadores</span>
+    El <strong>código es la parte rápida</strong>. Los bloqueadores reales son: conseguir documentos reales, generar datasets etiquetados, y producir queries de prueba. Estas tareas dependen de terceros y suelen tardar más que el código. El plan las marca explícitamente.
+  </div>
+</div>
+
+<!-- VISTA GENERAL -->
+<div id="vista" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">01</div>
+    <div>
+      <div class="ch-title">Vista general</div>
+      <div class="ch-sub">Ocho bloques · una escalera</div>
+    </div>
+  </div>
+
+  <p>El plan tiene <strong>3 fases base</strong> (obligatorias) y <strong>5 peldaños de extensión</strong> (opcionales, secuenciales). Cada peldaño añade una capacidad concreta sin tocar la arquitectura.</p>
+
+  <div class="timeline">
+    <div class="timeline-hdr"><span>Escalera de implementación</span><span>Senior · días laborables</span></div>
+    <div class="timeline-body">
+
+      <div class="tl-row">
+        <div class="tl-lbl"><div class="tl-lbl-t">Fase A · Diseño</div><div class="tl-lbl-s">Obligatoria</div></div>
+        <div class="tl-body">Elegir dominio, definir contratos, confirmar reglas. No hay código.</div>
+        <div class="tl-time"><b>0.5 d</b><span>base</span></div>
+      </div>
+
+      <div class="tl-row">
+        <div class="tl-lbl"><div class="tl-lbl-t">Fase B · IMR</div><div class="tl-lbl-s">Obligatoria</div></div>
+        <div class="tl-body">Implementación Mínima de Referencia: 3 capas en Python, ~150 líneas, corre en local.</div>
+        <div class="tl-time"><b>2 d</b><span>base</span></div>
+      </div>
+
+      <div class="tl-row">
+        <div class="tl-lbl"><div class="tl-lbl-t">Fase C · Validación</div><div class="tl-lbl-s">Obligatoria</div></div>
+        <div class="tl-body">Ejecutar con casos reales. Verificar que las 3 reglas se cumplen.</div>
+        <div class="tl-time"><b>0.5 d</b><span>base</span></div>
+      </div>
+
+      <div class="tl-row">
+        <div class="tl-lbl"><div class="tl-lbl-t">Peldaño 1 · Modelo</div><div class="tl-lbl-s">Extensión</div></div>
+        <div class="tl-body">Reemplazar el clasificador trivial por un modelo real entrenado.</div>
+        <div class="tl-time"><b>3-5 d</b><span>+ base</span></div>
+      </div>
+
+      <div class="tl-row">
+        <div class="tl-lbl"><div class="tl-lbl-t">Peldaño 2 · RAG real</div><div class="tl-lbl-s">Extensión</div></div>
+        <div class="tl-body">Embeddings + búsqueda vectorial. Sustituye la búsqueda por keyword.</div>
+        <div class="tl-time"><b>5-7 d</b><span>+ P1</span></div>
+      </div>
+
+      <div class="tl-row">
+        <div class="tl-lbl"><div class="tl-lbl-t">Peldaño 3 · LLM real</div><div class="tl-lbl-s">Extensión</div></div>
+        <div class="tl-body">Reemplazar plantilla por LLM local o API. Prompt grounded.</div>
+        <div class="tl-time"><b>3-5 d</b><span>+ P2</span></div>
+      </div>
+
+      <div class="tl-row">
+        <div class="tl-lbl"><div class="tl-lbl-t">Peldaño 4 · Observabilidad</div><div class="tl-lbl-s">Extensión</div></div>
+        <div class="tl-body">Langfuse + <code>@observe()</code>. Trazas por request.</div>
+        <div class="tl-time"><b>3-5 d</b><span>paralelo</span></div>
+      </div>
+
+      <div class="tl-row">
+        <div class="tl-lbl"><div class="tl-lbl-t">Peldaño 5 · Evaluación</div><div class="tl-lbl-s">Extensión</div></div>
+        <div class="tl-body">RAGAS + queries de prueba. Baseline de calidad.</div>
+        <div class="tl-time"><b>5-7 d</b><span>+ P3</span></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- FASE A -->
+<div id="fase-a" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">02</div>
+    <div>
+      <div class="ch-title">Fase A — Diseño de la base</div>
+      <div class="ch-sub">3 tareas · sin código · obligatorio</div>
+    </div>
+  </div>
+
+  <p>Es la fase que parece trivial y no lo es. Todo lo demás depende de las decisiones tomadas aquí. Si esta fase se hace mal, el código se reescribe después.</p>
+
+  <div class="fase f-a">
+    <div class="fase-hdr">
+      <span class="fase-hdr-n">FASE A</span>
+      <span class="fase-hdr-t">Diseño de la base</span>
+      <span class="fase-hdr-time">0.5 día</span>
+    </div>
+    <div class="fase-body">
+
+      <div class="fase-task">
+        <div class="fase-task-n">A1</div>
+        <div class="fase-task-b"><b>Elegir el dominio de la IMR.</b> Un caso concreto: motores, fraude, médico, u otro. Debe cumplir las 10 condiciones del Doc 0 §1.</div>
+        <div class="fase-task-time">2-4 h</div>
+      </div>
+
+      <div class="fase-task">
+        <div class="fase-task-n">A2</div>
+        <div class="fase-task-b"><b>Definir los 3 contratos.</b> Escribir los JSON exactos de <code>evento</code>, <code>predicción</code> y <code>explicación</code> para ese dominio. Los tres campos base se mantienen; los específicos se añaden.</div>
+        <div class="fase-task-time">3-4 h</div>
+      </div>
+
+      <div class="fase-task">
+        <div class="fase-task-n">A3</div>
+        <div class="fase-task-b"><b>Confirmar las 3 reglas.</b> Verificar que en el dominio elegido: cada capa tiene una sola responsabilidad, la capa 3 no modifica la predicción, y la abstención es posible.</div>
+        <div class="fase-task-time">1 h</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="callout danger">
+    <span class="clbl">⚠ Bloqueador real</span>
+    Elegir mal el dominio es el error más caro. Si la capa 3 (explicación) no aporta valor — porque el problema no necesita explicación, o porque no hay documentación experta — el patrón es sobredimensionado. <strong>No continúes a Fase B hasta estar seguro.</strong>
+  </div>
+</div>
+
+<!-- FASE B -->
+<div id="fase-b" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">03</div>
+    <div>
+      <div class="ch-title">Fase B — Implementación Mínima de Referencia</div>
+      <div class="ch-sub">6 tareas · ~150 líneas · obligatorio</div>
+    </div>
+  </div>
+
+  <p>La IMR es la implementación más pequeña posible de la base. 3 archivos Python + 3 carpetas. Sin Kafka, sin Qdrant, sin LLM. Corre en cualquier portátil con <code>python main.py</code>.</p>
+
+  <div class="fase f-b">
+    <div class="fase-hdr">
+      <span class="fase-hdr-n">FASE B</span>
+      <span class="fase-hdr-t">IMR — Implementación Mínima de Referencia</span>
+      <span class="fase-hdr-time">2 días</span>
+    </div>
+    <div class="fase-body">
+
+      <div class="fase-task">
+        <div class="fase-task-n">B1</div>
+        <div class="fase-task-b"><b>Estructura del proyecto.</b> Crear <code>ssep_referencia_minima/</code> con subcarpetas <code>docs/</code> y <code>datos/</code>.</div>
+        <div class="fase-task-time">30 min</div>
+      </div>
+
+      <div class="fase-task">
+        <div class="fase-task-n">B2</div>
+        <div class="fase-task-b"><b>Capa 1 — Ingesta.</b> <code>capa1_ingestion.py</code>: leer señal, extraer features, producir evento con el contrato exacto.</div>
+        <div class="fase-task-time">2-3 h</div>
+      </div>
+
+      <div class="fase-task">
+        <div class="fase-task-n">B3</div>
+        <div class="fase-task-b"><b>Capa 2 — Modelo.</b> <code>capa2_model.py</code>: clasificador trivial (reglas) o sklearn muy pequeño.</div>
+        <div class="fase-task-time">3-4 h</div>
+      </div>
+
+      <div class="fase-task">
+        <div class="fase-task-n">B4</div>
+        <div class="fase-task-b"><b>Capa 3 — Explicación.</b> <code>capa3_explanation.py</code>: retrieval simple, síntesis con plantilla, abstención si no hay fuentes. Es la capa más compleja.</div>
+        <div class="fase-task-time">4-6 h</div>
+      </div>
+
+      <div class="fase-task">
+        <div class="fase-task-n">B5</div>
+        <div class="fase-task-b"><b>Orquestador.</b> <code>main.py</code>: conectar las 3 capas, ejecutar con 3 casos de prueba.</div>
+        <div class="fase-task-time">1-2 h</div>
+      </div>
+
+      <div class="fase-task">
+        <div class="fase-task-n">B6</div>
+        <div class="fase-task-b"><b>Datos y documentos.</b> 3 documentos en <code>docs/</code> (texto plano), 3 señales en <code>datos/</code> (o generadas).</div>
+        <div class="fase-task-time">2-3 h</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="callout info">
+    <span class="clbl">Nota sobre la capa 3</span>
+    Es donde más se aprende y donde más tiempo se invierte. La abstención explícita (regla 3) es un requisito, no una opción. Si la implementación no puede abstenerse, está mal.
+  </div>
+</div>
+
+<!-- FASE C -->
+<div id="fase-c" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">04</div>
+    <div>
+      <div class="ch-title">Fase C — Validación</div>
+      <div class="ch-sub">3 tareas · criterio de salida</div>
+    </div>
+  </div>
+
+  <p>La IMR sirve de algo solo si funciona. Esta fase verifica que el flujo end-to-end produce resultados coherentes y que las 3 reglas se cumplen en código, no solo en papel.</p>
+
+  <div class="fase f-c">
+    <div class="fase-hdr">
+      <span class="fase-hdr-n">FASE C</span>
+      <span class="fase-hdr-t">Validación de la IMR</span>
+      <span class="fase-hdr-time">0.5 día</span>
+    </div>
+    <div class="fase-body">
+
+      <div class="fase-task">
+        <div class="fase-task-n">C1</div>
+        <div class="fase-task-b"><b>Ejecutar con los 3 casos.</b> Verificar que el flujo end-to-end produce output coherente en cada uno.</div>
+        <div class="fase-task-time">1-2 h</div>
+      </div>
+
+      <div class="fase-task">
+        <div class="fase-task-n">C2</div>
+        <div class="fase-task-b"><b>Verificar la regla 3 (abstención).</b> El sistema debe decir "no tengo información" cuando no hay docs. Probar con un caso sin documentación.</div>
+        <div class="fase-task-time">1 h</div>
+      </div>
+
+      <div class="fase-task">
+        <div class="fase-task-n">C3</div>
+        <div class="fase-task-b"><b>Verificar la regla 2 (no modifica).</b> La capa 3 no altera <code>label</code> ni <code>confidence</code>. Comparar predicción de entrada con el label de salida.</div>
+        <div class="fase-task-time">1 h</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="callout ok">
+    <span class="clbl">✓ Criterio de salida de la Fase C</span>
+    Puedes mostrar el output a alguien ajeno al proyecto y esa persona entiende qué ha pasado sin que se lo expliques. Si no, la base no está lista para escalar.
+  </div>
+</div>
+
+<!-- PELDAÑOS -->
+<div id="peldaños" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">05</div>
+    <div>
+      <div class="ch-title">Peldaños 1-5</div>
+      <div class="ch-sub">Extensiones · opcionales · secuenciales</div>
+    </div>
+  </div>
+
+  <p>Cada peldaño sustituye una pieza de la IMR por su versión real. La arquitectura no cambia — solo el contenido de cada capa. Cada peldaño se sube solo cuando el anterior está validado.</p>
+
+  <!-- PELDAÑO 1 -->
+  <div class="fase f-p1">
+    <div class="fase-hdr">
+      <span class="fase-hdr-n">PELDAÑO 1</span>
+      <span class="fase-hdr-t">Modelo real</span>
+      <span class="fase-hdr-time">3-5 días</span>
+    </div>
+    <div class="fase-body">
+
+      <div class="fase-task">
+        <div class="fase-task-n">P1.1</div>
+        <div class="fase-task-b"><b>Dataset mínimo.</b> 100-500 ejemplos etiquetados del dominio. Es el bloqueador más lento del peldaño.</div>
+        <div class="fase-task-time">1-3 d</div>
+      </div>
+
+      <div class="fase-task">
+        <div class="fase-task-n">P1.2</div>
+        <div class="fase-task-b"><b>Entrenamiento.</b> Modelo pequeño: sklearn, XGBoost, o PyTorch según dominio.</div>
+        <div class="fase-task-time">1-2 d</div>
+      </div>
+
+      <div class="fase-task">
+        <div class="fase-task-n">P1.3</div>
+        <div class="fase-task-b"><b>Serving.</b> FastAPI o función que carga el modelo y sirve predicciones.</div>
+        <div class="fase-task-time">0.5 d</div>
+      </div>
+
+      <div class="fase-task">
+        <div class="fase-task-n">P1.4</div>
+        <div class="fase-task-b"><b>Integrar en IMR.</b> Sustituir la función <code>classify()</code> por la llamada al modelo real. <strong>Sin tocar las otras dos capas.</strong></div>
+        <div class="fase-task-time">0.5 d</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- PELDAÑO 2 -->
+  <div class="fase f-p2">
+    <div class="fase-hdr">
+      <span class="fase-hdr-n">PELDAÑO 2</span>
+      <span class="fase-hdr-t">RAG real</span>
+      <span class="fase-hdr-time">5-7 días</span>
+    </div>
+    <div class="fase-body">
+
+      <div class="fase-task">
+        <div class="fase-task-n">P2.1</div>
+        <div class="fase-task-b"><b>Preparar documentos.</b> 20-50 documentos reales en texto plano. Depende de terceros. <strong>Bloqueador.</strong></div>
+        <div class="fase-task-time">1-3 d</div>
+      </div>
+
+      <div class="fase-task">
+        <div class="fase-task-n">P2.2</div>
+        <div class="fase-task-b"><b>Chunking.</b> Dividir en fragmentos con sentido semántico, no por caracteres fijos.</div>
+        <div class="fase-task-time">1 d</div>
+      </div>
+
+      <div class="fase-task">
+        <div class="fase-task-n">P2.3</div>
+        <div class="fase-task-b"><b>Embeddings + vector store.</b> pgvector o Chroma local. BGE o similar para embeddings.</div>
+        <div class="fase-task-time">1 d</div>
+      </div>
+
+      <div class="fase-task">
+        <div class="fase-task-n">P2.4</div>
+        <div class="fase-task-b"><b>Búsqueda + reranking.</b> Top-K + cross-encoder pequeño (ms-marco-MiniLM) con threshold 0.5.</div>
+        <div class="fase-task-time">1-2 d</div>
+      </div>
+
+      <div class="fase-task">
+        <div class="fase-task-n">P2.5</div>
+        <div class="fase-task-b"><b>Integrar en IMR.</b> Sustituir la búsqueda por keyword. <strong>Sin tocar las otras dos capas.</strong></div>
+        <div class="fase-task-time">0.5-1 d</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- PELDAÑO 3 -->
+  <div class="fase f-p3">
+    <div class="fase-hdr">
+      <span class="fase-hdr-n">PELDAÑO 3</span>
+      <span class="fase-hdr-t">LLM real</span>
+      <span class="fase-hdr-time">3-5 días</span>
+    </div>
+    <div class="fase-body">
+
+      <div class="fase-task">
+        <div class="fase-task-n">P3.1</div>
+        <div class="fase-task-b"><b>Levantar LLM local o conectar API.</b> Ollama con Llama 3.2 3B, o llamada a Claude/GPT-4o-mini.</div>
+        <div class="fase-task-time">1 d</div>
+      </div>
+
+      <div class="fase-task">
+        <div class="fase-task-n">P3.2</div>
+        <div class="fase-task-b"><b>Prompt grounded.</b> Plantilla que fuerza el uso exclusivo de los chunks como fuente. Aquí se gana o se pierde la calidad.</div>
+        <div class="fase-task-time">1-2 d</div>
+      </div>
+
+      <div class="fase-task">
+        <div class="fase-task-n">P3.3</div>
+        <div class="fase-task-b"><b>Integrar en IMR.</b> Sustituir la síntesis por la llamada al LLM. <strong>Sin tocar las otras dos capas.</strong></div>
+        <div class="fase-task-time">1-2 d</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- PELDAÑO 4 -->
+  <div class="fase f-p4">
+    <div class="fase-hdr">
+      <span class="fase-hdr-n">PELDAÑO 4</span>
+      <span class="fase-hdr-t">Observabilidad</span>
+      <span class="fase-hdr-time">3-5 días · paralelizable</span>
+    </div>
+    <div class="fase-body">
+
+      <div class="fase-task">
+        <div class="fase-task-n">P4.1</div>
+        <div class="fase-task-b"><b>Desplegar Langfuse.</b> Docker Compose local o K8s. Self-hosted obligatorio si hay datos de cliente.</div>
+        <div class="fase-task-time">1 d</div>
+      </div>
+
+      <div class="fase-task">
+        <div class="fase-task-n">P4.2</div>
+        <div class="fase-task-b"><b>Instrumentar con <code>@observe()</code>.</b> Decorar la función principal. Trazas automáticas.</div>
+        <div class="fase-task-time">0.5 d</div>
+      </div>
+
+      <div class="fase-task">
+        <div class="fase-task-n">P4.3</div>
+        <div class="fase-task-b"><b>Validar trazas.</b> Ver que cada request tiene su trace completo con input, output, coste, latencia.</div>
+        <div class="fase-task-time">1-2 d</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- PELDAÑO 5 -->
+  <div class="fase f-p5">
+    <div class="fase-hdr">
+      <span class="fase-hdr-n">PELDAÑO 5</span>
+      <span class="fase-hdr-t">Evaluación</span>
+      <span class="fase-hdr-time">5-7 días</span>
+    </div>
+    <div class="fase-body">
+
+      <div class="fase-task">
+        <div class="fase-task-n">P5.1</div>
+        <div class="fase-task-b"><b>Preparar 20-100 queries de prueba.</b> Con respuesta esperada. Trabajo manual. <strong>Bloqueador.</strong></div>
+        <div class="fase-task-time">2-3 d</div>
+      </div>
+
+      <div class="fase-task">
+        <div class="fase-task-n">P5.2</div>
+        <div class="fase-task-b"><b>Configurar RAGAS.</b> Pipeline de evaluación con las 4 métricas: faithfulness, relevancy, precision, recall.</div>
+        <div class="fase-task-time">1 d</div>
+      </div>
+
+      <div class="fase-task">
+        <div class="fase-task-n">P5.3</div>
+        <div class="fase-task-b"><b>Establecer baseline.</b> Ejecutar evaluación, documentar scores, definir gate de calidad.</div>
+        <div class="fase-task-time">1-2 d</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="callout warn">
+    <span class="clbl">⚠ Regla de crecimiento</span>
+    Cada peldaño se sube <strong>solo cuando el anterior está validado</strong>. El error más común es saltar del Peldaño 0 al 5 y terminar con un sistema complejo que no funciona en el 0.
+  </div>
+</div>
+
+<!-- TOTALES -->
+<div id="totales" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">06</div>
+    <div>
+      <div class="ch-title">Totales por perfil</div>
+      <div class="ch-sub">Cuánto tarda cada tramo</div>
+    </div>
+  </div>
+
+  <p>Los mismos peldaños, con tiempos distintos según perfil. Los tiempos asumen dedicación parcial realista, no sprints sin interrupciones.</p>
+
+  <h3>Perfil base — Senior Python + ML básico</h3>
+
+  <div class="totals">
+    <div class="total-card">
+      <div class="total-card-t">Hasta IMR funcional</div>
+      <div class="total-card-num">3<span>días</span></div>
+      <div class="total-card-desc">Fases A + B + C. Tienes la base arquitectónica corriendo en local, con contratos, reglas y validación.</div>
+    </div>
+    <div class="total-card">
+      <div class="total-card-t">Hasta Peldaño 3 (sistema real)</div>
+      <div class="total-card-num">14<span>días</span></div>
+      <div class="total-card-desc">Modelo real + RAG real + LLM real. El sistema ya es utilizable en producción interna.</div>
+    </div>
+    <div class="total-card">
+      <div class="total-card-t">Hasta Peldaño 5 (sistema medible)</div>
+      <div class="total-card-num">22-32<span>días</span></div>
+      <div class="total-card-desc">Observabilidad + evaluación. Puedes decir con datos si el sistema mejora o empeora.</div>
+    </div>
+  </div>
+
+  <h3>Comparativa por perfil</h3>
+
+  <div class="tbl">
+    <div class="tbl-hdr c4">
+      <div>Perfil</div>
+      <div>Hasta IMR</div>
+      <div>Hasta Peldaño 3</div>
+      <div>Hasta Peldaño 5</div>
+    </div>
+    <div class="tbl-row c4">
+      <div class="tbl-tech">Senior Python + ML</div>
+      <div>2.5 días</div>
+      <div>2 semanas</div>
+      <div>4 semanas</div>
+    </div>
+    <div class="tbl-row c4">
+      <div class="tbl-tech">Mid-level con apoyo</div>
+      <div>5 días</div>
+      <div>4 semanas</div>
+      <div>8 semanas</div>
+    </div>
+    <div class="tbl-row c4">
+      <div class="tbl-tech">Sin experiencia ML</div>
+      <div>2 semanas</div>
+      <div>8 semanas</div>
+      <div>16 semanas</div>
+    </div>
+    <div class="tbl-row c4">
+      <div class="tbl-tech">Equipo de 2-3 personas</div>
+      <div>2-3 días</div>
+      <div>1.5-2 semanas</div>
+      <div>3-4 semanas</div>
+    </div>
+  </div>
+
+  <div class="callout info">
+    <span class="clbl">Nota sobre equipos</span>
+    Un equipo de 2-3 personas no reduce los tiempos linealmente. La coordinación tiene coste. Sí permite paralelizar Peldaños 1, 2 y 4, que es donde se gana tiempo real.
+  </div>
+</div>
+
+<!-- CAMINO CRÍTICO -->
+<div id="critico" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">07</div>
+    <div>
+      <div class="ch-title">Camino crítico</div>
+      <div class="ch-sub">Los 4 bloqueadores reales</div>
+    </div>
+  </div>
+
+  <p>El camino crítico de este plan <strong>no es el código</strong>. Es todo lo que depende de terceros o de trabajo manual no automatizable. Estos son los 4 bloqueadores que hay que resolver para que los tiempos se cumplan.</p>
+
+  <div class="critical">
+    <div class="critical-hdr">Camino crítico · bloqueadores</div>
+    <div class="critical-body">
+
+      <div class="critical-item">
+        <div class="critical-t"><span class="critical-n">1</span>Elegir dominio correcto</div>
+        <div class="critical-d">Fase A · 2-4 horas. Si el dominio elegido no cumple las 10 condiciones del Doc 0, todo lo demás es trabajo perdido. Coste de equivocarse: semanas.</div>
+      </div>
+
+      <div class="critical-item">
+        <div class="critical-t"><span class="critical-n">2</span>Conseguir documentos reales</div>
+        <div class="critical-d">Peldaño 2 · 1-3 días. Depende de terceros: fabricantes, legal, clientes. Sin documentos reales, el RAG solo tiene sintéticos y no vale.</div>
+      </div>
+
+      <div class="critical-item">
+        <div class="critical-t"><span class="critical-n">3</span>Generar dataset etiquetado</div>
+        <div class="critical-d">Peldaño 1 · 1-3 días. Trabajo manual o de expertos del dominio. No se puede automatizar sin perder calidad.</div>
+      </div>
+
+      <div class="critical-item">
+        <div class="critical-t"><span class="critical-n">4</span>Producir queries de prueba</div>
+        <div class="critical-d">Peldaño 5 · 2-3 días. Sin queries de prueba, no hay evaluación. Sin evaluación, no sabes si el sistema mejora.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="callout danger">
+    <span class="clbl">⚠ Implicación</span>
+    El código de la base se hace en 3 días. Los bloqueadores añaden <strong>1-2 semanas</strong> de espera o trabajo manual. Si dependes de terceros para documentos o etiquetas, empieza a pedirlos en Fase A, no cuando los necesites.
+  </div>
+</div>
+
+<!-- PARALELIZACIÓN -->
+<div id="paralelo" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">08</div>
+    <div>
+      <div class="ch-title">Paralelización</div>
+      <div class="ch-sub">Qué se puede hacer a la vez</div>
+    </div>
+  </div>
+
+  <p>No todo es secuencial. Estas son las tareas que se pueden paralelizar sin comprometer la arquitectura.</p>
+
+  <div class="tbl">
+    <div class="tbl-hdr c3">
+      <div>Tarea</div>
+      <div>Se puede paralelizar con</div>
+      <div>Condición</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Fase A (diseño)</div>
+      <div>Nada</div>
+      <div>Es prerrequisito de todo lo demás</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Fase B (IMR)</div>
+      <div>Preparación de datos y docs (Peldaños 1 y 2)</div>
+      <div>Si los contratos están definidos en A2</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Peldaño 1 (dataset)</div>
+      <div>Peldaño 2 (documentos)</div>
+      <div>Son independientes entre sí</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Peldaño 4 (Langfuse)</div>
+      <div>Peldaños 1, 2, 3</div>
+      <div>La observabilidad no bloquea el desarrollo</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Peldaño 5 (RAGAS)</div>
+      <div>Peldaños 1, 2, 3</div>
+      <div>Si ya hay queries de prueba definidas</div>
+    </div>
+  </div>
+</div>
+
+<!-- DECISIONES -->
+<div id="decision" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">09</div>
+    <div>
+      <div class="ch-title">Reglas de decisión</div>
+      <div class="ch-sub">Cuándo subir al siguiente peldaño · cuándo parar</div>
+    </div>
+  </div>
+
+  <p>Antes de subir al siguiente peldaño, hazte estas 4 preguntas. Si alguna respuesta es "no" o "no sé", <strong>no subas</strong>.</p>
+
+  <div class="rules">
+    <div class="rule">
+      <div class="rule-n">1</div>
+      <div>
+        <div class="rule-t">¿El peldaño actual me da valor?</div>
+        <div class="rule-d">Si el peldaño actual no aporta valor en tu dominio, el siguiente probablemente tampoco. Detente y revisa si el dominio elegido es el correcto.</div>
+      </div>
+    </div>
+    <div class="rule">
+      <div class="rule-n">2</div>
+      <div>
+        <div class="rule-t">¿El bloqueador del siguiente peldaño está resuelto?</div>
+        <div class="rule-d">Ejemplo: no subas a Peldaño 2 si no tienes documentos. No subas a Peldaño 1 si no tienes dataset. Los bloqueadores son humanos, no técnicos.</div>
+      </div>
+    </div>
+    <div class="rule">
+      <div class="rule-n">3</div>
+      <div>
+        <div class="rule-t">¿Tengo claro qué mejora concreta espero del siguiente peldaño?</div>
+        <div class="rule-d">"Mejorar la calidad" no es una respuesta. "Reducir alucinaciones un 30%" o "detectar drift antes de 24h" sí lo es.</div>
+      </div>
+    </div>
+    <div class="rule">
+      <div class="rule-n">4</div>
+      <div>
+        <div class="rule-t">¿Puedo parar aquí y el sistema sigue siendo útil?</div>
+        <div class="rule-d">Si no, hay dependencia estructural entre peldaños que debería estar resuelta por la arquitectura. Revisa los contratos.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pq">
+    Cada peldaño es autónomo. Si el proyecto se detiene en el Peldaño 2, ya tienes un sistema con modelo real y RAG real. Si se detiene en el Peldaño 5, tienes un sistema medible. Ningún peldaño depende de que el siguiente exista.
+  </div>
+</div>
+
+<!-- PERFILES -->
+<div id="perfiles" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">10</div>
+    <div>
+      <div class="ch-title">Qué cambia según perfil</div>
+      <div class="ch-sub">Ajustes concretos para cada caso</div>
+    </div>
+  </div>
+
+  <h3>Senior con ML</h3>
+  <ul>
+    <li>Sigue el orden indicado. Los tiempos son realistas.</li>
+    <li>Puede paralelizar Peldaños 1 y 2 desde el principio (si tiene dataset y documentos).</li>
+    <li>No necesita apoyo externo para el código.</li>
+  </ul>
+
+  <h3>Mid-level con apoyo</h3>
+  <ul>
+    <li>Suma un <strong>50%</strong> al tiempo de cada peldaño.</li>
+    <li>Necesita revisión de código externa antes de escalar del Peldaño 3 al 4.</li>
+    <li>Puede hacer Fases A, B y C sin ayuda.</li>
+  </ul>
+
+  <h3>Sin experiencia ML</h3>
+  <ul>
+    <li>Empieza por Fase B sin modelo real (clasificador trivial).</li>
+    <li>Sube a Peldaño 1 solo cuando entiendas los contratos.</li>
+    <li>No intentes Peldaño 3 sin haber hecho Peldaño 2 completo.</li>
+    <li>Considera apoyo externo para el fine-tuning del Peldaño 4.</li>
+  </ul>
+
+  <h3>Equipo de 2-3 personas</h3>
+  <ul>
+    <li>Paralelizar Peldaños 1, 2 y 4. Peldaño 3 en serie con el 2.</li>
+    <li>Los tiempos no bajan linealmente. La coordinación tiene coste.</li>
+    <li>Designar a alguien como responsable de contratos e interfaces.</li>
+    <li>Reunión semanal de sincronización para no desviar la arquitectura.</li>
+  </ul>
+
+  <div class="callout ok">
+    <span class="clbl">✓ Cómo usar este plan</span>
+    Este plan no es un contrato. Es una referencia para estimar. Cuando el primer dominio esté implementado hasta Peldaño 5, tendrás datos reales sobre cuánto tarda <em>tu equipo</em> en cada peldaño. A partir de ahí, tus estimaciones serán mejores que las de este documento.
+  </div>
+
+  <div class="pq">
+    El código es la parte rápida. Lo lento son las decisiones correctas (Fase A), los datos reales (Peldaños 1 y 2), y la evaluación honesta (Peldaño 5). Si esos tres puntos están resueltos, el resto es mecánico.
+  </div>
+</div>
+
+</div>
+</div>
+
+<footer>
+  SSEP · Plan de Implementación · Documento 0.5 de 4
+  <div class="ft-dots">
+    <div class="ft-dot" style="background:var(--l1)"></div>
+    <div class="ft-dot" style="background:var(--l2)"></div>
+    <div class="ft-dot" style="background:var(--l3)"></div>
+    <div class="ft-dot" style="background:var(--l4)"></div>
+    <div class="ft-dot" style="background:var(--l5)"></div>
+  </div>
+</footer>
+
+</body>
+</html>

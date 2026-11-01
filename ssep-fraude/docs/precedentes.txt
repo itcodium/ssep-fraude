@@ -1,0 +1,13 @@
+Caso 2024-0341: patrón de fraude en compras online de
+electrónica en horario nocturno desde país extranjero. El
+titular no había viajado. La tarjeta fue clonada en un cajero
+del país habitual del titular. Acción: bloqueo inmediato
++ reemisión.
+
+Caso 2024-0287: transacción de bajo importe en país habitual
+del titular, horario comercial. Resultó ser una suscripción
+renovada automáticamente. Falso positivo. Acción: archivar.
+
+Caso 2024-0195: múltiples transacciones pequeñas en menos de
+1 hora desde el mismo comercio. Patrón de "card testing"
+(verificación de tarjeta clonada). Acción: bloqueo preventivo.

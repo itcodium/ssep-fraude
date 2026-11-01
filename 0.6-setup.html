@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SSEP — Documento 0.6 · Setup del Entorno</title>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,300;1,6..72,400&family=Geist:wght@300;400;500;600;700;800;900&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff; --ink:#0c0c0b; --ink2:#2d2d2b; --ink3:#787870;
+  --rule:#e4e4de; --rule2:#f5f5ef;
+
+  --l1:#c0390b; --l1-l:#fdeee9;
+  --l2:#1a5c3a; --l2-l:#e4f5ec;
+  --l3:#1c6ea4; --l3-l:#eef2fb;
+  --l4:#7b2d8b; --l4-l:#f5eaf9;
+  --l5:#b45309; --l5-l:#fef3e2;
+  --sec:#0a2540; --sec-l:#e8eef5;
+
+  --mono:'Geist Mono',monospace;
+  --head:'Geist',sans-serif;
+  --body:'Newsreader',Georgia,serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--body);background:var(--bg);color:var(--ink);line-height:1.7;font-size:17px;}
+
+nav{background:var(--ink);position:sticky;top:0;z-index:200;}
+.nav-in{max-width:1180px;margin:0 auto;display:flex;align-items:center;padding:10px 28px;gap:4px;flex-wrap:wrap;}
+.nav-logo{font-family:var(--head);font-size:13px;font-weight:800;color:white;margin-right:14px;letter-spacing:-.3px;}
+.nav-a{font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.38);text-decoration:none;padding:4px 9px;border-radius:3px;transition:all .12s;white-space:nowrap;}
+.nav-a:hover{background:rgba(255,255,255,.1);color:white;}
+
+.hero{background:var(--ink);color:white;position:relative;overflow:hidden;}
+.hero-stripe{height:5px;background:linear-gradient(90deg,
+  var(--l1) 0 16.6%,var(--l2) 16.6% 33.3%,var(--l3) 33.3% 50%,
+  var(--l4) 50% 66.6%,var(--l5) 66.6% 83.3%,var(--sec) 83.3% 100%);}
+.hero-in{max-width:1180px;margin:0 auto;padding:72px 28px 60px;}
+.hero-eye{font-family:var(--mono);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.28);margin-bottom:18px;}
+.hero h1{font-family:var(--head);font-size:clamp(36px,5.2vw,62px);font-weight:900;line-height:.95;letter-spacing:-1.8px;margin-bottom:20px;}
+.hero h1 .accent{color:#5ba3ff;}
+.hero h1 .smaller{font-size:.5em;font-weight:500;color:rgba(255,255,255,.35);letter-spacing:-.5px;display:block;margin-top:14px;}
+.hero-desc{font-family:var(--body);font-size:18px;font-style:italic;font-weight:300;color:rgba(255,255,255,.5);max-width:680px;line-height:1.65;margin-bottom:40px;}
+.hero-meta{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;background:rgba(255,255,255,.06);border-radius:12px;overflow:hidden;}
+@media(max-width:700px){.hero-meta{grid-template-columns:1fr 1fr;}}
+.hm{padding:18px 16px;background:rgba(255,255,255,.03);}
+.hm-k{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:6px;}
+.hm-v{font-family:var(--head);font-size:13px;font-weight:600;line-height:1.3;}
+.hm-v span{color:rgba(255,255,255,.5);font-weight:400;}
+
+.layout{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:220px 1fr;gap:0;}
+@media(max-width:900px){.layout{grid-template-columns:1fr;}}
+.sidebar{border-right:1px solid var(--rule);padding:28px 14px;position:sticky;top:48px;height:calc(100vh - 48px);overflow-y:auto;}
+@media(max-width:900px){.sidebar{display:none;}}
+.sb-section{margin-bottom:22px;}
+.sb-hdr{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin-bottom:8px;padding-left:8px;}
+.sb-a{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:5px;font-family:var(--head);font-size:12px;font-weight:500;text-decoration:none;color:var(--ink2);transition:background .12s;margin-bottom:1px;}
+.sb-a:hover{background:var(--rule2);}
+.sb-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.sb-a .layer-num{font-family:var(--mono);font-size:10px;color:var(--ink3);width:16px;}
+
+.content{padding:0 0 80px;}
+.chapter{padding:0 44px;}
+@media(max-width:680px){.chapter{padding:0 20px;}}
+.ch-hdr{padding:58px 0 26px;border-bottom:2px solid var(--ink);margin-bottom:34px;display:flex;align-items:flex-end;gap:16px;}
+.ch-n{font-family:var(--head);font-size:70px;font-weight:900;line-height:1;color:var(--rule);letter-spacing:-3px;flex-shrink:0;}
+.ch-title{font-family:var(--head);font-size:26px;font-weight:800;letter-spacing:-.5px;line-height:1.0;}
+.ch-sub{font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:1.5px;text-transform:uppercase;margin-top:5px;}
+.ch-badge{margin-left:auto;font-family:var(--mono);font-size:9px;padding:5px 12px;border-radius:50px;color:white;flex-shrink:0;letter-spacing:.5px;}
+
+p{margin-bottom:20px;color:var(--ink2);line-height:1.78;font-weight:300;}
+strong{color:var(--ink);font-weight:600;}
+em{font-style:italic;}
+h3{font-family:var(--head);font-size:19px;font-weight:700;margin:38px 0 12px;letter-spacing:-.3px;padding-left:14px;border-left:3px solid var(--ink);}
+h4{font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin:22px 0 8px;}
+
+ol,ul{margin:0 0 20px 22px;color:var(--ink2);}
+li{margin-bottom:8px;line-height:1.7;font-weight:300;}
+li strong{color:var(--ink);}
+
+.callout{margin:22px 0;padding:16px 20px;border-radius:6px;border-left:4px solid;font-size:15px;line-height:1.68;font-family:var(--head);}
+.callout.ok{background:var(--l2-l);border-color:var(--l2);color:#0a3020;}
+.callout.info{background:var(--l3-l);border-color:var(--l3);color:#0d3258;}
+.callout.warn{background:var(--l5-l);border-color:var(--l5);color:#5c2d00;}
+.callout.danger{background:var(--l1-l);border-color:var(--l1);color:#5c1a05;}
+.clbl{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;font-weight:600;margin-bottom:5px;display:block;}
+
+/* Tables */
+.tbl{margin:20px 0;border:1.5px solid var(--ink);border-radius:12px;overflow:hidden;font-family:var(--head);}
+.tbl-hdr{background:var(--ink);color:white;display:grid;padding:0;}
+.tbl-hdr>div{padding:10px 14px;font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;}
+.tbl-row{display:grid;border-bottom:1px solid var(--rule);}
+.tbl-row:last-child{border-bottom:none;}
+.tbl-row>div{padding:12px 14px;font-size:13px;color:var(--ink2);border-right:1px solid var(--rule);line-height:1.5;}
+.tbl-row>div:last-child{border-right:none;}
+.tbl-tech{font-size:13px;font-weight:700;color:var(--ink);font-family:var(--head);}
+.tbl-row:nth-child(even){background:var(--rule2);}
+.c3{grid-template-columns:200px 1fr 1fr;}
+.c4{grid-template-columns:180px 1fr 1fr 1fr;}
+@media(max-width:680px){.tbl-hdr,.tbl-row{grid-template-columns:1fr!important;} .tbl-row>div,.tbl-hdr>div{border-right:none;border-bottom:1px solid var(--rule);}}
+
+/* Setup block */
+.setup{margin:26px 0;border:1.5px solid;border-radius:12px;overflow:hidden;}
+.setup-hdr{padding:14px 22px;color:white;display:flex;align-items:center;gap:14px;font-family:var(--head);}
+.setup-hdr-n{font-family:var(--mono);font-size:10px;opacity:.65;letter-spacing:2px;}
+.setup-hdr-t{font-size:15px;font-weight:800;letter-spacing:-.2px;}
+.setup-hdr-tag{margin-left:auto;font-family:var(--mono);font-size:9px;opacity:.7;letter-spacing:1.5px;text-transform:uppercase;}
+.setup-body{background:white;}
+.setup-tools{padding:16px 22px;background:var(--rule2);border-bottom:1px solid var(--rule);font-family:var(--mono);font-size:11.5px;color:var(--ink2);line-height:1.8;}
+.setup-tools b{color:var(--ink);font-weight:600;}
+.setup-code{background:#f8f8f4;padding:18px 22px;font-family:var(--mono);font-size:12.5px;line-height:1.85;color:var(--ink2);overflow-x:auto;white-space:pre;}
+.setup-code .cm{color:#999;font-style:italic;}
+.setup-code .kw{color:var(--l3);font-weight:500;}
+.setup-code .st{color:var(--l1);}
+.setup-verify{padding:16px 22px;background:var(--l2-l);border-top:1px solid var(--rule);font-family:var(--head);font-size:13.5px;color:#0a3020;line-height:1.6;}
+.setup-verify b{color:var(--l2);font-weight:700;}
+
+.setup.s0{border-color:var(--ink3);} .setup.s0 .setup-hdr{background:var(--ink3);}
+.setup.s1{border-color:var(--l4);} .setup.s1 .setup-hdr{background:var(--l4);}
+.setup.s2{border-color:var(--l5);} .setup.s2 .setup-hdr{background:var(--l5);}
+.setup.s3{border-color:#5c34c0;} .setup.s3 .setup-hdr{background:#5c34c0;}
+.setup.s4{border-color:var(--sec);} .setup.s4 .setup-hdr{background:var(--sec);}
+.setup.s5{border-color:#0d7a5f;} .setup.s5 .setup-hdr{background:#0d7a5f;}
+
+/* Dependencies viz */
+.deps{margin:24px 0;border:1.5px solid var(--ink);border-radius:12px;overflow:hidden;}
+.deps-hdr{background:var(--ink);color:white;padding:12px 20px;font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;}
+.deps-body{padding:20px 24px;background:#fafaf8;font-family:var(--mono);font-size:12px;line-height:1.9;color:var(--ink2);white-space:pre;overflow-x:auto;}
+.deps-body b{color:var(--l1);font-weight:600;}
+
+/* Recipe cards */
+.recipe{margin:22px 0;border:1.5px solid var(--rule);border-radius:12px;overflow:hidden;}
+.recipe-hdr{padding:12px 20px;background:var(--rule2);font-family:var(--head);display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--rule);}
+.recipe-t{font-size:14px;font-weight:700;color:var(--ink);}
+.recipe-sub{font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:1px;margin-left:auto;}
+.recipe-body{padding:0;}
+.recipe-row{display:grid;grid-template-columns:150px 1fr;border-bottom:1px solid var(--rule);}
+.recipe-row:last-child{border-bottom:none;}
+.recipe-lbl{padding:14px 18px;background:var(--rule2);border-right:1px solid var(--rule);font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--ink3);}
+.recipe-val{padding:14px 18px;font-family:var(--head);font-size:13.5px;color:var(--ink2);line-height:1.55;}
+.recipe-val b{color:var(--ink);font-weight:600;}
+
+/* Pull quote */
+.pq{margin:40px 0;padding:26px 32px;border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);font-family:var(--head);font-size:clamp(17px,2.2vw,21px);font-weight:700;line-height:1.3;text-align:center;letter-spacing:-.3px;}
+
+/* Rules */
+.rules{margin:24px 0;}
+.rule{display:grid;grid-template-columns:44px 1fr;gap:16px;padding:14px 0;border-bottom:1px solid var(--rule);}
+.rule:last-child{border-bottom:none;}
+.rule-n{font-family:var(--head);font-size:28px;font-weight:900;line-height:1;color:var(--rule);letter-spacing:-1.5px;}
+.rule-t{font-family:var(--head);font-size:15px;font-weight:700;color:var(--ink);margin-bottom:4px;}
+.rule-d{font-size:14px;color:var(--ink2);line-height:1.6;font-family:var(--body);}
+
+/* Requirement cards */
+.reqs{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:22px 0;}
+@media(max-width:680px){.reqs{grid-template-columns:1fr 1fr;}}
+.req{border:1.5px solid var(--rule);border-radius:10px;padding:16px 18px;background:white;font-family:var(--head);}
+.req-t{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin-bottom:8px;}
+.req-v{font-size:15px;font-weight:700;color:var(--ink);line-height:1.3;margin-bottom:4px;}
+.req-d{font-size:12px;color:var(--ink3);line-height:1.5;}
+
+footer{background:var(--ink);color:rgba(255,255,255,.28);padding:22px 28px;font-family:var(--mono);font-size:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
+.ft-dots{display:flex;gap:5px;}
+.ft-dot{width:8px;height:8px;border-radius:50%;}
+
+code{font-family:var(--mono);font-size:12.5px;background:var(--rule2);padding:2px 6px;border-radius:3px;color:var(--l1);}
+</style>
+</head>
+<body>
+  <nav>
+    <div class="nav-in">
+      <a class="nav-logo" href="index.html">SSEP</a>
+      <a class="nav-a" href="0-base.html">0 · Base</a>
+      <a class="nav-a" href="0.5-plan.html">0.5 · Plan</a>
+      <a class="nav-a" href="0.6-setup.html">0.6 · Setup</a>
+      <a class="nav-a" href="0.7-escalado.html">0.7 · Escalado</a>
+      <a class="nav-a" href="1-patron.html">1 · Patrón</a>
+      <a class="nav-a" href="2-implementacion.html">2 · Implementación</a>
+      <a class="nav-a" href="3-metalkube.html">3 · MetalKube</a>
+    </div>
+  </nav>
+
+<div class="hero">
+  <div class="hero-stripe"></div>
+  <div class="hero-in">
+    <div class="hero-eye">Documento 0.6 · Setup del entorno · v0.1</div>
+    <h1>Qué instalar<br>y con qué <span class="accent">comandos</span>.
+      <span class="smaller">Inventario por peldaño · comandos concretos · verificación · dependencias ocultas</span>
+    </h1>
+    <p class="hero-desc">
+      El Doc 0.5 dice qué hacer y cuándo. Este documento dice con qué herramientas, en qué orden, con qué comandos y cómo verificar que cada instalación funciona antes de pasar al siguiente peldaño.
+    </p>
+    <div class="hero-meta">
+      <div class="hm"><div class="hm-k">Depende de</div><div class="hm-v">Doc 0 <span>+ Doc 0.5</span></div></div>
+      <div class="hm"><div class="hm-k">Alcance</div><div class="hm-v">Peldaños 0-5 <span>· del IMR a RAGAS</span></div></div>
+      <div class="hm"><div class="hm-k">Formato</div><div class="hm-v">Comandos <span>no teoría</span></div></div>
+      <div class="hm"><div class="hm-k">Perfil</div><div class="hm-v">Senior Python <span>· Linux/Mac · Docker</span></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+
+<div class="sidebar">
+  <div class="sb-section">
+    <div class="sb-hdr">Contenido</div>
+    <a class="sb-a" href="#intro"><span class="layer-num">00</span>Intro</a>
+    <a class="sb-a" href="#requisitos"><span class="layer-num">01</span>Requisitos base</a>
+    <a class="sb-a" href="#inventario"><span class="layer-num">02</span>Inventario</a>
+    <a class="sb-a" href="#s0"><span class="layer-num">03</span>P0 · IMR</a>
+    <a class="sb-a" href="#s1"><span class="layer-num">04</span>P1 · Modelo real</a>
+    <a class="sb-a" href="#s2"><span class="layer-num">05</span>P2 · RAG real</a>
+    <a class="sb-a" href="#s3"><span class="layer-num">06</span>P3 · LLM real</a>
+    <a class="sb-a" href="#s4"><span class="layer-num">07</span>P4 · Observabilidad</a>
+    <a class="sb-a" href="#s5"><span class="layer-num">08</span>P5 · Evaluación</a>
+    <a class="sb-a" href="#ocultas"><span class="layer-num">09</span>Dependencias ocultas</a>
+    <a class="sb-a" href="#perfiles"><span class="layer-num">10</span>Perfiles y alternativas</a>
+  </div>
+</div>
+
+<div class="content">
+
+<!-- INTRO -->
+<div id="intro" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">00</div>
+    <div>
+      <div class="ch-title">Cómo leer este documento</div>
+      <div class="ch-sub">Comandos · verificación · dependencias</div>
+    </div>
+  </div>
+
+  <p>Cada peldaño del Doc 0.5 tiene aquí su sección. Cada sección tiene la misma estructura:</p>
+
+  <div class="recipe">
+    <div class="recipe-hdr">
+      <div class="recipe-t">Estructura de cada bloque</div>
+      <div class="recipe-sub">PATRÓN</div>
+    </div>
+    <div class="recipe-body">
+      <div class="recipe-row">
+        <div class="recipe-lbl">Herramientas</div>
+        <div class="recipe-val">Qué instalar y para qué. Con <b>tamaño</b> aproximado.</div>
+      </div>
+      <div class="recipe-row">
+        <div class="recipe-lbl">Comandos</div>
+        <div class="recipe-val">Los comandos exactos, en orden. Copia-pega.</div>
+      </div>
+      <div class="recipe-row">
+        <div class="recipe-lbl">Verificación</div>
+        <div class="recipe-val">Cómo saber que funciona antes de pasar al siguiente peldaño.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout warn">
+    <span class="clbl">⚠ Regla de oro del setup</span>
+    <strong>No instales nada del peldaño N+1 hasta que el peldaño N esté verificado.</strong> El error más común es instalar todo de golpe y descubrir al final que no sabes qué falla. Un peldaño, una verificación, un paso.
+  </div>
+
+  <p>Los comandos asumen <strong>Linux o macOS</strong>. Si estás en Windows, usa WSL2 (Ubuntu 22.04+) y sigue el mismo documento.</p>
+</div>
+
+<!-- REQUISITOS -->
+<div id="requisitos" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">01</div>
+    <div>
+      <div class="ch-title">Requisitos base</div>
+      <div class="ch-sub">Lo que necesitas antes de empezar</div>
+    </div>
+  </div>
+
+  <div class="reqs">
+    <div class="req">
+      <div class="req-t">Hardware</div>
+      <div class="req-v">16 GB RAM</div>
+      <div class="req-d">Mínimo. 32 GB si vas a correr Ollama + Langfuse en la misma máquina.</div>
+    </div>
+    <div class="req">
+      <div class="req-t">Disco</div>
+      <div class="req-v">40 GB libres</div>
+      <div class="req-d">Modelos de embeddings + LLM local + Docker images.</div>
+    </div>
+    <div class="req">
+      <div class="req-t">GPU</div>
+      <div class="req-v">Opcional</div>
+      <div class="req-d">Solo necesaria para fine-tuning (Peldaño 4 opcional) y para Ollama rápido.</div>
+    </div>
+    <div class="req">
+      <div class="req-t">Docker</div>
+      <div class="req-v">24+</div>
+      <div class="req-d">Docker Desktop en Mac, Docker Engine en Linux. Con Compose v2.</div>
+    </div>
+  </div>
+
+  <h3>Software base — instalar una vez</h3>
+
+  <div class="setup s0">
+    <div class="setup-hdr">
+      <span class="setup-hdr-n">BASE</span>
+      <span class="setup-hdr-t">Python, pip, venv, git, make</span>
+      <span class="setup-hdr-tag">UNA VEZ</span>
+    </div>
+    <div class="setup-body">
+      <div class="setup-tools">
+        <b>Python 3.11+</b> · <b>pip</b> · <b>venv</b> (built-in) · <b>git</b> · <b>make</b> (opcional, pero recomendado)
+      </div>
+      <div class="setup-code"><span class="cm"># macOS con Homebrew</span>
+brew install python@3.11 git make
+
+<span class="cm"># Linux (Ubuntu/Debian)</span>
+sudo apt update
+sudo apt install python3.11 python3.11-venv git make
+
+<span class="cm"># Verificar versiones</span>
+python3.11 --version   <span class="cm"># ≥ 3.11</span>
+git --version
+make --version
+
+<span class="cm"># Crear entorno virtual del proyecto</span>
+mkdir ssep_referencia_minima && cd ssep_referencia_minima
+python3.11 -m venv .venv
+source .venv/bin/activate
+
+<span class="cm"># Actualizar pip y herramientas base</span>
+pip install --upgrade pip setuptools wheel</div>
+      <div class="setup-verify">
+        <b>Verificación:</b> <code>python --version</code> responde 3.11+, <code>pip list</code> funciona dentro del venv, y <code>which python</code> apunta a <code>.venv/bin/python</code>.
+      </div>
+    </div>
+  </div>
+
+  <div class="callout info">
+    <span class="clbl">Consejo de organización</span>
+    Un solo repositorio por peldaño: <code>ssep_p0/</code>, <code>ssep_p1/</code>, etc. No mezcles. Cuando el peldaño N funciona, se queda congelado y el N+1 empieza limpio. Esto evita que un cambio del Peldaño 3 rompa el Peldaño 1.
+  </div>
+</div>
+
+<!-- INVENTARIO -->
+<div id="inventario" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">02</div>
+    <div>
+      <div class="ch-title">Inventario completo</div>
+      <div class="ch-sub">Todo lo que se instala · por peldaño</div>
+    </div>
+  </div>
+
+  <p>Vista rápida. Cada fila es una herramienta. Cada columna, el peldaño en el que entra por primera vez.</p>
+
+  <div class="tbl">
+    <div class="tbl-hdr c4">
+      <div>Herramienta</div>
+      <div>Peldaño</div>
+      <div>Para qué</div>
+      <div>Tamaño</div>
+    </div>
+    <div class="tbl-row c4">
+      <div class="tbl-tech">Python 3.11+</div>
+      <div>P0</div>
+      <div>Todo el código</div>
+      <div>~100 MB</div>
+    </div>
+    <div class="tbl-row c4">
+      <div class="tbl-tech">scikit-learn</div>
+      <div>P1</div>
+      <div>Clasificador simple de referencia</div>
+      <div>~80 MB</div>
+    </div>
+    <div class="tbl-row c4">
+      <div class="tbl-tech">PyTorch (CPU)</div>
+      <div>P1</div>
+      <div>Si el modelo es una red neuronal</div>
+      <div>~800 MB</div>
+    </div>
+    <div class="tbl-row c4">
+      <div class="tbl-tech">ONNX Runtime</div>
+      <div>P1</div>
+      <div>Serving rápido sin GPU</div>
+      <div>~150 MB</div>
+    </div>
+    <div class="tbl-row c4">
+      <div class="tbl-tech">FastAPI + uvicorn</div>
+      <div>P1</div>
+      <div>Servir el modelo por HTTP</div>
+      <div>~20 MB</div>
+    </div>
+    <div class="tbl-row c4">
+      <div class="tbl-tech">sentence-transformers</div>
+      <div>P2</div>
+      <div>Embeddings locales (BGE, E5)</div>
+      <div>~500 MB</div>
+    </div>
+    <div class="tbl-row c4">
+      <div class="tbl-tech">pgvector + Postgres</div>
+      <div>P2</div>
+      <div>Vector store en Docker</div>
+      <div>~200 MB</div>
+    </div>
+    <div class="tbl-row c4">
+      <div class="tbl-tech">cross-encoder reranker</div>
+      <div>P2</div>
+      <div>Reordenar chunks por relevancia</div>
+      <div>~120 MB</div>
+    </div>
+    <div class="tbl-row c4">
+      <div class="tbl-tech">Ollama</div>
+      <div>P3</div>
+      <div>LLM local (Llama, Gemma)</div>
+      <div>~2-5 GB</div>
+    </div>
+    <div class="tbl-row c4">
+      <div class="tbl-tech">Langfuse (Docker)</div>
+      <div>P4</div>
+      <div>Trazas LLM self-hosted</div>
+      <div>~1 GB</div>
+    </div>
+    <div class="tbl-row c4">
+      <div class="tbl-tech">RAGAS</div>
+      <div>P5</div>
+      <div>Evaluación de RAG</div>
+      <div>~50 MB</div>
+    </div>
+  </div>
+
+  <div class="callout info">
+    <span class="clbl">Regla del tamaño</span>
+    El Peldaño 0 pesa ~100 MB. El Peldaño 5 pesa ~10 GB. Es la diferencia entre "instalo y ejecuto en 5 minutos" y "descargo modelos durante horas". Planifica cada peldaño con su descarga correspondiente.
+  </div>
+</div>
+
+<!-- P0 IMR -->
+<div id="s0" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">03</div>
+    <div>
+      <div class="ch-title">Peldaño 0 · IMR</div>
+      <div class="ch-sub">Solo Python · sin dependencias externas</div>
+    </div>
+    <div class="ch-badge" style="background:var(--ink3)">BASE</div>
+  </div>
+
+  <p>La Implementación Mínima de Referencia del Doc 0 no necesita nada más que Python. Ni base de datos, ni Docker, ni modelos. Es la prueba más pura de que los contratos entre capas funcionan.</p>
+
+  <div class="setup s0">
+    <div class="setup-hdr">
+      <span class="setup-hdr-n">P0</span>
+      <span class="setup-hdr-t">Entorno virtual del IMR</span>
+      <span class="setup-hdr-tag">~5 MIN</span>
+    </div>
+    <div class="setup-body">
+      <div class="setup-tools">
+        <b>Python 3.11+</b> · <b>venv</b> · (opcional) <b>pytest</b> para verificar contratos
+      </div>
+      <div class="setup-code"><span class="cm"># Crear estructura del proyecto</span>
+mkdir ssep_p0 && cd ssep_p0
+python3.11 -m venv .venv
+source .venv/bin/activate
+
+<span class="cm"># Solo si quieres tests de contratos</span>
+pip install pytest
+
+<span class="cm"># Estructura de carpetas</span>
+mkdir -p docs datos
+touch capa1_ingestion.py capa2_model.py capa3_explanation.py main.py
+
+<span class="cm"># Ejecutar</span>
+python main.py</div>
+      <div class="setup-verify">
+        <b>Verificación:</b> <code>python main.py</code> imprime los tres bloques del flujo (evento, predicción, explicación) sin errores. Si funciona aquí, la arquitectura está validada y el resto son extensiones.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- P1 MODELO -->
+<div id="s1" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">04</div>
+    <div>
+      <div class="ch-title">Peldaño 1 · Modelo real</div>
+      <div class="ch-sub">scikit-learn o PyTorch + FastAPI</div>
+    </div>
+    <div class="ch-badge" style="background:var(--l4)">P1</div>
+  </div>
+
+  <p>Reemplaza el clasificador trivial del IMR por un modelo entrenado. Aquí eliges stack según el dominio: <strong>scikit-learn</strong> si los datos son tabulares (fraude, telemetría), <strong>PyTorch</strong> si son secuenciales (audio, imagen).</p>
+
+  <h3>Opción A — scikit-learn (datos tabulares)</h3>
+
+  <div class="setup s1">
+    <div class="setup-hdr">
+      <span class="setup-hdr-n">P1-A</span>
+      <span class="setup-hdr-t">scikit-learn + joblib + FastAPI</span>
+      <span class="setup-hdr-tag">~10 MIN</span>
+    </div>
+    <div class="setup-body">
+      <div class="setup-tools">
+        <b>scikit-learn</b> (~80 MB) · <b>joblib</b> (built-in con sklearn) · <b>FastAPI</b> + <b>uvicorn</b> (~20 MB) · <b>pydantic</b> (~10 MB)
+      </div>
+      <div class="setup-code">pip install scikit-learn joblib fastapi uvicorn pydantic
+
+<span class="cm"># Entrenar (ejemplo)</span>
+python -c <span class="st">"
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.model_selection import train_test_split
+import joblib
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+clf = GradientBoostingClassifier().fit(X_train, y_train)
+print('accuracy:', clf.score(X_test, y_test))
+joblib.dump(clf, 'model.pkl')
+"</span>
+
+<span class="cm"># Servir</span>
+uvicorn serving:app --reload --port 8000</div>
+      <div class="setup-verify">
+        <b>Verificación:</b> <code>curl http://localhost:8000/predict -d '{...}'</code> devuelve una predicción con <code>label</code> y <code>confidence</code>. El modelo está servido y responde al contrato de la capa 2.
+      </div>
+    </div>
+  </div>
+
+  <h3>Opción B — PyTorch (datos secuenciales)</h3>
+
+  <div class="setup s1">
+    <div class="setup-hdr">
+      <span class="setup-hdr-n">P1-B</span>
+      <span class="setup-hdr-t">PyTorch + ONNX Runtime + FastAPI</span>
+      <span class="setup-hdr-tag">~20 MIN + DESCARGA</span>
+    </div>
+    <div class="setup-body">
+      <div class="setup-tools">
+        <b>PyTorch CPU</b> (~800 MB) · <b>ONNX</b> + <b>ONNX Runtime</b> (~200 MB) · <b>FastAPI</b> + <b>uvicorn</b>
+      </div>
+      <div class="setup-code"><span class="cm"># PyTorch sin CUDA (CPU)</span>
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+
+<span class="cm"># Para exportar el modelo a ONNX</span>
+pip install onnx onnxruntime
+
+<span class="cm"># FastAPI</span>
+pip install fastapi uvicorn pydantic
+
+<span class="cm"># Exportar modelo a ONNX</span>
+python -c <span class="st">"
+import torch, torch.onnx
+model = torch.load('model.pt').eval()
+dummy = torch.randn(1, 3, 224, 224)
+torch.onnx.export(model, dummy, 'model.onnx', opset_version=14)
+"</span>
+
+<span class="cm"># Servir con ONNX Runtime</span>
+uvicorn serving:app --reload --port 8000</div>
+      <div class="setup-verify">
+        <b>Verificación:</b> <code>curl</code> al endpoint devuelve predicción. Compara latencia con el modelo original: ONNX suele ser 2-3x más rápido en CPU.
+      </div>
+    </div>
+  </div>
+
+  <div class="callout warn">
+    <span class="clbl">Bloqueador real</span>
+    Instalar es 20 minutos. Conseguir el <strong>dataset etiquetado</strong> es 1-3 días. No esperes a tener el modelo para empezar a recolectar datos. El bloqueador no es técnico, es humano.
+  </div>
+</div>
+
+<!-- P2 RAG -->
+<div id="s2" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">05</div>
+    <div>
+      <div class="ch-title">Peldaño 2 · RAG real</div>
+      <div class="ch-sub">Embeddings + vector store + reranker</div>
+    </div>
+    <div class="ch-badge" style="background:var(--l5)">P2</div>
+  </div>
+
+  <p>Aquí es donde la descarga se vuelve pesada. Los embeddings locales pesan cientos de MB. El vector store en Docker añade capas. La buena noticia: el reranker es lo único que no puedes sustituir por un servicio gestionado sin perder el control.</p>
+
+  <div class="setup s2">
+    <div class="setup-hdr">
+      <span class="setup-hdr-n">P2</span>
+      <span class="setup-hdr-t">pgvector + sentence-transformers + reranker</span>
+      <span class="setup-hdr-tag">~30 MIN + DESCARGA</span>
+    </div>
+    <div class="setup-body">
+      <div class="setup-tools">
+        <b>pgvector</b> + <b>Postgres</b> en Docker (~200 MB) · <b>sentence-transformers</b> (~500 MB) · <b>cross-encoder reranker</b> (~120 MB) · <b>psycopg2</b> + <b>sqlalchemy</b> para conectar
+      </div>
+      <div class="setup-code"><span class="cm"># 1. Postgres + pgvector en Docker</span>
+docker run -d --name ssep-pgvector \
+  -e POSTGRES_PASSWORD=ssep \
+  -e POSTGRES_DB=ssep \
+  -p 5432:5432 \
+  -v ssep_pgdata:/var/lib/postgresql/data \
+  pgvector/pgvector:pg16
+
+<span class="cm"># 2. Habilitar la extensión dentro de Postgres</span>
+docker exec -it ssep-pgvector psql -U postgres -d ssep -c <span class="st">"CREATE EXTENSION IF NOT EXISTS vector;"</span>
+
+<span class="cm"># 3. Python</span>
+pip install sentence-transformers psycopg2-binary sqlalchemy pgvector
+
+<span class="cm"># 4. Descargar embeddings + reranker (una sola vez, ~600 MB)</span>
+python -c <span class="st">"
+from sentence_transformers import SentenceTransformer, CrossEncoder
+SentenceTransformer('BAAI/bge-large-en-v1.5')  # embeddings
+CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2')  # reranker
+"</span>
+
+<span class="cm"># 5. Verificar conexión Postgres</span>
+python -c <span class="st">"
+import psycopg2
+conn = psycopg2.connect('postgresql://postgres:ssep@localhost:5432/ssep')
+print('OK')
+"</span></div>
+      <div class="setup-verify">
+        <b>Verificación:</b> insertas 3 documentos en la tabla <code>docs</code>, embeds con <code>bge-large</code>, calculas similitud con una query, y obtienes el top-1 correcto. El reranker reordena el top-5 y el chunk relevante sube a posición 1.
+      </div>
+    </div>
+  </div>
+
+  <div class="callout info">
+    <span class="clbl">Alternativa sin Docker</span>
+    Si no quieres Postgres, cambia por <b>Chroma</b> (embebido, cero infra) o <b>Qdrant</b> (Docker, ~300 MB). El contrato es el mismo: un vector store que responde a búsquedas por similitud. Cambiar de uno a otro es 20 líneas de código.
+  </div>
+</div>
+
+<!-- P3 LLM -->
+<div id="s3" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">06</div>
+    <div>
+      <div class="ch-title">Peldaño 3 · LLM real</div>
+      <div class="ch-sub">Ollama local o API externa</div>
+    </div>
+    <div class="ch-badge" style="background:#5c34c0">P3</div>
+  </div>
+
+  <p>Dos caminos: <strong>local con Ollama</strong> (privacidad total, sin coste por token, GPU recomendable) o <strong>API externa</strong> (Claude, GPT-4o-mini, calidad top, coste por token). Si el dominio es regulado, Ollama. Si no, API.</p>
+
+  <h3>Opción A — Ollama local (recomendado para dominios regulados)</h3>
+
+  <div class="setup s3">
+    <div class="setup-hdr">
+      <span class="setup-hdr-n">P3-A</span>
+      <span class="setup-hdr-t">Ollama + modelo local</span>
+      <span class="setup-hdr-tag">~15 MIN + 2-5 GB</span>
+    </div>
+    <div class="setup-body">
+      <div class="setup-tools">
+        <b>Ollama</b> (~150 MB binario) · <b>Modelo</b>: <code>llama3.2:3b</code> (~2 GB) o <code>gemma2:2b</code> (~1.5 GB) · <b>SDK Python</b> (~5 MB)
+      </div>
+      <div class="setup-code"><span class="cm"># 1. Instalar Ollama</span>
+<span class="cm"># macOS</span>
+brew install ollama
+
+<span class="cm"># Linux</span>
+curl -fsSL https://ollama.com/install.sh | sh
+
+<span class="cm"># 2. Arrancar el servicio</span>
+ollama serve &
+
+<span class="cm"># 3. Descargar modelo (elige uno según RAM)</span>
+ollama pull llama3.2:3b        <span class="cm"># 3B, ~2 GB, 8GB RAM mínimo</span>
+<span class="cm"># o</span>
+ollama pull gemma2:2b          <span class="cm"># 2B, ~1.5 GB, 4GB RAM mínimo</span>
+<span class="cm"># o</span>
+ollama pull qwen2.5:7b         <span class="cm"># 7B, ~4 GB, 16GB RAM, mejor calidad</span>
+
+<span class="cm"># 4. SDK Python</span>
+pip install ollama
+
+<span class="cm"># 5. Verificar</span>
+ollama run llama3.2:3b <span class="st">"Hola, responde en 5 palabras"</span></div>
+      <div class="setup-verify">
+        <b>Verificación:</b> <code>ollama list</code> muestra el modelo descargado. Desde Python, <code>ollama.chat(model='llama3.2:3b', messages=[...])</code> devuelve texto. Latencia: ~1-2s para respuestas cortas en CPU, ~200-500ms con GPU.
+      </div>
+    </div>
+  </div>
+
+  <h3>Opción B — API externa (más rápida de arrancar, coste por uso)</h3>
+
+  <div class="setup s3">
+    <div class="setup-hdr">
+      <span class="setup-hdr-n">P3-B</span>
+      <span class="setup-hdr-t">Claude o GPT-4o-mini vía SDK</span>
+      <span class="setup-hdr-tag">~5 MIN</span>
+    </div>
+    <div class="setup-body">
+      <div class="setup-tools">
+        <b>anthropic</b> o <b>openai</b> SDK (~20 MB) · <b>API key</b> en variable de entorno
+      </div>
+      <div class="setup-code"><span class="cm"># Claude</span>
+pip install anthropic
+<span class="cm"># GPT-4o-mini</span>
+pip install openai
+
+<span class="cm"># Configurar API key (añadir a ~/.bashrc o .env)</span>
+export ANTHROPIC_API_KEY=<span class="st">"sk-ant-..."</span>
+<span class="cm"># o</span>
+export OPENAI_API_KEY=<span class="st">"sk-..."</span>
+
+<span class="cm"># Verificar</span>
+python -c <span class="st">"
+from anthropic import Anthropic
+c = Anthropic()
+r = c.messages.create(model='claude-3-5-sonnet-latest', max_tokens=50,
+                      messages=[{'role':'user','content':'Hola'}])
+print(r.content[0].text)
+"</span></div>
+      <div class="setup-verify">
+        <b>Verificación:</b> la llamada devuelve texto en &lt;2s. Coste orientativo: ~$0.003 por query técnica en Claude Sonnet, ~$0.0005 en GPT-4o-mini.
+      </div>
+    </div>
+  </div>
+
+  <div class="callout warn">
+    <span class="clbl">Decisión de cumplimiento</span>
+    Si el prompt contiene datos de cliente → <strong>Ollama obligatorio</strong>. Enviar prompts con información interna a una API externa es una brecha SOC2/ISO27001. Ollama es la opción defendible ante auditoría.
+  </div>
+</div>
+
+<!-- P4 OBSERVABILIDAD -->
+<div id="s4" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">07</div>
+    <div>
+      <div class="ch-title">Peldaño 4 · Observabilidad</div>
+      <div class="ch-sub">Langfuse self-hosted · el peldaño con más dependencias ocultas</div>
+    </div>
+    <div class="ch-badge" style="background:var(--sec)">P4</div>
+  </div>
+
+  <p>Langfuse v3 no es una sola aplicación. Es una <strong>arquitectura de 5 componentes</strong>: web + worker + Postgres + ClickHouse + Redis. Este es el peldaño donde más gente se atasca. Instalarlo mal es peor que no instalarlo.</p>
+
+  <div class="setup s4">
+    <div class="setup-hdr">
+      <span class="setup-hdr-n">P4</span>
+      <span class="setup-hdr-t">Langfuse self-hosted (v3 completo)</span>
+      <span class="setup-hdr-tag">~30 MIN</span>
+    </div>
+    <div class="setup-body">
+      <div class="setup-tools">
+        <b>Docker Compose</b> · <b>Langfuse web + worker</b> (~500 MB) · <b>Postgres</b> (~200 MB) · <b>ClickHouse</b> (~500 MB) · <b>Redis</b> (~50 MB)
+      </div>
+      <div class="setup-code"><span class="cm"># 1. Crear docker-compose.yml (versión simplificada)</span>
+<span class="cm"># Descargar el oficial: </span>
+curl -o docker-compose.yml \
+  https://raw.githubusercontent.com/langfuse/langfuse/main/docker-compose.yml
+
+<span class="cm"># 2. Ajustar variables de entorno mínimas</span>
+cat &gt; .env &lt;&lt; 'EOF'
+NEXTAUTH_SECRET=tu-secret-aleatorio-largo
+SALT=tu-salt-aleatorio
+DATABASE_URL=postgresql://postgres:postgres@db:5432/langfuse
+CLICKHOUSE_URL=http://clickhouse:8123
+REDIS_CONNECTION_STRING=redis://redis:6379
+NEXTAUTH_URL=http://localhost:3000
+EOF
+
+<span class="cm"># 3. Levantar</span>
+docker compose up -d
+
+<span class="cm"># 4. Verificar que los 5 contenedores están healthy</span>
+docker compose ps
+
+<span class="cm"># 5. Crear usuario en la UI</span>
+<span class="cm"># Abrir http://localhost:3000 → crear cuenta → crear proyecto</span>
+<span class="cm"># Guardar public_key y secret_key para el SDK</span>
+
+<span class="cm"># 6. SDK Python</span>
+pip install langfuse
+
+<span class="cm"># 7. Configurar</span>
+export LANGFUSE_PUBLIC_KEY=<span class="st">"pk-lf-..."</span>
+export LANGFUSE_SECRET_KEY=<span class="st">"sk-lf-..."</span>
+export LANGFUSE_HOST=<span class="st">"http://localhost:3000"</span>
+
+<span class="cm"># 8. Instrumentar</span>
+python -c <span class="st">"
+from langfuse.decorators import observe
+@observe()
+def f(): return 42
+f()
+"</span></div>
+      <div class="setup-verify">
+        <b>Verificación:</b> la UI en <code>http://localhost:3000</code> muestra la traza del test en la pestaña "Traces" con input, output y latencia. Si no aparece, revisa el worker en <code>docker compose logs worker</code>.
+      </div>
+    </div>
+  </div>
+
+  <div class="callout danger">
+    <span class="clbl">⚠ Modo simplificado</span>
+    Si el setup completo te bloquea, usa <strong>Langfuse Cloud</strong> con una cuenta gratis para el Peldaño 4. Pero antes de llevar datos de cliente reales, migra a self-hosted. La nube es para desarrollo, no para producción con datos regulados.
+  </div>
+</div>
+
+<!-- P5 EVALUACION -->
+<div id="s5" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">08</div>
+    <div>
+      <div class="ch-title">Peldaño 5 · Evaluación</div>
+      <div class="ch-sub">RAGAS + queries de prueba + juez LLM</div>
+    </div>
+    <div class="ch-badge" style="background:#0d7a5f">P5</div>
+  </div>
+
+  <p>RAGAS es la librería de evaluación. Pero RAGAS <strong>necesita un LLM como juez</strong> para calcular las métricas. Si usaste Ollama en el Peldaño 3, lo reutilizas. Si usaste API, RAGAS gastará tokens de esa API.</p>
+
+  <div class="setup s5">
+    <div class="setup-hdr">
+      <span class="setup-hdr-n">P5</span>
+      <span class="setup-hdr-t">RAGAS + LLM juez + dataset</span>
+      <span class="setup-hdr-tag">~15 MIN + DATASET</span>
+    </div>
+    <div class="setup-body">
+      <div class="setup-tools">
+        <b>ragas</b> (~50 MB) · <b>langchain-community</b> para integración · <b>LLM juez</b>: reutiliza el del Peldaño 3 · <b>Dataset</b> de 20-100 queries (trabajo manual)
+      </div>
+      <div class="setup-code"><span class="cm"># 1. Instalar RAGAS</span>
+pip install ragas langchain-community langchain-openai
+
+<span class="cm"># 2. Configurar LLM juez (Ollama local)</span>
+python -c <span class="st">"
+from ragas.llms import LangchainLLMWrapper
+from langchain_community.llms import Ollama
+judge = LangchainLLMWrapper(Ollama(model='llama3.2:3b'))
+print('OK')
+"</span>
+
+<span class="cm"># 3. Con API (alternativa)</span>
+<span class="cm"># export OPENAI_API_KEY="sk-..."</span>
+
+<span class="cm"># 4. Verificar con un caso trivial</span>
+python -c <span class="st">"
+from ragas import evaluate
+from ragas.metrics import faithfulness
+from datasets import Dataset
+
+data = Dataset.from_dict({
+    'question': ['¿Qué significa desgaste leve?'],
+    'answer': ['Desgaste leve significa...'],
+    'contexts': [['Manual Siemens 1LA7: desgaste leve es...']],
+    'ground_truth': ['Desgaste leve es un patrón acústico...']
+})
+result = evaluate(data, metrics=[faithfulness])
+print(result)
+"</span></div>
+      <div class="setup-verify">
+        <b>Verificación:</b> el output muestra un score de faithfulness entre 0 y 1. Si funciona con 1 caso, funciona con 100. El bloqueador real es producir los 100 casos con <code>ground_truth</code> correcto.
+      </div>
+    </div>
+  </div>
+
+  <div class="callout info">
+    <span class="clbl">Coste de RAGAS</span>
+    Cada evaluación consume 4 llamadas al LLM juez por query (una por métrica). 100 queries × 4 métricas = 400 llamadas. Con Ollama local: 0€. Con GPT-4o-mini: ~$0.10 por evaluación completa. Con Claude Sonnet: ~$1.50.
+  </div>
+</div>
+
+<!-- DEPENDENCIAS OCULTAS -->
+<div id="ocultas" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">09</div>
+    <div>
+      <div class="ch-title">Dependencias ocultas</div>
+      <div class="ch-sub">Lo que no se ve en el pip install</div>
+    </div>
+  </div>
+
+  <p>Estas son las cosas que no aparecen en la documentación de cada herramienta y que rompen el setup si no las anticipas.</p>
+
+  <div class="deps">
+    <div class="deps-hdr">Mapa de dependencias · lo que arrastra cada herramienta</div>
+    <div class="deps-body"><b>Langfuse v3</b> arrastra:
+├── Postgres (metadatos)
+├── ClickHouse (trazas)
+├── Redis (queue)
+└── Blob storage opcional (S3/MinIO para artefactos grandes)
+
+<b>RAGAS</b> arrastra:
+├── Un LLM (juez, para todas las métricas)
+├── Embeddings (algunas métricas)
+└── datasets + pandas (para el dataset format)
+
+<b>sentence-transformers</b> arrastra:
+├── PyTorch (CPU o GPU)
+├── transformers
+└── huggingface_hub (para descargar modelos)
+
+<b>pgvector</b> arrastra:
+├── Postgres 14+
+├── Extensión vector (no viene por defecto)
+└── Índice HNSW o IVFFlat (hay que crearlo a mano)
+
+<b>Ollama</b> arrastra:
+├── GPU opcional (si no, CPU = 10x más lento)
+├── ~4-8 GB de RAM por modelo de 3B
+└── Espacio en disco (los modelos no se borran solos)
+
+<b>ONNX Runtime</b> arrastra:
+├── Numpy 1.x (no 2.x en algunas versiones)
+└── Compilación específica por plataforma</div>
+  </div>
+
+  <div class="callout danger">
+    <span class="clbl">⚠ Los tres errores más comunes</span>
+    <strong>1.</strong> Instalar Langfuse v3 sin ClickHouse (no arranca). <strong>2.</strong> Configurar RAGAS sin LLM juez (falla silenciosamente devolviendo NaN). <strong>3.</strong> Instalar sentence-transformers sin PyTorch (falla al cargar el primer modelo). Cada uno tiene su propio mensaje de error que no apunta a la causa real.
+  </div>
+</div>
+
+<!-- PERFILES -->
+<div id="perfiles" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">10</div>
+    <div>
+      <div class="ch-title">Perfiles y alternativas</div>
+      <div class="ch-sub">Qué instalar según tu situación</div>
+    </div>
+  </div>
+
+  <h3>Instalación mínima · solo para entender el patrón</h3>
+
+  <div class="recipe">
+    <div class="recipe-hdr">
+      <div class="recipe-t">Setup mínimo</div>
+      <div class="recipe-sub">~500 MB · 10 MIN</div>
+    </div>
+    <div class="recipe-body">
+      <div class="recipe-row">
+        <div class="recipe-lbl">Peldaños</div>
+        <div class="recipe-val">P0 (IMR) + P1 (modelo) + P2 (solo Chroma, sin Postgres) + P3 (API externa)</div>
+      </div>
+      <div class="recipe-row">
+        <div class="recipe-lbl">Herramientas</div>
+        <div class="recipe-val">Python + scikit-learn + Chroma + anthropic SDK</div>
+      </div>
+      <div class="recipe-row">
+        <div class="recipe-lbl">Sin</div>
+        <div class="recipe-val">Docker, Ollama, Langfuse, RAGAS</div>
+      </div>
+      <div class="recipe-row">
+        <div class="recipe-lbl">Para</div>
+        <div class="recipe-val">Validar que el patrón aplica a tu dominio antes de invertir en infraestructura</div>
+      </div>
+    </div>
+  </div>
+
+  <h3>Instalación completa · producción con datos regulados</h3>
+
+  <div class="recipe">
+    <div class="recipe-hdr">
+      <div class="recipe-t">Setup completo</div>
+      <div class="recipe-sub">~10 GB · 2-3 H</div>
+    </div>
+    <div class="recipe-body">
+      <div class="recipe-row">
+        <div class="recipe-lbl">Peldaños</div>
+        <div class="recipe-val">P0 + P1 + P2 + P3 + P4 + P5 completos</div>
+      </div>
+      <div class="recipe-row">
+        <div class="recipe-lbl">Herramientas</div>
+        <div class="recipe-val">Todo lo anterior + Ollama + Langfuse self-hosted con los 5 contenedores + RAGAS</div>
+      </div>
+      <div class="recipe-row">
+        <div class="recipe-lbl">Requisitos</div>
+        <div class="recipe-val">16 GB RAM mínimo, 32 GB recomendado. GPU opcional pero muy útil.</div>
+      </div>
+      <div class="recipe-row">
+        <div class="recipe-lbl">Para</div>
+        <div class="recipe-val">Producción interna o cliente enterprise. Cumplimiento SOC2/ISO27001 exigible.</div>
+      </div>
+    </div>
+  </div>
+
+  <h3>Ajustes por perfil</h3>
+
+  <div class="tbl">
+    <div class="tbl-hdr c3">
+      <div>Perfil</div>
+      <div>Qué cambiar</div>
+      <div>Por qué</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Sin Docker</div>
+      <div>Chroma en lugar de pgvector. Langfuse Cloud en desarrollo. SQLite para estado.</div>
+      <div>Menos infra que aprender, mismo contrato de capa.</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Sin GPU</div>
+      <div>Usa API externa para LLM (Claude/GPT-4o-mini). Ollama solo con modelos ≤2B.</div>
+      <div>Ollama 3B en CPU tarda 10-30s por query. La API tarda 1-2s.</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Poca RAM (&lt;16 GB)</div>
+      <div>Chroma embebido, API externa, sin Langfuse local. Todo gestión en la nube.</div>
+      <div>Langfuse v3 completo necesita ~4 GB de RAM solo para él.</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Windows</div>
+      <div>WSL2 con Ubuntu 22.04. Sigue este documento sin cambios dentro de WSL.</div>
+      <div>Ollama, Postgres y Docker funcionan mal nativamente en Windows.</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Equipo de 2-3</div>
+      <div>Añade: <code>docker compose</code> en un servidor compartido. Todos apuntan al mismo Langfuse y Postgres.</div>
+      <div>Evita 3 Langfuse y 3 Postgres independientes desincronizados.</div>
+    </div>
+  </div>
+
+  <div class="pq">
+    El setup no es la parte difícil. Es la parte que se atasca cuando no está documentada. Con este documento, cada peldaño se instala en menos de una hora y se verifica antes de pasar al siguiente.
+  </div>
+
+  <div class="callout ok">
+    <span class="clbl">✓ Regla final</span>
+    Si el Peldaño N tarda más de <strong>una hora</strong> en instalarse, algo va mal. Detente, revisa el mensaje de error real (no el primero que aparece), y consulta las dependencias ocultas (§09). El 90% de los bloqueos son dependencias no listadas en el README de la herramienta.
+  </div>
+</div>
+
+</div>
+</div>
+
+<footer>
+  SSEP · Setup del entorno · Documento 0.6 de 4
+  <div class="ft-dots">
+    <div class="ft-dot" style="background:var(--l1)"></div>
+    <div class="ft-dot" style="background:var(--l2)"></div>
+    <div class="ft-dot" style="background:var(--l3)"></div>
+    <div class="ft-dot" style="background:var(--l4)"></div>
+    <div class="ft-dot" style="background:var(--l5)"></div>
+    <div class="ft-dot" style="background:var(--sec)"></div>
+  </div>
+</footer>
+
+</body>
+</html>

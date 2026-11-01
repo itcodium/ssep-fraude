@@ -1,0 +1,1685 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SSEP — Documento 2 · Implementación</title>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,300;1,6..72,400&family=Geist:wght@300;400;500;600;700;800;900&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff; --ink:#0c0c0b; --ink2:#2d2d2b; --ink3:#787870;
+  --rule:#e4e4de; --rule2:#f5f5ef;
+
+  --l1:#c0390b; --l1-l:#fdeee9;
+  --l2:#1a5c3a; --l2-l:#e4f5ec;
+  --l3:#1c6ea4; --l3-l:#eef2fb;
+  --l4:#7b2d8b; --l4-l:#f5eaf9;
+  --l5:#b45309; --l5-l:#fef3e2;
+  --sec:#0a2540; --sec-l:#e8eef5;
+
+  --mono:'Geist Mono',monospace;
+  --head:'Geist',sans-serif;
+  --body:'Newsreader',Georgia,serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--body);background:var(--bg);color:var(--ink);line-height:1.7;font-size:17px;}
+
+nav{background:var(--ink);position:sticky;top:0;z-index:200;}
+.nav-in{max-width:1180px;margin:0 auto;display:flex;align-items:center;padding:10px 28px;gap:4px;flex-wrap:wrap;}
+.nav-logo{font-family:var(--head);font-size:13px;font-weight:800;color:white;margin-right:14px;letter-spacing:-.3px;}
+.nav-a{font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.38);text-decoration:none;padding:4px 9px;border-radius:3px;transition:all .12s;white-space:nowrap;}
+.nav-a:hover{background:rgba(255,255,255,.1);color:white;}
+
+.hero{background:var(--ink);color:white;position:relative;overflow:hidden;}
+.hero-stripe{height:5px;background:linear-gradient(90deg,
+  var(--l1) 0 16.6%,var(--l2) 16.6% 33.3%,var(--l3) 33.3% 50%,
+  var(--l4) 50% 66.6%,var(--l5) 66.6% 83.3%,var(--sec) 83.3% 100%);}
+.hero-in{max-width:1180px;margin:0 auto;padding:78px 28px 64px;}
+.hero-eye{font-family:var(--mono);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.28);margin-bottom:20px;}
+.hero h1{font-family:var(--head);font-size:clamp(38px,5.4vw,66px);font-weight:900;line-height:.95;letter-spacing:-1.8px;margin-bottom:22px;}
+.hero h1 .accent{color:#5ba3ff;}
+.hero h1 .smaller{font-size:.55em;font-weight:500;color:rgba(255,255,255,.35);letter-spacing:-.5px;display:block;margin-top:14px;}
+.hero-desc{font-family:var(--body);font-size:18px;font-style:italic;font-weight:300;color:rgba(255,255,255,.5);max-width:680px;line-height:1.65;margin-bottom:44px;}
+.hero-meta{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;background:rgba(255,255,255,.06);border-radius:12px;overflow:hidden;}
+@media(max-width:700px){.hero-meta{grid-template-columns:1fr 1fr;}}
+.hm{padding:18px 16px;background:rgba(255,255,255,.03);}
+.hm-k{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:6px;}
+.hm-v{font-family:var(--head);font-size:13px;font-weight:600;line-height:1.3;}
+.hm-v span{color:rgba(255,255,255,.5);font-weight:400;}
+
+.layout{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:240px 1fr;gap:0;}
+@media(max-width:900px){.layout{grid-template-columns:1fr;}}
+.sidebar{border-right:1px solid var(--rule);padding:28px 14px;position:sticky;top:48px;height:calc(100vh - 48px);overflow-y:auto;}
+@media(max-width:900px){.sidebar{display:none;}}
+.sb-section{margin-bottom:22px;}
+.sb-hdr{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin-bottom:8px;padding-left:8px;}
+.sb-a{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:5px;font-family:var(--head);font-size:12px;font-weight:500;text-decoration:none;color:var(--ink2);transition:background .12s;margin-bottom:1px;}
+.sb-a:hover{background:var(--rule2);}
+.sb-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+
+.content{padding:0 0 80px;}
+.chapter{padding:0 44px;}
+@media(max-width:680px){.chapter{padding:0 20px;}}
+.ch-hdr{padding:58px 0 26px;border-bottom:2px solid var(--ink);margin-bottom:34px;display:flex;align-items:flex-end;gap:16px;}
+.ch-n{font-family:var(--head);font-size:70px;font-weight:900;line-height:1;color:var(--rule);letter-spacing:-3px;flex-shrink:0;}
+.ch-title{font-family:var(--head);font-size:26px;font-weight:800;letter-spacing:-.5px;line-height:1.0;}
+.ch-sub{font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:1.5px;text-transform:uppercase;margin-top:5px;}
+.ch-badge{margin-left:auto;font-family:var(--mono);font-size:9px;padding:5px 12px;border-radius:50px;color:white;flex-shrink:0;letter-spacing:.5px;}
+
+p{margin-bottom:20px;color:var(--ink2);line-height:1.78;font-weight:300;}
+strong{color:var(--ink);font-weight:600;}
+em{font-style:italic;}
+h3{font-family:var(--head);font-size:19px;font-weight:700;margin:38px 0 12px;letter-spacing:-.3px;padding-left:14px;border-left:3px solid var(--ink);}
+h4{font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin:22px 0 8px;}
+
+ol,ul{margin:0 0 20px 22px;color:var(--ink2);}
+li{margin-bottom:8px;line-height:1.7;font-weight:300;}
+li strong{color:var(--ink);}
+
+.callout{margin:22px 0;padding:16px 20px;border-radius:6px;border-left:4px solid;font-size:15px;line-height:1.68;font-family:var(--head);}
+.callout.ok{background:var(--l2-l);border-color:var(--l2);color:#0a3020;}
+.callout.info{background:var(--l3-l);border-color:var(--l3);color:#0d3258;}
+.callout.warn{background:var(--l5-l);border-color:var(--l5);color:#5c2d00;}
+.callout.danger{background:var(--l1-l);border-color:var(--l1);color:#5c1a05;}
+.clbl{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;font-weight:600;margin-bottom:5px;display:block;}
+
+/* Tables */
+.tbl{margin:20px 0;border:1.5px solid var(--ink);border-radius:12px;overflow:hidden;font-family:var(--head);}
+.tbl-hdr{background:var(--ink);color:white;display:grid;padding:0;}
+.tbl-hdr>div{padding:10px 14px;font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;}
+.tbl-row{display:grid;border-bottom:1px solid var(--rule);}
+.tbl-row:last-child{border-bottom:none;}
+.tbl-row>div{padding:12px 14px;font-size:13px;color:var(--ink2);border-right:1px solid var(--rule);line-height:1.5;}
+.tbl-row>div:last-child{border-right:none;}
+.tbl-tech{font-size:13px;font-weight:700;color:var(--ink);font-family:var(--head);}
+.tbl-row:nth-child(even){background:var(--rule2);}
+.c3{grid-template-columns:180px 1fr 1fr;}
+.c4{grid-template-columns:170px 1fr 1fr 1fr;}
+.c5{grid-template-columns:150px 1fr 1fr 1fr 1fr;}
+@media(max-width:680px){.tbl-hdr,.tbl-row{grid-template-columns:1fr!important;} .tbl-row>div,.tbl-hdr>div{border-right:none;border-bottom:1px solid var(--rule);}}
+
+/* Stack cards */
+.stack{margin:26px 0;border:1.5px solid var(--rule);border-radius:12px;overflow:hidden;}
+.stack-hdr{padding:16px 22px;color:white;font-family:var(--head);display:flex;align-items:center;gap:14px;}
+.stack-hdr-num{font-family:var(--mono);font-size:10px;opacity:.6;letter-spacing:2px;}
+.stack-hdr-t{font-size:16px;font-weight:800;letter-spacing:-.3px;}
+.stack-hdr-sub{margin-left:auto;font-family:var(--mono);font-size:10px;opacity:.7;letter-spacing:1px;}
+.stack-body{padding:0;background:white;}
+.stack-layer{display:grid;grid-template-columns:130px 1fr;border-bottom:1px solid var(--rule);}
+.stack-layer:last-child{border-bottom:none;}
+.stack-layer-lbl{padding:14px 18px;font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);background:var(--rule2);border-right:1px solid var(--rule);}
+.stack-layer-val{padding:14px 18px;font-family:var(--head);font-size:13px;color:var(--ink2);line-height:1.6;}
+.stack-layer-val b{color:var(--ink);font-weight:600;}
+.stack-cost{padding:16px 22px;background:var(--rule2);font-family:var(--mono);font-size:11px;color:var(--ink2);letter-spacing:.5px;border-top:1px solid var(--rule);}
+.stack-cost b{color:var(--ink);font-weight:700;}
+
+.stack.s1 .stack-hdr{background:var(--l2);}
+.stack.s2 .stack-hdr{background:var(--l3);}
+.stack.s3 .stack-hdr{background:var(--l4);}
+
+/* Anti-selection table variant */
+.anti{margin:20px 0;border:1.5px solid var(--l1);border-radius:12px;overflow:hidden;font-family:var(--head);}
+.anti-hdr{background:var(--l1);color:white;display:grid;grid-template-columns:1fr 1fr;padding:0;}
+.anti-hdr>div{padding:10px 14px;font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;}
+.anti-row{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--rule);}
+.anti-row:last-child{border-bottom:none;}
+.anti-row>div{padding:12px 14px;font-size:13px;color:var(--ink2);border-right:1px solid var(--rule);line-height:1.5;}
+.anti-row>div:last-child{border-right:none;}
+.anti-row:nth-child(even){background:var(--l1-l);}
+.anti-tech{font-size:13px;font-weight:700;color:var(--l1);font-family:var(--head);}
+@media(max-width:680px){.anti-hdr,.anti-row{grid-template-columns:1fr;} .anti-row>div,.anti-hdr>div{border-right:none;border-bottom:1px solid var(--rule);}}
+
+/* Pull quote */
+.pq{margin:40px 0;padding:26px 32px;border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);font-family:var(--head);font-size:clamp(17px,2.2vw,21px);font-weight:700;line-height:1.3;text-align:center;letter-spacing:-.3px;}
+
+/* Rule list */
+.rules{counter-reset:rule;margin:24px 0;}
+.rule{display:grid;grid-template-columns:44px 1fr;gap:14px;padding:14px 0;border-bottom:1px solid var(--rule);}
+.rule:last-child{border-bottom:none;}
+.rule-n{font-family:var(--head);font-size:28px;font-weight:900;line-height:1;color:var(--rule);letter-spacing:-1.5px;}
+.rule-t{font-family:var(--head);font-size:15px;font-weight:700;color:var(--ink);margin-bottom:4px;}
+.rule-d{font-size:14px;color:var(--ink2);line-height:1.6;font-family:var(--body);}
+
+footer{background:var(--ink);color:rgba(255,255,255,.28);padding:22px 28px;font-family:var(--mono);font-size:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
+.ft-dots{display:flex;gap:5px;}
+.ft-dot{width:8px;height:8px;border-radius:50%;}
+
+code{font-family:var(--mono);font-size:12.5px;background:var(--rule2);padding:2px 6px;border-radius:3px;color:var(--l1);}
+</style>
+</head>
+<body>
+  <nav>
+    <div class="nav-in">
+      <a class="nav-logo" href="index.html">SSEP</a>
+      <a class="nav-a" href="0-base.html">0 · Base</a>
+      <a class="nav-a" href="0.5-plan.html">0.5 · Plan</a>
+      <a class="nav-a" href="0.6-setup.html">0.6 · Setup</a>
+      <a class="nav-a" href="0.7-escalado.html">0.7 · Escalado</a>
+      <a class="nav-a" href="1-patron.html">1 · Patrón</a>
+      <a class="nav-a" href="2-implementacion.html">2 · Implementación</a>
+      <a class="nav-a" href="3-metalkube.html">3 · MetalKube</a>
+    </div>
+  </nav>
+
+<div class="hero">
+  <div class="hero-stripe"></div>
+  <div class="hero-in">
+    <div class="hero-eye">Documento 2 · Implementación · v0.2</div>
+    <h1>Herramientas para<br>materializar <span class="accent">las 5 capas</span>.
+      <span class="smaller">Catálogo de opciones · stacks de referencia · anti-selecciones · criterios de decisión</span>
+    </h1>
+    <p class="hero-desc">
+      Este documento es agnóstico de dominio pero específico de tecnología. Habla de Kafka, Qdrant y LangGraph, no de motores ni de manuales. Cada capa tiene 3-5 opciones viables. Ninguna es "la correcta" en abstracto — depende del volumen, del equipo, del presupuesto y de la madurez operacional.
+    </p>
+    <div class="hero-meta">
+      <div class="hm"><div class="hm-k">Depende de</div><div class="hm-v">Documento 1 <span>— patrón SSEP</span></div></div>
+      <div class="hm"><div class="hm-k">Alcance</div><div class="hm-v">Agnóstico de dominio <span>· específico de tecnología</span></div></div>
+      <div class="hm"><div class="hm-k">Contenido</div><div class="hm-v">5 capas + seguridad <span>+ 3 stacks</span></div></div>
+      <div class="hm"><div class="hm-k">Estado</div><div class="hm-v">v0.2 <span>— consolidado</span></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+
+<div class="sidebar">
+  <div class="sb-section">
+    <div class="sb-hdr">Contenido</div>
+    <a class="sb-a" href="#intro"><span class="sb-dot" style="background:var(--ink3)"></span>Cómo leer</a>
+    <a class="sb-a" href="#ingestion"><span class="sb-dot" style="background:var(--l1)"></span>01 · Ingestion</a>
+    <a class="sb-a" href="#model"><span class="sb-dot" style="background:var(--l2)"></span>02 · Model</a>
+    <a class="sb-a" href="#explanation"><span class="sb-dot" style="background:var(--l3)"></span>03 · Explanation</a>
+    <a class="sb-a" href="#decision"><span class="sb-dot" style="background:var(--l4)"></span>04 · Decision</a>
+    <a class="sb-a" href="#governance"><span class="sb-dot" style="background:var(--l5)"></span>05 · Governance</a>
+    <a class="sb-a" href="#security"><span class="sb-dot" style="background:var(--sec)"></span>06 · Security</a>
+    <a class="sb-a" href="#stacks"><span class="sb-dot" style="background:var(--ink)"></span>07 · Stacks de referencia</a>
+    <a class="sb-a" href="#anti"><span class="sb-dot" style="background:var(--l1)"></span>08 · Anti-selecciones</a>
+    <a class="sb-a" href="#criterios"><span class="sb-dot" style="background:var(--l2)"></span>09 · Criterios de decisión</a>
+  </div>
+</div>
+
+<div class="content">
+
+<!-- INTRO -->
+<div id="intro" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">00</div>
+    <div>
+      <div class="ch-title">Cómo leer este documento</div>
+      <div class="ch-sub">Tres reglas · tres atajos</div>
+    </div>
+  </div>
+
+  <p>Este documento no es una receta. Es un catálogo de opciones para materializar cada una de las cinco capas del patrón SSEP. Cada capa tiene múltiples herramientas viables y ninguna es universalmente correcta — la elección depende de cuatro variables: <strong>volumen</strong>, <strong>latencia objetivo</strong>, <strong>equipo disponible</strong> y <strong>presupuesto operacional</strong>.</p>
+
+  <div class="rules">
+    <div class="rule">
+      <div class="rule-n">1</div>
+      <div>
+        <div class="rule-t">No busques "la mejor" herramienta</div>
+        <div class="rule-d">Busca la que encaja con tu volumen, equipo y restricciones. Kafka es la respuesta correcta para >10k msg/s y la respuesta incorrecta para <1k msg/s operado por una persona.</div>
+      </div>
+    </div>
+    <div class="rule">
+      <div class="rule-n">2</div>
+      <div>
+        <div class="rule-t">Cada opción tiene coste operacional explícito</div>
+        <div class="rule-d">No solo coste económico. También coste de aprendizaje, de mantenimiento, de contratación. Un Kafka bien operado cuesta más que una cola en Redis aunque el hardware sea el mismo.</div>
+      </div>
+    </div>
+    <div class="rule">
+      <div class="rule-n">3</div>
+      <div>
+        <div class="rule-t">Los stacks (§07) son el atajo</div>
+        <div class="rule-d">Si no quieres leer el catálogo completo, ve directo a §07 y elige el stack que más se parezca a tu situación. Después vuelve a las capas específicas que necesites ajustar.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 01 INGESTION -->
+<div id="ingestion" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">01</div>
+    <div>
+      <div class="ch-title">Ingestion</div>
+      <div class="ch-sub">Captura · pre-procesado en edge · transporte · control de flujo</div>
+    </div>
+    <div class="ch-badge" style="background:var(--l1)">Capa 1</div>
+  </div>
+
+  <h3>1.1 Transporte de eventos</h3>
+
+  <p>La capa de transporte mueve eventos del origen al sistema de cómputo. La decisión depende fundamentalmente del volumen y de si necesitas replay.</p>
+
+  <div class="tbl">
+    <div class="tbl-hdr c3">
+      <div>Opción</div>
+      <div>Cuándo elegirla / evitarla</div>
+      <div>Coste operacional</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Kafka</div>
+      <div><b>Elegir:</b> >10k msg/s, replay, múltiples consumers independientes, retención larga. <b>Evitar:</b> <1k msg/s o equipo sin experiencia.</div>
+      <div>Alto — brokers, tuning, ZK/KRaft, on-call</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Redpanda</div>
+      <div><b>Elegir:</b> igual que Kafka pero quieres menos operación (binario único, sin ZK). <b>Evitar:</b> necesitas ecosistema máximo de conectores.</div>
+      <div>Medio — un solo binario, API compatible Kafka</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Pulsar</div>
+      <div><b>Elegir:</b> multi-tenant, geo-replicación nativa, colas + streaming unificados. <b>Evitar:</b> equipo pequeño.</div>
+      <div>Alto — muchos componentes (broker, bookkeeper, ZK)</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">NATS JetStream</div>
+      <div><b>Elegir:</b> latencia ultra-baja, operación simple, <100k msg/s. <b>Evitar:</b> retención larga o replay masivo.</div>
+      <div>Bajo — binario único, sin dependencias</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">MQTT (Mosquitto/EMQX)</div>
+      <div><b>Elegir:</b> dispositivos con recursos limitados, redes inestables, protocolo IoT estándar. <b>Evitar:</b> procesamiento stream nativo.</div>
+      <div>Bajo-Medio — simple, pero necesita bridge a Kafka</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">RabbitMQ</div>
+      <div><b>Elegir:</b> colas tradicionales, routing complejo, <5k msg/s. <b>Evitar:</b> replay o consumer groups múltiples.</div>
+      <div>Medio — Erlang, plugins, HA configurable</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Redis Streams</div>
+      <div><b>Elegir:</b> ya tienes Redis, volumen moderado, simplicidad. <b>Evitar:</b> retención larga, múltiples consumers independientes.</div>
+      <div>Bajo — ya está en el stack</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Cloud managed</div>
+      <div>Kinesis (AWS), Pub/Sub (GCP), Event Hubs (Azure). <b>Elegir:</b> estás en cloud y quieres olvidarte de la operación. <b>Evitar:</b> on-prem, coste por mensaje prohibitivo.</div>
+      <div>Managed — pagas por uso</div>
+    </div>
+  </div>
+
+  <div class="callout info">
+    <span class="clbl">Regla práctica</span>
+    Si los dispositivos son IoT con recursos limitados → <strong>MQTT en el borde, Kafka en el centro</strong>. MQTT no reemplaza a Kafka, lo alimenta. El bridge (EMQX + kafka-connect o similar) es la frontera.
+  </div>
+
+  <h3>1.2 Procesamiento stream</h3>
+
+  <div class="tbl">
+    <div class="tbl-hdr c4">
+      <div>Opción</div>
+      <div>Cuándo elegirla</div>
+      <div>Latencia típica</div>
+      <div>Coste operacional</div>
+    </div>
+    <div class="tbl-row c4">
+      <div class="tbl-tech">Kafka Streams</div>
+      <div>Ya tienes Kafka, lógica simple, equipo Java/Kotlin</div>
+      <div>10-100ms</div>
+      <div>Bajo</div>
+    </div>
+    <div class="tbl-row c4">
+      <div class="tbl-tech">Flink</div>
+      <div>Latencia <100ms real, event-time processing, exactly-once</div>
+      <div><100ms</div>
+      <div>Alto</div>
+    </div>
+    <div class="tbl-row c4">
+      <div class="tbl-tech">Spark Structured Streaming</div>
+      <div>Ya tienes equipo Spark, micro-batch aceptable, ML en stream</div>
+      <div>500ms-2s</div>
+      <div>Alto</div>
+    </div>
+    <div class="tbl-row c4">
+      <div class="tbl-tech">Materialize / RisingWave</div>
+      <div>Quieres SQL sobre streams, equipo sin Java/Scala</div>
+      <div><100ms</div>
+      <div>Medio</div>
+    </div>
+    <div class="tbl-row c4">
+      <div class="tbl-tech">Consumer directo (aiokafka)</div>
+      <div>Volumen bajo, lógica ML en Python, latencia no crítica</div>
+      <div>100ms-1s</div>
+      <div>Muy bajo</div>
+    </div>
+    <div class="tbl-row c4">
+      <div class="tbl-tech">Bytewax</div>
+      <div>Python nativo para stream processing, equipo ML puro</div>
+      <div>100ms-1s</div>
+      <div>Bajo</div>
+    </div>
+  </div>
+
+  <div class="callout info">
+    <span class="clbl">Regla práctica</span>
+    Si tu equipo es Python y el SLA no es <100ms → <strong>consumer directo con aiokafka</strong> o <strong>Bytewax</strong>. Spark Structured Streaming solo si ya tienes Spark operado. Flink solo si necesitas exactly-once real y event-time processing.
+  </div>
+
+  <h3>1.3 Schema y compatibilidad</h3>
+
+  <div class="tbl">
+    <div class="tbl-hdr c3">
+      <div>Opción</div>
+      <div>Cuándo elegirla</div>
+      <div>Coste operacional</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Confluent Schema Registry + Avro</div>
+      <div>Estándar de facto con Kafka. Compatibilidad hacia atrás garantizada.</div>
+      <div>Medio — un servicio más a operar</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Protobuf + buf</div>
+      <div>Tipado fuerte, codegen multi-lenguaje, mejor rendimiento. Si vas a largo plazo.</div>
+      <div>Bajo — solo tooling, sin servicio</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">JSON Schema</div>
+      <div>Prototipos, volumen bajo, equipo sin experiencia en serialización binaria.</div>
+      <div>Muy bajo</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Pydantic + versionado manual</div>
+      <div>Equipo Python, control total, sin infra extra.</div>
+      <div>Muy bajo</div>
+    </div>
+  </div>
+
+  <h3>1.4 Pre-procesado en edge</h3>
+
+  <p>No hay herramienta — hay decisión de diseño. La pregunta es: <em>¿envías la señal cruda o la pre-procesas en el dispositivo?</em></p>
+
+  <div class="tbl">
+    <div class="tbl-hdr c3">
+      <div>Estrategia</div>
+      <div>Cuándo</div>
+      <div>Coste</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Enviar señal cruda</div>
+      <div>Sensores con ancho de banda ilimitado, volumen bajo.</div>
+      <div>Ancho de banda alto, coste de red significativo</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Pre-procesar en edge (recomendado)</div>
+      <div>Cualquier caso con miles de dispositivos.</div>
+      <div>Requiere firmware actualizable — complejidad de despliegue</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Híbrido</div>
+      <div>Crudo solo cuando el modelo edge detecta anomalía.</div>
+      <div>Complejidad de firmware + lógica de decisión en edge</div>
+    </div>
+  </div>
+
+  <p><strong>Stack típico edge:</strong> ONNX Runtime + Rust/C++ o TensorFlow Lite + Python Micro. El modelo de feature extraction debe caber en <50MB y ejecutar en <100ms.</p>
+</div>
+
+<!-- 02 MODEL -->
+<div id="model" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">02</div>
+    <div>
+      <div class="ch-title">Model</div>
+      <div class="ch-sub">Serving · registry · versionado · calibración · fine-tuning</div>
+    </div>
+    <div class="ch-badge" style="background:var(--l2)">Capa 2</div>
+  </div>
+
+  <h3>2.1 Serving de inferencia</h3>
+
+  <div class="tbl">
+    <div class="tbl-hdr c3">
+      <div>Opción</div>
+      <div>Cuándo elegirla</div>
+      <div>Coste operacional</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">FastAPI + ONNX Runtime</div>
+      <div>Equipo Python, GPU opcional, control total. Cubre el 80% de casos.</div>
+      <div>Bajo</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Triton Inference Server</div>
+      <div>GPU compartida, múltiples modelos, batching dinámico.</div>
+      <div>Medio — configuración por modelo, curvas de aprendizaje</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">TorchServe</div>
+      <div>Ecosistema PyTorch puro, equipo PyTorch.</div>
+      <div>Medio</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">BentoML</div>
+      <div>Empaquetar modelo + preprocesado + API en un artefacto único.</div>
+      <div>Medio</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Ray Serve</div>
+      <div>Serving distribuido, composición de modelos, equipo Python.</div>
+      <div>Alto — Ray cluster es un sistema complejo</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">KServe</div>
+      <div>Ya tienes Kubernetes, quieres CRDs para modelos.</div>
+      <div>Alto — operación K8s avanzada</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Modal / Replicate / Baseten</div>
+      <div>Quieres olvidarte de la infra, pagas por uso.</div>
+      <div>Managed</div>
+    </div>
+  </div>
+
+  <h3>2.2 Registry de modelos</h3>
+
+  <div class="tbl">
+    <div class="tbl-hdr c3">
+      <div>Opción</div>
+      <div>Cuándo elegirla</div>
+      <div>Coste operacional</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">MLflow</div>
+      <div>Estándar open source, on-prem, equipo ML clásico. Default si tienes infraestructura.</div>
+      <div>Bajo</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Weights & Biases</div>
+      <div>Equipo ML grande, colaboración, experiment tracking avanzado.</div>
+      <div>Managed — SaaS</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">SageMaker / Vertex AI</div>
+      <div>Estás en AWS o GCP y quieres integración nativa.</div>
+      <div>Managed</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">DVC + git tags</div>
+      <div>MVP, equipo pequeño, no quieres infra extra.</div>
+      <div>Muy bajo</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Hugging Face Hub</div>
+      <div>Modelos abiertos o fine-tuned públicos.</div>
+      <div>Bajo</div>
+    </div>
+  </div>
+
+  <h3>2.3 Versionado de datos</h3>
+
+  <div class="tbl">
+    <div class="tbl-hdr c3">
+      <div>Opción</div>
+      <div>Cuándo elegirla</div>
+      <div>Coste operacional</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">DVC + remote S3/MinIO/SeaweedFS</div>
+      <div>Estándar open source, integración git, dataset <1TB.</div>
+      <div>Bajo</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">LakeFS</div>
+      <div>Git-like sobre data lake, ramas y commits sobre objetos.</div>
+      <div>Medio</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Delta Lake / Iceberg / Hudi</div>
+      <div>Ya tienes Spark, quieres ACID sobre data lake.</div>
+      <div>Alto — requiere Spark o engine compatible</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Pachyderm</div>
+      <div>Pipelines data-centric con versionado automático.</div>
+      <div>Alto</div>
+    </div>
+  </div>
+
+  <h3>2.4 Calibración e incertidumbre</h3>
+
+  <p>No hay debate — son librerías específicas:</p>
+
+  <div class="tbl">
+    <div class="tbl-hdr c3">
+      <div>Necesidad</div>
+      <div>Librería</div>
+      <div>Cuándo</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Calibración de probabilidades</div>
+      <div><code>sklearn.calibration</code> (Platt, isotonic), <code>netcal</code></div>
+      <div>Siempre que un threshold numérico importe. Un 0.9 sin calibrar no significa 90% real.</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Incertidumbre epistémica</div>
+      <div>MC Dropout, Deep Ensembles, <code>torch-uncertainty</code></div>
+      <div>Cuando el sistema debe poder decir "no sé" y derivar a revisión humana.</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Conformal prediction</div>
+      <div><code>mapie</code>, <code>crepes</code></div>
+      <div>Cuando necesitas intervalos con garantía estadística, no solo un score.</div>
+    </div>
+  </div>
+
+  <h3>2.5 Fine-tuning</h3>
+
+  <p>Aplica cuando el modelo base general no alcanza la calidad, latencia o coste requeridos. <strong>No es obligatorio</strong> — es una optimización cuando el general alcanza su techo.</p>
+
+  <div class="tbl">
+    <div class="tbl-hdr c3">
+      <div>Opción</div>
+      <div>Cuándo elegirla</div>
+      <div>Coste operacional</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Unsloth + LoRA/QLoRA</div>
+      <div>Single GPU (12-24GB VRAM), fine-tuning rápido de 2B-8B, produce GGUF para Ollama.</div>
+      <div>Bajo — 2x más rápido que HuggingFace vanilla</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">PEFT + HuggingFace</div>
+      <div>Multi-GPU, más control, no necesitas Ollama.</div>
+      <div>Medio</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Axolotl</div>
+      <div>Config-driven, YAML, muchas recetas listas.</div>
+      <div>Medio</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">LLaMA-Factory</div>
+      <div>UI web, experimentación rápida, equipo sin experiencia.</div>
+      <div>Bajo</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Modal / Together / Fireworks</div>
+      <div>Fine-tuning gestionado, pagas por uso.</div>
+      <div>Managed</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">OpenAI fine-tuning API</div>
+      <div>Solo para modelos OpenAI.</div>
+      <div>Managed</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Sin fine-tuning</div>
+      <div>El modelo base ya cumple. No todas las aplicaciones necesitan especialización.</div>
+      <div>Cero</div>
+    </div>
+  </div>
+
+  <h3>2.6 Serving de modelos fine-tuned</h3>
+
+  <div class="tbl">
+    <div class="tbl-hdr c3">
+      <div>Opción</div>
+      <div>Cuándo elegirla</div>
+      <div>Coste operacional</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Ollama</div>
+      <div>Modelo GGUF, sin infra extra, si ya lo usas.</div>
+      <div>Muy bajo</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">vLLM</div>
+      <div>Throughput alto, PagedAttention, multi-LoRA simultáneo.</div>
+      <div>Medio</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">TGI (HuggingFace)</div>
+      <div>Alternativa a vLLM, ecosistema HF.</div>
+      <div>Medio</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">llama.cpp</div>
+      <div>CPU-only, sin GPU.</div>
+      <div>Bajo</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Triton</div>
+      <div>Si ya lo usas para otros modelos.</div>
+      <div>Medio</div>
+    </div>
+  </div>
+
+  <div class="callout info">
+    <span class="clbl">Regla práctica</span>
+    FastAPI + ONNX Runtime cubre el 80% de casos de inferencia ML. Triton solo si compartes GPU entre varios modelos. Unsloth + Ollama es la combinación más sencilla para fine-tuning de un LLM pequeño en hardware modesto.
+  </div>
+</div>
+
+<!-- 03 EXPLANATION -->
+<div id="explanation" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">03</div>
+    <div>
+      <div class="ch-title">Explanation</div>
+      <div class="ch-sub">Vector store · embeddings · retrieval · reranking · síntesis · verificación</div>
+    </div>
+    <div class="ch-badge" style="background:var(--l3)">Capa 3</div>
+  </div>
+
+  <h3>3.1 Vector store</h3>
+
+  <div class="tbl">
+    <div class="tbl-hdr c3">
+      <div>Opción</div>
+      <div>Cuándo elegirla</div>
+      <div>Coste operacional</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Qdrant</div>
+      <div>Estándar open source, filtros ricos, on-prem. Buen punto medio.</div>
+      <div>Medio</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Weaviate</div>
+      <div>Módulos integrados (reranker, generative), más features out-of-the-box.</div>
+      <div>Medio</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">pgvector</div>
+      <div>Ya tienes Postgres, <1M vectores, simplicidad. Default para MVP.</div>
+      <div>Muy bajo</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Milvus</div>
+      <div>Miles de millones de vectores, escala horizontal.</div>
+      <div>Alto — cluster con muchos componentes</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Chroma</div>
+      <div>Prototipo, MVP, desarrollo local.</div>
+      <div>Muy bajo</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Pinecone / Weaviate Cloud</div>
+      <div>Managed, quieres olvidarte.</div>
+      <div>Managed</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">LanceDB</div>
+      <div>Vector store embebido, sin servidor.</div>
+      <div>Muy bajo</div>
+    </div>
+  </div>
+
+  <div class="callout info">
+    <span class="clbl">Regla práctica</span>
+    pgvector si <1M vectores y ya tienes Postgres. Qdrant si creces. Pinecone si no quieres operar. <strong>Nunca</strong> un vector store custom.
+  </div>
+
+  <h3>3.2 Embeddings</h3>
+
+  <div class="tbl">
+    <div class="tbl-hdr c3">
+      <div>Opción</div>
+      <div>Cuándo elegirla</div>
+      <div>Coste operacional</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">OpenAI text-embedding-3</div>
+      <div>Calidad top, coste aceptable, llamada API.</div>
+      <div>Managed — coste por token</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Cohere embed-v3</div>
+      <div>Multilingüe fuerte, API.</div>
+      <div>Managed</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">BGE / E5 / GTE (open source)</div>
+      <div>On-prem, sin coste por token, calidad cercana a OpenAI.</div>
+      <div>Bajo — requiere GPU para batch</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Sentence-transformers</div>
+      <div>Equipo Python, control total, fine-tuning posible.</div>
+      <div>Bajo</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Voyage / Jina</div>
+      <div>Dominios específicos (código, legal, médico).</div>
+      <div>Managed</div>
+    </div>
+  </div>
+
+  <h3>3.3 Retrieval y reranking</h3>
+
+  <div class="tbl">
+    <div class="tbl-hdr c3">
+      <div>Técnica</div>
+      <div>Cuándo</div>
+      <div>Coste operacional</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Búsqueda densa</div>
+      <div>Vector store por defecto. Suficiente para queries semánticas simples.</div>
+      <div>Bajo</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Búsqueda híbrida (BM25 + densa)</div>
+      <div>Cuando hay términos técnicos exactos que la densa pierde. Qdrant/Weaviate/Milvus lo soportan nativo.</div>
+      <div>Bajo-Medio</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Cross-encoder reranker</div>
+      <div><b>Obligatorio</b> si el threshold es bajo. <code>ms-marco-MiniLM</code>, <code>bge-reranker</code> o Cohere Rerank API. Distingue "rodamiento desgastado" de "rodamiento nuevo".</div>
+      <div>Medio — requiere GPU para latencia útil</div>
+    </div>
+  </div>
+
+  <div class="callout danger">
+    <span class="clbl">⚠ Anti-patrón crítico</span>
+    RAG sin reranker + threshold bajo (0.2-0.3) es la combinación que produce las alucinaciones más frecuentes. El retrieval denso solo no distingue matices semánticos. El reranker cross-encoder es la mejora de mayor impacto sin cambiar el modelo base.
+  </div>
+
+  <h3>3.4 Síntesis (LLM)</h3>
+
+  <div class="tbl">
+    <div class="tbl-hdr c3">
+      <div>Opción</div>
+      <div>Cuándo elegirla</div>
+      <div>Coste operacional</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">OpenAI GPT-4o / o1</div>
+      <div>Calidad top, coste medio-alto. Default si no hay restricciones.</div>
+      <div>Managed — coste por token</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Anthropic Claude</div>
+      <div>Contexto largo, buen grounding, menos alucinación en tareas técnicas.</div>
+      <div>Managed</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Llama / Mistral / Gemma (open)</div>
+      <div>On-prem, control total, fine-tuning posible, compliance.</div>
+      <div>Bajo-Medio — GPU propia</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Gemini</div>
+      <div>Multimodal, contexto enorme.</div>
+      <div>Managed</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Groq / Together / Fireworks</div>
+      <div>Inferencia rápida de modelos open source.</div>
+      <div>Managed</div>
+    </div>
+  </div>
+
+  <h3>3.5 Orquestación de chains</h3>
+
+  <div class="tbl">
+    <div class="tbl-hdr c3">
+      <div>Opción</div>
+      <div>Cuándo elegirla</div>
+      <div>Coste operacional</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">LangChain / LCEL</div>
+      <div>Estándar, muchas integraciones, MVP rápido.</div>
+      <div>Bajo — pero la abstracción puede estorbar</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">LlamaIndex</div>
+      <div>Foco en RAG, mejor para retrieval complejo.</div>
+      <div>Bajo</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Haystack</div>
+      <div>Empresa, pipelines declarativos, equipo con experiencia.</div>
+      <div>Medio</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">LangGraph</div>
+      <div>Estado, ciclos, multi-agente. Cuando necesitas grafo, no chain.</div>
+      <div>Medio</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">DSPy</div>
+      <div>Optimización automática de prompts. Cuando quieres mejorar prompts sistemáticamente.</div>
+      <div>Medio</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Sin framework (llamadas directas)</div>
+      <div>Control total, sin magia. Si solo haces 5 llamadas, es lo más honesto.</div>
+      <div>Muy bajo</div>
+    </div>
+  </div>
+
+  <h3>3.6 Verificación de grounding</h3>
+
+  <div class="tbl">
+    <div class="tbl-hdr c3">
+      <div>Modo</div>
+      <div>Herramienta</div>
+      <div>Cuándo</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Síncrono sin tokens</div>
+      <div>NLI models (<code>cross-encoder/nli-deberta</code>), similitud de embeddings, overlap de chunks</div>
+      <div>Siempre. ~50ms, 0 tokens. Bloquea alucinaciones antes de que lleguen al usuario.</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Background con sampling</div>
+      <div>RAGAS, DeepEval, Phoenix evals</div>
+      <div>Con muestreo (ej: 20%). Nunca en el path crítico — latencia ×3, coste ×3.</div>
+    </div>
+  </div>
+</div>
+
+<!-- 04 DECISION -->
+<div id="decision" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">04</div>
+    <div>
+      <div class="ch-title">Decision</div>
+      <div class="ch-sub">Routing · alertas · dedup · agentes · checkpointing</div>
+    </div>
+    <div class="ch-badge" style="background:var(--l4)">Capa 4</div>
+  </div>
+
+  <h3>4.1 Classifier de routing</h3>
+
+  <div class="tbl">
+    <div class="tbl-hdr c3">
+      <div>Opción</div>
+      <div>Cuándo elegirla</div>
+      <div>Coste operacional</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">DistilBERT fine-tuned</div>
+      <div>Tienes dataset etiquetado (5000+ queries), latencia <50ms.</div>
+      <div>Medio</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Embeddings + regresión logística</div>
+      <div>MVP, pocos datos, interpretable.</div>
+      <div>Muy bajo</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">SetFit</div>
+      <div>Fine-tuning con pocos ejemplos (8-16 por clase). <b>Recomendado</b> cuando tienes 200-500 queries etiquetadas y quieres calidad sin 10x datos.</div>
+      <div>Bajo</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">LLM zero-shot</div>
+      <div>Sin datos etiquetados, latencia no crítica.</div>
+      <div>Medio — cada query cuesta tokens</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Reglas + embeddings</div>
+      <div>Fallback robusto, siempre disponible. Empieza aquí.</div>
+      <div>Muy bajo</div>
+    </div>
+  </div>
+
+  <h3>4.2 Alertas y notificaciones</h3>
+
+  <div class="tbl">
+    <div class="tbl-hdr c3">
+      <div>Opción</div>
+      <div>Cuándo elegirla</div>
+      <div>Coste operacional</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Alertmanager + Prometheus</div>
+      <div>Estándar, on-prem, integraciones Slack/PagerDuty/email.</div>
+      <div>Bajo</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Grafana OnCall</div>
+      <div>Ya tienes Grafana, quieres on-call management.</div>
+      <div>Bajo</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">PagerDuty</div>
+      <div>Managed, on-call profesional.</div>
+      <div>Managed</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Opsgenie / VictorOps</div>
+      <div>Equivalentes a PagerDuty.</div>
+      <div>Managed</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Slack webhooks directos</div>
+      <div>MVP, sin infra extra.</div>
+      <div>Muy bajo</div>
+    </div>
+  </div>
+
+  <h3>4.3 Deduplicación y ventanas</h3>
+
+  <div class="tbl">
+    <div class="tbl-hdr c3">
+      <div>Opción</div>
+      <div>Cuándo elegirla</div>
+      <div>Coste operacional</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Redis con TTL</div>
+      <div>Patrón clásico, bajo coste, ventanas simples. Default.</div>
+      <div>Muy bajo</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Redis Streams</div>
+      <div>Ventanas más complejas, múltiples señales.</div>
+      <div>Bajo</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Flink / Kafka Streams</div>
+      <div>Si la dedup es parte del stream processing.</div>
+      <div>Alto</div>
+    </div>
+  </div>
+
+  <h3>4.4 Orquestación de agentes</h3>
+
+  <div class="tbl">
+    <div class="tbl-hdr c3">
+      <div>Opción</div>
+      <div>Cuándo elegirla</div>
+      <div>Coste operacional</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">LangGraph</div>
+      <div>Grafo de estados con checkpointing, human-in-the-loop, agnóstico de LLM. <b>Recomendado</b> si necesitas human gate o ciclos.</div>
+      <div>Medio</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">CrewAI</div>
+      <div>Multi-agente con roles, menos control.</div>
+      <div>Bajo</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">AutoGen (Microsoft)</div>
+      <div>Conversación multi-agente, investigación.</div>
+      <div>Medio</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Pydantic AI</div>
+      <div>Tipado fuerte, equipo Python, sin grafo explícito.</div>
+      <div>Bajo</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Sin framework (funciones + estado manual)</div>
+      <div>Flujos simples, 2-3 pasos lineales.</div>
+      <div>Muy bajo</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Temporal / Prefect</div>
+      <div>Workflows duraderos con LLM como nodo.</div>
+      <div>Medio</div>
+    </div>
+  </div>
+
+  <h3>4.5 Checkpointing de estado</h3>
+
+  <div class="tbl">
+    <div class="tbl-hdr c3">
+      <div>Opción</div>
+      <div>Cuándo elegirla</div>
+      <div>Coste operacional</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Redis</div>
+      <div>Ya lo tienes, TTL configurable, simple. Default si el estado es pequeño.</div>
+      <div>Muy bajo</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Postgres</div>
+      <div>Quieres queries sobre el estado, joins con otras tablas.</div>
+      <div>Bajo</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">SQLite</div>
+      <div>Desarrollo, un solo nodo.</div>
+      <div>Muy bajo</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">S3/objeto</div>
+      <div>Estado grande, acceso poco frecuente.</div>
+      <div>Bajo</div>
+    </div>
+  </div>
+</div>
+
+<!-- 05 GOVERNANCE -->
+<div id="governance" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">05</div>
+    <div>
+      <div class="ch-title">Governance</div>
+      <div class="ch-sub">Drift · trazas LLM · evaluación RAG · pipelines · feedback · analytics</div>
+    </div>
+    <div class="ch-badge" style="background:var(--l5)">Capa 5</div>
+  </div>
+
+  <h3>5.1 Drift detection</h3>
+
+  <div class="tbl">
+    <div class="tbl-hdr c3">
+      <div>Opción</div>
+      <div>Cuándo elegirla</div>
+      <div>Coste operacional</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Evidently AI</div>
+      <div>Dashboards, informes HTML, muchas métricas out-of-the-box. <b>Default</b> si quieres ver dashboards.</div>
+      <div>Bajo</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Alibi Detect</div>
+      <div>Algoritmos específicos (KS, MMD, drift multivariante). Más control algorítmico.</div>
+      <div>Medio</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">NannyML</div>
+      <div>Estimación de performance sin labels (CBPE, DLE). Único si no tienes labels de producción.</div>
+      <div>Medio</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">WhyLabs</div>
+      <div>Managed, dashboards, equipo sin tiempo para operar.</div>
+      <div>Managed</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Implementación propia con scipy</div>
+      <div>MVP, PSI + KS-test manual. Control total, sin dependencias.</div>
+      <div>Muy bajo</div>
+    </div>
+  </div>
+
+  <h3>5.2 Trazas LLM</h3>
+
+  <div class="tbl">
+    <div class="tbl-hdr c4">
+      <div>Opción</div>
+      <div>Data location</div>
+      <div>Cuándo elegirla</div>
+      <div>Coste operacional</div>
+    </div>
+    <div class="tbl-row c4">
+      <div class="tbl-tech">Langfuse (self-hosted)</div>
+      <div>Tu cluster</div>
+      <div><b>Recomendado si cumplimiento importa.</b> Open source, integración RAGAS nativa, SDK agnóstico de proveedor.</div>
+      <div>Bajo</div>
+    </div>
+    <div class="tbl-row c4">
+      <div class="tbl-tech">LangSmith (SaaS)</div>
+      <div>Servidores Langchain</div>
+      <div>Si usas LangChain intensivamente y no hay requisitos de soberanía.</div>
+      <div>Managed</div>
+    </div>
+    <div class="tbl-row c4">
+      <div class="tbl-tech">Arize Phoenix</div>
+      <div>Self-hosted o cloud</div>
+      <div>Buena integración con notebooks. Menos maduro que Langfuse.</div>
+      <div>Bajo</div>
+    </div>
+    <div class="tbl-row c4">
+      <div class="tbl-tech">Helicone</div>
+      <div>Proxy, self-hosted o cloud</div>
+      <div>Cero código, pero menos features.</div>
+      <div>Bajo</div>
+    </div>
+    <div class="tbl-row c4">
+      <div class="tbl-tech">OpenTelemetry custom</div>
+      <div>Tu elección</div>
+      <div>Control total, sin vendor, más trabajo.</div>
+      <div>Medio</div>
+    </div>
+  </div>
+
+  <div class="callout warn">
+    <span class="clbl">Criterio de decisión</span>
+    Si el prompt/completion contiene datos de cliente → <strong>self-hosted obligatorio</strong>. Un trace completo (input + output) enviado a un SaaS es una brecha de cumplimiento SOC2/ISO27001, no una optimización.
+  </div>
+
+  <h3>5.3 Evaluación RAG</h3>
+
+  <div class="tbl">
+    <div class="tbl-hdr c3">
+      <div>Opción</div>
+      <div>Cuándo elegirla</div>
+      <div>Coste operacional</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">RAGAS</div>
+      <div>Estándar. 4 métricas: faithfulness, answer_relevancy, context_precision, context_recall. Integración nativa Langfuse.</div>
+      <div>Bajo — pero consume tokens LLM</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">DeepEval</div>
+      <div>Más métricas, test suites, más programático.</div>
+      <div>Bajo</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">TruLens</div>
+      <div>Feedback functions, enfoque programático.</div>
+      <div>Bajo</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">OpenAI Evals</div>
+      <div>Si estás muy dentro del ecosistema OpenAI.</div>
+      <div>Managed</div>
+    </div>
+  </div>
+
+  <h3>5.4 Orquestación de pipelines ML</h3>
+
+  <div class="tbl">
+    <div class="tbl-hdr c3">
+      <div>Opción</div>
+      <div>Cuándo elegirla</div>
+      <div>Coste operacional</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Argo Workflows</div>
+      <div>Kubernetes, equipo DevOps, pipelines en contenedores. Default si ya tienes K8s.</div>
+      <div>Medio</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Airflow</div>
+      <div>Estándar Python, mucha integración, equipo data.</div>
+      <div>Medio</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Prefect</div>
+      <div>Python nativo, menos boilerplate que Airflow.</div>
+      <div>Bajo</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Dagster</div>
+      <div>Data-aware, tipado fuerte, bueno para ML.</div>
+      <div>Medio</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Kubeflow Pipelines</div>
+      <div>Kubernetes, equipo ML puro.</div>
+      <div>Alto</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Metaflow</div>
+      <div>Equipo ML, integración AWS/GCP.</div>
+      <div>Bajo</div>
+    </div>
+  </div>
+
+  <h3>5.5 Feedback loop</h3>
+
+  <p>No hay herramienta estándar. Es <strong>decisión de producto</strong>:</p>
+
+  <ul>
+    <li><strong>UI de revisión</strong> — el operador marca "correcto / incorrecto / corregir a X".</li>
+    <li><strong>Almacenamiento</strong> — vuelve al data lake versionado con DVC/LakeFS.</li>
+    <li><strong>Priorización</strong> — muestrear casos de alta incertidumbre para revisión primero.</li>
+    <li><strong>Trigger de reentrenamiento</strong> — cuando se acumulan N etiquetas nuevas (no cada semana).</li>
+  </ul>
+
+  <h3>5.6 Almacenamiento analítico</h3>
+
+  <p>Prometheus es para alertas en tiempo real. Loki es para búsqueda de logs. Ninguno responde "¿cuánto gastó el usuario X este mes?" ni "¿cuál fue el p99 de latencia por modelo el martes pasado?".</p>
+
+  <div class="tbl">
+    <div class="tbl-hdr c3">
+      <div>Opción</div>
+      <div>Cuándo elegirla</div>
+      <div>Coste operacional</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">ClickHouse</div>
+      <div>Estándar OLAP columnar, queries analíticas sobre miles de millones de filas. p99 ~50ms sobre 100M filas.</div>
+      <div>Medio</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Druid</div>
+      <div>Similar, ecosistema Apache, más pesado.</div>
+      <div>Alto</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">DuckDB</div>
+      <div>Analítica embebida, sin servidor, <10M filas.</div>
+      <div>Muy bajo</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">TimescaleDB</div>
+      <div>Ya tienes Postgres, series temporales.</div>
+      <div>Bajo</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">BigQuery / Snowflake</div>
+      <div>Cloud managed, pagas por query.</div>
+      <div>Managed</div>
+    </div>
+  </div>
+
+  <h4>Tablas típicas</h4>
+
+  <div class="tbl">
+    <div class="tbl-hdr c3">
+      <div>Tabla</div>
+      <div>Contenido</div>
+      <div>Uso principal</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">llm_requests</div>
+      <div>provider, model, tokens_in, tokens_out, cost_usd, ttft_ms, cache_hit, user_id, session_id</div>
+      <div>Coste por usuario/mes, drift de proveedor, A/B de prompts</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">ml_predictions</div>
+      <div>label, confidence, latency_ms, model_version, audio_hash</div>
+      <div>Drift de clases, degradación de latencia, tendencia de confianza</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">security_events</div>
+      <div>tipo, severidad, user_id, patrón matchado, action</div>
+      <div>Auditoría, análisis forense, SOC2</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">audit_log</div>
+      <div>timestamp, user, verb, resource, resource_name, namespace</div>
+      <div>Cumplimiento ISO 27001, accesos a secretos, cambios RBAC</div>
+    </div>
+  </div>
+</div>
+
+<!-- 06 SECURITY -->
+<div id="security" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">06</div>
+    <div>
+      <div class="ch-title">Security</div>
+      <div class="ch-sub">Input validation · output guardrails · auditoría</div>
+    </div>
+    <div class="ch-badge" style="background:var(--sec)">Transversal</div>
+  </div>
+
+  <h3>6.1 Input validation</h3>
+
+  <div class="tbl">
+    <div class="tbl-hdr c3">
+      <div>Opción</div>
+      <div>Cuándo elegirla</div>
+      <div>Coste operacional</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Heurísticas propias</div>
+      <div>Siempre como primera capa. <1ms. Bloquea injection obvia (regex sobre "ignore previous", "reveal prompt").</div>
+      <div>Muy bajo</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">LLM Guard</div>
+      <div>Librería Python, multi-modelo, sin dependencia NVIDIA.</div>
+      <div>Bajo</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Rebuff</div>
+      <div>Detección de injection con múltiples capas.</div>
+      <div>Bajo</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">NeMo Guardrails (input)</div>
+      <div>Si ya usas NeMo para output, unificar.</div>
+      <div>Medio</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">OpenAI Moderation API</div>
+      <div>Solo si estás en OpenAI. Cubre toxicidad, no injection.</div>
+      <div>Managed</div>
+    </div>
+  </div>
+
+  <h3>6.2 Output guardrails</h3>
+
+  <div class="tbl">
+    <div class="tbl-hdr c3">
+      <div>Opción</div>
+      <div>Cuándo elegirla</div>
+      <div>Coste operacional</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">NeMo Guardrails (Colang)</div>
+      <div>Estándar NVIDIA, open source, declarativo, funciona con Ollama. Flujos que el modelo no puede violar.</div>
+      <div>Medio</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Guardrails AI</div>
+      <div>Validación estructurada, integración Pydantic.</div>
+      <div>Bajo</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Pydantic estricto</div>
+      <div>Endpoints con schema fijo. La opción más simple. Si no valida → 500 genérico.</div>
+      <div>Muy bajo</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Outlines / LMQL</div>
+      <div>Si generas con modelos abiertos, constrain decoding.</div>
+      <div>Medio</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">LLM-as-judge para toxicidad</div>
+      <div>Capa adicional, costosa. Solo si el dominio lo requiere.</div>
+      <div>Alto</div>
+    </div>
+  </div>
+
+  <h3>6.3 Auditing</h3>
+
+  <p>Toda la instrumentación de seguridad va a tres destinos correlacionados por <code>trace_id</code>:</p>
+
+  <ul>
+    <li><strong>Langfuse</strong> — span de seguridad en cada traza, correlacionado con la request.</li>
+    <li><strong>ClickHouse</strong> — tabla <code>security_events</code> con tipo, severidad, usuario, patrón matchado.</li>
+    <li><strong>Loki</strong> — búsqueda de texto sobre los patrones de ataque (forense).</li>
+  </ul>
+</div>
+
+<!-- 07 STACKS -->
+<div id="stacks" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">07</div>
+    <div>
+      <div class="ch-title">Stacks de referencia</div>
+      <div class="ch-sub">Tres combinaciones que funcionan juntas</div>
+    </div>
+  </div>
+
+  <p>Si no quieres elegir herramienta por herramienta, elige el stack que más se parezca a tu situación. Después ajusta las capas específicas donde tu contexto difiera.</p>
+
+  <!-- STACK MINIMAL -->
+  <div class="stack s1">
+    <div class="stack-hdr">
+      <span class="stack-hdr-num">STACK 01</span>
+      <span class="stack-hdr-t">Minimal — MVP, <10 sensores, 1-2 personas</span>
+      <span class="stack-hdr-sub">Semanas de setup</span>
+    </div>
+    <div class="stack-body">
+      <div class="stack-layer">
+        <div class="stack-layer-lbl">Ingestion</div>
+        <div class="stack-layer-val">FastAPI + <b>Redis Streams</b> (o consumer directo con <b>aiokafka</b>)</div>
+      </div>
+      <div class="stack-layer">
+        <div class="stack-layer-lbl">Model</div>
+        <div class="stack-layer-val"><b>FastAPI + ONNX Runtime</b>. Sin Triton. Sin MLflow si solo tienes 1 modelo — usa DVC + git tags.</div>
+      </div>
+      <div class="stack-layer">
+        <div class="stack-layer-lbl">Explanation</div>
+        <div class="stack-layer-val"><b>pgvector</b> + OpenAI embeddings + <b>GPT-4o-mini</b> + LangChain. Sin reranker al principio; añádelo si faithfulness baja.</div>
+      </div>
+      <div class="stack-layer">
+        <div class="stack-layer-lbl">Decision</div>
+        <div class="stack-layer-val"><b>Reglas Python</b> + <b>Slack webhooks</b>. Sin alertmanager, sin PagerDuty.</div>
+      </div>
+      <div class="stack-layer">
+        <div class="stack-layer-lbl">Governance</div>
+        <div class="stack-layer-val"><b>Langfuse self-hosted</b> + <b>Evidently</b> + <b>DuckDB</b> para analytics. DVC para datasets.</div>
+      </div>
+      <div class="stack-layer">
+        <div class="stack-layer-lbl">Security</div>
+        <div class="stack-layer-val">Heurísticas propias + <b>Pydantic</b> en endpoints estructurados. Sin NeMo al principio.</div>
+      </div>
+      <div class="stack-layer">
+        <div class="stack-layer-lbl">Infra</div>
+        <div class="stack-layer-val">1 servidor, <b>Docker Compose</b>. Sin Kubernetes. Sin GitOps.</div>
+      </div>
+    </div>
+    <div class="stack-cost"><b>Coste:</b> ~$100/mes + coste de LLM por uso · <b>Equipo:</b> 1-2 personas · <b>Cuándo migrar:</b> cuando >10 sensores o >2 personas</div>
+  </div>
+
+  <!-- STACK MEDIO -->
+  <div class="stack s2">
+    <div class="stack-hdr">
+      <span class="stack-hdr-num">STACK 02</span>
+      <span class="stack-hdr-t">Medio — 100-1000 sensores, equipo de 3-5</span>
+      <span class="stack-hdr-sub">Meses de setup</span>
+    </div>
+    <div class="stack-body">
+      <div class="stack-layer">
+        <div class="stack-layer-lbl">Ingestion</div>
+        <div class="stack-layer-val"><b>Kafka</b> (o Redpanda) + <b>MQTT en edge</b> + Schema Registry + <b>Bytewax</b> o consumer Python</div>
+      </div>
+      <div class="stack-layer">
+        <div class="stack-layer-lbl">Model</div>
+        <div class="stack-layer-val"><b>FastAPI + ONNX</b> + <b>MLflow</b> + DVC + S3/MinIO. <b>Unsloth LoRA</b> para fine-tuning del LLM. <b>Ollama</b> para serving.</div>
+      </div>
+      <div class="stack-layer">
+        <div class="stack-layer-lbl">Explanation</div>
+        <div class="stack-layer-val"><b>Qdrant</b> + BGE embeddings + Claude/GPT-4o + <b>reranker cross-encoder</b> + LangGraph</div>
+      </div>
+      <div class="stack-layer">
+        <div class="stack-layer-lbl">Decision</div>
+        <div class="stack-layer-val"><b>SetFit classifier</b> + Redis dedup + <b>Alertmanager</b> + Slack/PagerDuty + <b>LangGraph agent</b> con Redis checkpointer</div>
+      </div>
+      <div class="stack-layer">
+        <div class="stack-layer-lbl">Governance</div>
+        <div class="stack-layer-val"><b>Evidently</b> + <b>Langfuse</b> + <b>RAGAS</b> + <b>Argo Workflows</b> + <b>ClickHouse</b> para analytics</div>
+      </div>
+      <div class="stack-layer">
+        <div class="stack-layer-lbl">Security</div>
+        <div class="stack-layer-val"><b>NeMo Guardrails</b> + heurísticas input + Pydantic output</div>
+      </div>
+      <div class="stack-layer">
+        <div class="stack-layer-lbl">Infra</div>
+        <div class="stack-layer-val"><b>Kubernetes</b> 3-5 nodos, <b>ArgoCD</b> para GitOps</div>
+      </div>
+    </div>
+    <div class="stack-cost"><b>Coste:</b> ~$2-5k/mes + LLM por uso · <b>Equipo:</b> 3-5 personas · <b>Cuándo migrar:</b> >1000 sensores o SLA <100ms</div>
+  </div>
+
+  <!-- STACK COMPLETO -->
+  <div class="stack s3">
+    <div class="stack-hdr">
+      <span class="stack-hdr-num">STACK 03</span>
+      <span class="stack-hdr-t">Completo — >1000 sensores, equipo de 8+</span>
+      <span class="stack-hdr-sub">Año+ de setup</span>
+    </div>
+    <div class="stack-body">
+      <div class="stack-layer">
+        <div class="stack-layer-lbl">Ingestion</div>
+        <div class="stack-layer-val"><b>Kafka</b> + <b>Flink</b> + Schema Registry + DLQ + backpressure monitoring</div>
+      </div>
+      <div class="stack-layer">
+        <div class="stack-layer-lbl">Model</div>
+        <div class="stack-layer-val"><b>Triton</b> (GPU compartida) + <b>MLflow</b> + <b>LakeFS</b> + <b>Feast</b> (feature store). <b>vLLM multi-LoRA</b> para serving.</div>
+      </div>
+      <div class="stack-layer">
+        <div class="stack-layer-lbl">Explanation</div>
+        <div class="stack-layer-val"><b>Qdrant cluster</b> + híbrido denso+BM25 + BGE + reranker + <b>LangGraph multi-agente</b></div>
+      </div>
+      <div class="stack-layer">
+        <div class="stack-layer-lbl">Decision</div>
+        <div class="stack-layer-val"><b>DistilBERT classifier</b> + <b>Kafka Streams</b> para dedup + <b>PagerDuty</b> + on-call</div>
+      </div>
+      <div class="stack-layer">
+        <div class="stack-layer-lbl">Governance</div>
+        <div class="stack-layer-val"><b>Evidently</b> + <b>NannyML</b> + <b>Langfuse</b> + <b>RAGAS</b> + <b>Argo Workflows</b> + <b>ClickHouse</b> + rollback automático</div>
+      </div>
+      <div class="stack-layer">
+        <div class="stack-layer-lbl">Security</div>
+        <div class="stack-layer-val"><b>NeMo Guardrails</b> + <b>LLM Guard</b> + <b>OPA</b> para policy-as-code</div>
+      </div>
+      <div class="stack-layer">
+        <div class="stack-layer-lbl">Infra</div>
+        <div class="stack-layer-val">Kubernetes multi-nodo + GitOps + Prometheus + Grafana + Loki + <b>ClickHouse</b></div>
+      </div>
+    </div>
+    <div class="stack-cost"><b>Coste:</b> $15-50k/mes + LLM por uso · <b>Equipo:</b> 8+ personas · <b>Cuándo migrar:</b> solo si el volumen lo justifica</div>
+  </div>
+</div>
+
+<!-- 08 ANTI-SELECCIONES -->
+<div id="anti" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">08</div>
+    <div>
+      <div class="ch-title">Anti-selecciones</div>
+      <div class="ch-sub">Qué NO usar · y por qué</div>
+    </div>
+  </div>
+
+  <p>Tan importante como saber qué elegir es saber qué evitar. Estas son combinaciones que parecen razonables pero que producen deuda técnica, coste operacional injustificado o fallos silenciosos.</p>
+
+  <div class="anti">
+    <div class="anti-hdr">
+      <div>Anti-selección</div>
+      <div>Por qué evitarla</div>
+    </div>
+    <div class="anti-row">
+      <div class="anti-tech">Spark para <1000 msg/s</div>
+      <div>Overhead operacional desproporcionado. Un consumer Python es suficiente.</div>
+    </div>
+    <div class="anti-row">
+      <div class="anti-tech">Kubernetes para MVP de 1 persona</div>
+      <div>Complejidad que no pagas. Docker Compose es suficiente hasta que no lo sea.</div>
+    </div>
+    <div class="anti-row">
+      <div class="anti-tech">Pinecone si puedes usar pgvector</div>
+      <div>Managed innecesario si <1M vectores. pgvector ya está en tu Postgres.</div>
+    </div>
+    <div class="anti-row">
+      <div class="anti-tech">LLM-as-judge en path síncrono</div>
+      <div>Latencia ×3, coste ×3, sin ganancia real. Muévelo a background con sampling.</div>
+    </div>
+    <div class="anti-row">
+      <div class="anti-tech">Triton si no compartes GPU</div>
+      <div>FastAPI + ONNX Runtime cubre el caso. Triton añade complejidad de configuración por modelo.</div>
+    </div>
+    <div class="anti-row">
+      <div class="anti-tech">MLflow si solo tienes 1 modelo</div>
+      <div>DVC + git tags sobra. MLflow se justifica cuando hay >3 modelos o múltiples personas.</div>
+    </div>
+    <div class="anti-row">
+      <div class="anti-tech">LangChain si controlas 5 llamadas</div>
+      <div>La abstracción cuesta más de lo que aporta. Llamadas directas son más claras.</div>
+    </div>
+    <div class="anti-row">
+      <div class="anti-tech">Evidently si no vas a mirar dashboards</div>
+      <div>Instrumentación sin uso es deuda. Si nadie va a actuar sobre el drift, no lo midas.</div>
+    </div>
+    <div class="anti-row">
+      <div class="anti-tech">Custom vector store</div>
+      <div>Nunca. Usa uno existente. Ya hay cinco que cubren todos los casos.</div>
+    </div>
+    <div class="anti-row">
+      <div class="anti-tech">LangSmith con datos de cliente</div>
+      <div>Brecha SOC2/ISO27001. El trace completo (prompt + completion) va a servidores de terceros.</div>
+    </div>
+    <div class="anti-row">
+      <div class="anti-tech">Fine-tuning antes de medir RAG</div>
+      <div>Optimizas sin baseline. No sabrás si mejoró. Primero RAGAS, después Unsloth.</div>
+    </div>
+    <div class="anti-row">
+      <div class="anti-tech">ClickHouse como único sistema de observabilidad</div>
+      <div>No sustituye a Prometheus para alertas en tiempo real. Complementa, no reemplaza.</div>
+    </div>
+    <div class="anti-row">
+      <div class="anti-tech">LangGraph para 2 pasos lineales</div>
+      <div>El grafo es overhead. Si no hay ciclos ni human gate, una función secuencial basta.</div>
+    </div>
+    <div class="anti-row">
+      <div class="anti-tech">LLM-as-judge en cada request</div>
+      <div>Latencia ×3, coste ×3. Muestreo (20%) da señal suficiente.</div>
+    </div>
+    <div class="anti-row">
+      <div class="anti-tech">Guardrails propios con regex</div>
+      <div>NeMo existe y es mantenido. Escribir tus propios guardrails es reinventar mal algo que ya está resuelto.</div>
+    </div>
+  </div>
+</div>
+
+<!-- 09 CRITERIOS -->
+<div id="criterios" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">09</div>
+    <div>
+      <div class="ch-title">Criterios de decisión</div>
+      <div class="ch-sub">Cómo elegir cuando dudes entre dos opciones</div>
+    </div>
+  </div>
+
+  <p>Cuando dos opciones parecen igualmente viables, decide por este orden. Cada paso elimina parte de las opciones.</p>
+
+  <div class="rules">
+    <div class="rule">
+      <div class="rule-n">1</div>
+      <div>
+        <div class="rule-t">Volumen</div>
+        <div class="rule-d">¿Cuántos eventos por segundo? <100/s → consumer directo. 1k-10k/s → Kafka. >10k/s → Kafka + Flink. Este criterio elimina la mitad de las opciones.</div>
+      </div>
+    </div>
+    <div class="rule">
+      <div class="rule-n">2</div>
+      <div>
+        <div class="rule-t">Latencia objetivo</div>
+        <div class="rule-d">¿Milisegundos o segundos? <100ms → Flink, no Spark. <5s end-to-end → permite LLM en el path. Si necesitas <50ms, el LLM no puede estar en el path crítico.</div>
+      </div>
+    </div>
+    <div class="rule">
+      <div class="rule-n">3</div>
+      <div>
+        <div class="rule-t">Equipo disponible</div>
+        <div class="rule-d">¿Quién va a operar esto en 2 años? Si no tienes equipo Kafka, no uses Kafka. La herramienta más sofisticada operada por nadie es peor que la herramienta simple operada por alguien.</div>
+      </div>
+    </div>
+    <div class="rule">
+      <div class="rule-n">4</div>
+      <div>
+        <div class="rule-t">Presupuesto</div>
+        <div class="rule-d">No solo infra: también tiempo de ingeniería. Un Kafka bien operado consume 0.5 FTE. Un ClickHouse, otros 0.3. Súmalos antes de comprometerte.</div>
+      </div>
+    </div>
+    <div class="rule">
+      <div class="rule-n">5</div>
+      <div>
+        <div class="rule-t">Madurez del dominio</div>
+        <div class="rule-d">MVP o producto estable. En MVP → stack minimal. En producto → stack completo. No construyas para el producto que no tienes todavía.</div>
+      </div>
+    </div>
+    <div class="rule">
+      <div class="rule-n">6</div>
+      <div>
+        <div class="rule-t">Restricciones externas</div>
+        <div class="rule-d">On-prem obligatorio, cumplimiento, latencia geográfica. Estas restricciones eliminan opciones antes de empezar: LangSmith SaaS no es viable si SOC2 requiere soberanía.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pq">
+    La herramienta correcta no es la más sofisticada. Es la que tu equipo puede operar, tu presupuesto puede sostener, y tu volumen justifica. Todo lo demás es sobre-ingeniería disfrazada de buenas prácticas.
+  </div>
+
+  <div class="callout ok">
+    <span class="clbl">✓ Siguiente paso</span>
+    Con el patrón (Doc 1) y el catálogo de implementación (Doc 2) cerrados, el Documento 3 aplica ambos a un caso concreto: <strong>MetalKube</strong>, mantenimiento predictivo de motores eléctricos industriales. El Doc 3 muestra qué stack se eligió, por qué, y cómo se materializa cada capa end-to-end.
+  </div>
+</div>
+
+</div>
+</div>
+
+<footer>
+  SSEP · Implementación · v0.2 · Documento 2 de 3
+  <div class="ft-dots">
+    <div class="ft-dot" style="background:var(--l1)"></div>
+    <div class="ft-dot" style="background:var(--l2)"></div>
+    <div class="ft-dot" style="background:var(--l3)"></div>
+    <div class="ft-dot" style="background:var(--l4)"></div>
+    <div class="ft-dot" style="background:var(--l5)"></div>
+    <div class="ft-dot" style="background:var(--sec)"></div>
+  </div>
+</footer>
+
+</body>
+</html>

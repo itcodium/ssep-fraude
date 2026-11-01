@@ -1,0 +1,9 @@
+PCI-DSS §10.2: Toda transacción sospechosa debe registrarse con
+card_id enmascarado, timestamp, importe, país del comercio y
+factores de riesgo.
+
+PCI-DSS §10.3: El fraude confirmado debe notificarse al emisor
+en menos de 24 horas.
+
+PCI-DSS §10.4: Los registros de auditoría deben conservarse
+durante al menos 12 meses.

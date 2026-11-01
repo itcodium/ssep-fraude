@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SSEP — Set completo · Índice maestro</title>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,300;1,6..72,400&family=Geist:wght@300;400;500;600;700;800;900&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff; --ink:#0c0c0b; --ink2:#2d2d2b; --ink3:#787870;
+  --rule:#e4e4de; --rule2:#f5f5ef;
+  --l1:#c0390b; --l1-l:#fdeee9;
+  --l2:#1a5c3a; --l2-l:#e4f5ec;
+  --l3:#1c6ea4; --l3-l:#eef2fb;
+  --l4:#7b2d8b; --l4-l:#f5eaf9;
+  --l5:#b45309; --l5-l:#fef3e2;
+  --sec:#0a2540; --sec-l:#e8eef5;
+  --mono:'Geist Mono',monospace;
+  --head:'Geist',sans-serif;
+  --body:'Newsreader',Georgia,serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--body);background:var(--bg);color:var(--ink);line-height:1.7;font-size:17px;}
+
+nav{background:var(--ink);position:sticky;top:0;z-index:200;}
+.nav-in{max-width:1180px;margin:0 auto;display:flex;align-items:center;padding:10px 28px;gap:4px;flex-wrap:wrap;}
+.nav-logo{font-family:var(--head);font-size:13px;font-weight:800;color:white;margin-right:14px;letter-spacing:-.3px;text-decoration:none;}
+.nav-a{font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.38);text-decoration:none;padding:4px 9px;border-radius:3px;transition:all .12s;white-space:nowrap;}
+.nav-a:hover{background:rgba(255,255,255,.1);color:white;}
+.nav-a.active{background:rgba(255,255,255,.15);color:white;}
+
+.hero{background:var(--ink);color:white;position:relative;overflow:hidden;}
+.hero-stripe{height:5px;background:linear-gradient(90deg,
+  var(--l1) 0 16.6%,var(--l2) 16.6% 33.3%,var(--l3) 33.3% 50%,
+  var(--l4) 50% 66.6%,var(--l5) 66.6% 83.3%,var(--sec) 83.3% 100%);}
+.hero-in{max-width:1180px;margin:0 auto;padding:72px 28px 60px;}
+.hero-eye{font-family:var(--mono);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.28);margin-bottom:18px;}
+.hero h1{font-family:var(--head);font-size:clamp(38px,5.4vw,68px);font-weight:900;line-height:.95;letter-spacing:-1.8px;margin-bottom:20px;}
+.hero h1 .accent{color:#5ba3ff;}
+.hero h1 .smaller{font-size:.48em;font-weight:500;color:rgba(255,255,255,.35);letter-spacing:-.5px;display:block;margin-top:14px;}
+.hero-desc{font-family:var(--body);font-size:18px;font-style:italic;font-weight:300;color:rgba(255,255,255,.55);max-width:680px;line-height:1.65;margin-bottom:40px;}
+.hero-meta{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;background:rgba(255,255,255,.06);border-radius:12px;overflow:hidden;}
+@media(max-width:700px){.hero-meta{grid-template-columns:1fr 1fr;}}
+.hm{padding:18px 16px;background:rgba(255,255,255,.03);}
+.hm-k{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:6px;}
+.hm-v{font-family:var(--head);font-size:13px;font-weight:600;line-height:1.3;}
+.hm-v span{color:rgba(255,255,255,.5);font-weight:400;}
+
+.layout{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:220px 1fr;gap:0;}
+@media(max-width:900px){.layout{grid-template-columns:1fr;}}
+.sidebar{border-right:1px solid var(--rule);padding:28px 14px;position:sticky;top:48px;height:calc(100vh - 48px);overflow-y:auto;}
+@media(max-width:900px){.sidebar{display:none;}}
+.sb-section{margin-bottom:22px;}
+.sb-hdr{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin-bottom:8px;padding-left:8px;}
+.sb-a{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:5px;font-family:var(--head);font-size:12px;font-weight:500;text-decoration:none;color:var(--ink2);transition:background .12s;margin-bottom:1px;}
+.sb-a:hover{background:var(--rule2);}
+.sb-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.sb-a .layer-num{font-family:var(--mono);font-size:10px;color:var(--ink3);width:16px;}
+
+.content{padding:0 0 80px;}
+.chapter{padding:0 44px;}
+@media(max-width:680px){.chapter{padding:0 20px;}}
+.ch-hdr{padding:58px 0 26px;border-bottom:2px solid var(--ink);margin-bottom:34px;display:flex;align-items:flex-end;gap:16px;}
+.ch-n{font-family:var(--head);font-size:70px;font-weight:900;line-height:1;color:var(--rule);letter-spacing:-3px;flex-shrink:0;}
+.ch-title{font-family:var(--head);font-size:26px;font-weight:800;letter-spacing:-.5px;line-height:1.0;}
+.ch-sub{font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:1.5px;text-transform:uppercase;margin-top:5px;}
+
+p{margin-bottom:20px;color:var(--ink2);line-height:1.78;font-weight:300;}
+strong{color:var(--ink);font-weight:600;}
+h3{font-family:var(--head);font-size:19px;font-weight:700;margin:38px 0 12px;letter-spacing:-.3px;padding-left:14px;border-left:3px solid var(--ink);}
+h4{font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin:22px 0 8px;}
+ul,ol{margin:0 0 20px 22px;color:var(--ink2);}
+li{margin-bottom:8px;line-height:1.7;font-weight:300;}
+
+.callout{margin:22px 0;padding:16px 20px;border-radius:6px;border-left:4px solid;font-size:15px;line-height:1.68;font-family:var(--head);}
+.callout.ok{background:var(--l2-l);border-color:var(--l2);color:#0a3020;}
+.callout.info{background:var(--l3-l);border-color:var(--l3);color:#0d3258;}
+.clbl{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;font-weight:600;margin-bottom:5px;display:block;}
+
+.docset{display:grid;grid-template-columns:1fr;gap:14px;margin:24px 0;}
+.doc-card{display:grid;grid-template-columns:100px 1fr;border:1.5px solid var(--rule);border-radius:12px;overflow:hidden;background:white;text-decoration:none;color:inherit;transition:all .15s;}
+.doc-card:hover{border-color:var(--ink);transform:translateX(4px);}
+.doc-card.d0{border-left:6px solid var(--ink3);}
+.doc-card.d05{border-left:6px solid var(--l1);}
+.doc-card.d06{border-left:6px solid var(--l2);}
+.doc-card.d07{border-left:6px solid var(--sec);}
+.doc-card.d1{border-left:6px solid var(--l3);}
+.doc-card.d2{border-left:6px solid var(--l4);}
+.doc-card.d3{border-left:6px solid var(--l5);}
+.doc-n{padding:20px 16px;background:var(--rule2);border-right:1px solid var(--rule);font-family:var(--mono);}
+.doc-num{font-family:var(--head);font-size:28px;font-weight:900;line-height:1;color:var(--ink);letter-spacing:-1px;margin-bottom:4px;}
+.doc-lbl{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);}
+.doc-body{padding:18px 22px;font-family:var(--head);}
+.doc-t{font-size:16px;font-weight:800;color:var(--ink);letter-spacing:-.2px;margin-bottom:6px;display:flex;align-items:center;gap:8px;}
+.doc-t .arrow{margin-left:auto;color:var(--ink3);font-family:var(--mono);font-size:12px;transition:transform .15s;}
+.doc-card:hover .doc-t .arrow{transform:translateX(4px);color:var(--ink);}
+.doc-d{font-size:13.5px;color:var(--ink2);line-height:1.6;margin-bottom:10px;}
+.doc-meta{display:flex;gap:16px;flex-wrap:wrap;font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:.5px;text-transform:uppercase;}
+.doc-meta span{display:flex;gap:5px;align-items:center;}
+.doc-meta span::before{content:'·';color:var(--ink3);font-weight:700;}
+.doc-meta span:first-child::before{display:none;}
+@media(max-width:680px){.doc-card{grid-template-columns:1fr;} .doc-n{border-right:none;border-bottom:1px solid var(--rule);}}
+
+.tbl{margin:20px 0;border:1.5px solid var(--ink);border-radius:12px;overflow:hidden;font-family:var(--head);}
+.tbl-hdr{background:var(--ink);color:white;display:grid;grid-template-columns:1fr 1fr;padding:0;}
+.tbl-hdr>div{padding:10px 14px;font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;}
+.tbl-row{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--rule);}
+.tbl-row:last-child{border-bottom:none;}
+.tbl-row>div{padding:12px 14px;font-size:13.5px;color:var(--ink2);border-right:1px solid var(--rule);line-height:1.5;}
+.tbl-row>div:last-child{border-right:none;}
+.tbl-row:nth-child(even){background:var(--rule2);}
+.tbl-tech{font-size:13px;font-weight:700;color:var(--ink);}
+@media(max-width:680px){.tbl-hdr,.tbl-row{grid-template-columns:1fr;} .tbl-row>div{border-right:none;border-bottom:1px solid var(--rule);}}
+
+.pq{margin:40px 0;padding:26px 32px;border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);font-family:var(--head);font-size:clamp(17px,2.2vw,21px);font-weight:700;line-height:1.3;text-align:center;letter-spacing:-.3px;}
+
+footer{background:var(--ink);color:rgba(255,255,255,.28);padding:22px 28px;font-family:var(--mono);font-size:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
+.ft-dots{display:flex;gap:5px;}
+.ft-dot{width:8px;height:8px;border-radius:50%;}
+
+code{font-family:var(--mono);font-size:12.5px;background:var(--rule2);padding:2px 6px;border-radius:3px;color:var(--l1);}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-in">
+    <a class="nav-logo" href="index.html">SSEP</a>
+    <a class="nav-a" href="0-base.html">0 · Base</a>
+    <a class="nav-a" href="0.5-plan.html">0.5 · Plan</a>
+    <a class="nav-a" href="0.6-setup.html">0.6 · Setup</a>
+    <a class="nav-a" href="0.7-escalado.html">0.7 · Escalado</a>
+    <a class="nav-a" href="1-patron.html">1 · Patrón</a>
+    <a class="nav-a" href="2-implementacion.html">2 · Implementación</a>
+    <a class="nav-a" href="3-metalkube.html">3 · MetalKube</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-stripe"></div>
+  <div class="hero-in">
+    <div class="hero-eye">SSEP · Set completo · Índice maestro</div>
+    <h1>Ocho documentos.<br>Una <span class="accent">escalera</span>.<br>Un solo patrón.
+      <span class="smaller">De la arquitectura mínima a un sistema industrial · agnóstico de dominio</span>
+    </h1>
+    <p class="hero-desc">
+      El set completo del patrón SSEP. Cada documento responde a una pregunta distinta. Este índice organiza el orden de lectura, las rutas por perfil, y cuándo abrir cada uno.
+    </p>
+    <div class="hero-meta">
+      <div class="hm"><div class="hm-k">Documentos</div><div class="hm-v">8 <span>· este es el 00</span></div></div>
+      <div class="hm"><div class="hm-k">Escalones</div><div class="hm-v">P0-P10 <span>+ fases A-C</span></div></div>
+      <div class="hm"><div class="hm-k">Tiempo total</div><div class="hm-v">4 semanas <span>senior → P5</span></div></div>
+      <div class="hm"><div class="hm-k">Alcance</div><div class="hm-v">Agnóstico <span>· dominio y tecnología</span></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+
+<div class="sidebar">
+  <div class="sb-section">
+    <div class="sb-hdr">Contenido</div>
+    <a class="sb-a" href="#intro"><span class="layer-num">00</span>Cómo usar</a>
+    <a class="sb-a" href="#set"><span class="layer-num">01</span>El set completo</a>
+    <a class="sb-a" href="#rutas"><span class="layer-num">02</span>Rutas de lectura</a>
+    <a class="sb-a" href="#cuando"><span class="layer-num">03</span>Cuándo abrir cada doc</a>
+    <a class="sb-a" href="#empezar"><span class="layer-num">04</span>Empezar hoy</a>
+  </div>
+</div>
+
+<div class="content">
+
+<div id="intro" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">00</div>
+    <div>
+      <div class="ch-title">Cómo usar este índice</div>
+      <div class="ch-sub">El mapa · no el territorio</div>
+    </div>
+  </div>
+
+  <p>Hay ocho documentos en el set. Cada uno responde a una pregunta distinta. Este es el <strong>índice maestro</strong>: no reemplaza a ninguno, los organiza. Los links del menú superior te llevan a cada uno.</p>
+
+  <div class="callout info">
+    <span class="clbl">Tres formas de usar este índice</span>
+    <strong>Como mapa:</strong> leerlo entero una vez para tener visión general.<br>
+    <strong>Como ruta:</strong> seguir §02 "Rutas de lectura" según tu perfil.<br>
+    <strong>Como referencia:</strong> usar §03 "Cuándo abrir cada doc" cuando tengas una pregunta concreta.
+  </div>
+</div>
+
+<div id="set" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">01</div>
+    <div>
+      <div class="ch-title">El set completo</div>
+      <div class="ch-sub">8 documentos · clic para abrir</div>
+    </div>
+  </div>
+
+  <div class="docset">
+
+    <a class="doc-card d0" href="0-base.html">
+      <div class="doc-n"><div class="doc-num">0</div><div class="doc-lbl">Base</div></div>
+      <div class="doc-body">
+        <div class="doc-t">Base Arquitectónica Reutilizable <span class="arrow">→</span></div>
+        <div class="doc-d">La arquitectura mínima del patrón. 3 capas, 3 contratos, 3 reglas. Agnóstico de dominio y tecnología.</div>
+        <div class="doc-meta"><span>15 min</span><span>7 secciones</span><span>Sin código</span></div>
+      </div>
+    </a>
+
+    <a class="doc-card d05" href="0.5-plan.html">
+      <div class="doc-n"><div class="doc-num">0.5</div><div class="doc-lbl">Plan</div></div>
+      <div class="doc-body">
+        <div class="doc-t">Plan de Implementación <span class="arrow">→</span></div>
+        <div class="doc-d">Tareas y tiempos por fase (A/B/C) y por peldaño (P0-P5). Camino crítico, paralelización, ajustes por perfil.</div>
+        <div class="doc-meta"><span>20 min</span><span>10 secciones</span><span>Con tiempos</span></div>
+      </div>
+    </a>
+
+    <a class="doc-card d06" href="0.6-setup.html">
+      <div class="doc-n"><div class="doc-num">0.6</div><div class="doc-lbl">Setup</div></div>
+      <div class="doc-body">
+        <div class="doc-t">Setup del Entorno (P0-P5) <span class="arrow">→</span></div>
+        <div class="doc-d">Comandos concretos para instalar cada peldaño: del IMR a RAGAS. Incluye dependencias ocultas.</div>
+        <div class="doc-meta"><span>30 min setup</span><span>10 secciones</span><span>Comandos</span></div>
+      </div>
+    </a>
+
+    <a class="doc-card d07" href="0.7-escalado.html">
+      <div class="doc-n"><div class="doc-num">0.7</div><div class="doc-lbl">Escalado</div></div>
+      <div class="doc-body">
+        <div class="doc-t">Setup de Escalado (P6-P10) <span class="arrow">→</span></div>
+        <div class="doc-d">Kafka, Flink, MLflow, DVC, Evidently, Argo, NeMo, LangGraph, ClickHouse, Loki, K8s. Para cuando el sistema escala.</div>
+        <div class="doc-meta"><span>2h setup</span><span>12 secciones</span><span>Comandos</span></div>
+      </div>
+    </a>
+
+    <a class="doc-card d1" href="1-patron.html">
+      <div class="doc-n"><div class="doc-num">1</div><div class="doc-lbl">Patrón</div></div>
+      <div class="doc-body">
+        <div class="doc-t">Patrón SSEP completo <span class="arrow">→</span></div>
+        <div class="doc-d">Las 5 capas invariantes + seguridad transversal. Contexto, problema, solución, variaciones, anti-patrones, criterios.</div>
+        <div class="doc-meta"><span>30 min</span><span>10 secciones</span><span>Visión arquitectónica</span></div>
+      </div>
+    </a>
+
+    <a class="doc-card d2" href="2-implementacion.html">
+      <div class="doc-n"><div class="doc-num">2</div><div class="doc-lbl">Implementación</div></div>
+      <div class="doc-body">
+        <div class="doc-t">Catálogo de herramientas <span class="arrow">→</span></div>
+        <div class="doc-d">3-5 opciones viables por capa. Cuándo elegir, cuándo evitar. Stacks de referencia. Anti-selecciones. Criterios de decisión.</div>
+        <div class="doc-meta"><span>40 min</span><span>9 secciones</span><span>Específico de tecnología</span></div>
+      </div>
+    </a>
+
+    <a class="doc-card d3" href="3-metalkube.html">
+      <div class="doc-n"><div class="doc-num">3</div><div class="doc-lbl">Caso</div></div>
+      <div class="doc-body">
+        <div class="doc-t">MetalKube — mantenimiento predictivo <span class="arrow">→</span></div>
+        <div class="doc-d">El patrón aplicado a motores industriales. Flujo end-to-end, decisiones no obvias, roadmap de 11 fases.</div>
+        <div class="doc-meta"><span>45 min</span><span>8 secciones</span><span>Dominio + tecnología</span></div>
+      </div>
+    </a>
+
+  </div>
+</div>
+
+<div id="rutas" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">02</div>
+    <div>
+      <div class="ch-title">Rutas de lectura</div>
+      <div class="ch-sub">Tres caminos según tu objetivo</div>
+    </div>
+  </div>
+
+  <p>No todo el mundo necesita leer los 8 documentos. Depende de si vas a <em>evaluar</em>, <em>implementar</em> o <em>escalar</em>.</p>
+
+  <h3>Ruta 01 · Evaluar — "¿esto aplica a mi problema?"</h3>
+  <p><strong>Para quién:</strong> decisor técnico antes de comprometer recursos. <strong>Duración:</strong> 1-2 días. Sin instalar nada.</p>
+  <ul>
+    <li><a href="0-base.html">Doc 0 · Base</a> → leer §1-3 (contexto, arquitectura, contratos)</li>
+    <li><a href="1-patron.html">Doc 1 · Patrón</a> → leer §1-3 (contexto, problema, solución)</li>
+    <li><strong>Decisión:</strong> ¿cumple las 10 condiciones? Si sí → Ruta 02. Si no → parar.</li>
+  </ul>
+
+  <h3>Ruta 02 · Implementar — "quiero el sistema mínimo funcionando"</h3>
+  <p><strong>Para quién:</strong> equipo que va a construir. <strong>Duración:</strong> 4 semanas (perfil senior).</p>
+  <ul>
+    <li><a href="0-base.html">Doc 0 · Base</a> → leer entero</li>
+    <li><a href="0.5-plan.html">Doc 0.5 · Plan</a> → leer entero</li>
+    <li><a href="0.6-setup.html">Doc 0.6 · Setup</a> → abrir al instalar cada peldaño</li>
+    <li><a href="3-metalkube.html">Doc 3 · MetalKube</a> → leer §2 al llegar a P1-P3</li>
+    <li><strong>Decisión al llegar a P5:</strong> ¿merece la pena escalar? Si sí → Ruta 03. Si no → el sistema ya es útil.</li>
+  </ul>
+
+  <h3>Ruta 03 · Escalar — "voy a producción industrial"</h3>
+  <p><strong>Para quién:</strong> equipo con volumen real o clientes enterprise. <strong>Duración:</strong> 6-9 meses.</p>
+  <ul>
+    <li><a href="1-patron.html">Doc 1 · Patrón</a> → leer entero</li>
+    <li><a href="2-implementacion.html">Doc 2 · Implementación</a> → consultar por capa</li>
+    <li><a href="3-metalkube.html">Doc 3 · MetalKube</a> → leer §5-7 (MVP, roadmap, decisiones)</li>
+    <li><a href="0.7-escalado.html">Doc 0.7 · Escalado</a> → abrir al instalar cada herramienta</li>
+  </ul>
+
+  <div class="callout ok">
+    <span class="clbl">✓ Regla común a las tres rutas</span>
+    Un peldaño a la vez. Nunca saltar. El error más común es intentar el sistema completo (Doc 3) antes de validar la base (Doc 0).
+  </div>
+</div>
+
+<div id="cuando" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">03</div>
+    <div>
+      <div class="ch-title">Cuándo abrir cada documento</div>
+      <div class="ch-sub">Búsqueda rápida por situación</div>
+    </div>
+  </div>
+
+  <div class="tbl">
+    <div class="tbl-hdr"><div>Si tu pregunta es...</div><div>Ve a...</div></div>
+    <div class="tbl-row"><div>¿Cómo sé si este patrón aplica a mi problema?</div><div><a href="0-base.html">Doc 0</a> §1 + <a href="1-patron.html">Doc 1</a> §1</div></div>
+    <div class="tbl-row"><div>¿Cuál es el contrato entre capa 2 y capa 3?</div><div><a href="0-base.html">Doc 0</a> §2</div></div>
+    <div class="tbl-row"><div>¿Cuánto tarda cada paso?</div><div><a href="0.5-plan.html">Doc 0.5</a> §6</div></div>
+    <div class="tbl-row"><div>¿Qué herramienta uso para embeddings?</div><div><a href="2-implementacion.html">Doc 2</a> §3.2</div></div>
+    <div class="tbl-row"><div>¿Cómo instalo pgvector paso a paso?</div><div><a href="0.6-setup.html">Doc 0.6</a> §5</div></div>
+    <div class="tbl-row"><div>¿Cómo instalo Kafka + Flink + MLflow?</div><div><a href="0.7-escalado.html">Doc 0.7</a></div></div>
+    <div class="tbl-row"><div>¿Cómo es un flujo real de fallo a alerta?</div><div><a href="3-metalkube.html">Doc 3</a> §3</div></div>
+    <div class="tbl-row"><div>¿Qué decisiones no obvias debo tomar?</div><div><a href="3-metalkube.html">Doc 3</a> §4 + <a href="1-patron.html">Doc 1</a> §7</div></div>
+    <div class="tbl-row"><div>¿Por qué evitar Kafka para 10 sensores?</div><div><a href="2-implementacion.html">Doc 2</a> §8</div></div>
+    <div class="tbl-row"><div>¿Cómo priorizo entre opciones parecidas?</div><div><a href="2-implementacion.html">Doc 2</a> §9</div></div>
+    <div class="tbl-row"><div>¿Cuándo parar y no escalar?</div><div><a href="0.5-plan.html">Doc 0.5</a> §9</div></div>
+  </div>
+</div>
+
+<div id="empezar" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">04</div>
+    <div>
+      <div class="ch-title">Empezar hoy</div>
+      <div class="ch-sub">El siguiente paso concreto según tu situación</div>
+    </div>
+  </div>
+
+  <h3>Si aún no sabes si el patrón aplica</h3>
+  <p><strong>30 minutos.</strong> Lee <a href="0-base.html">Doc 0 §1</a> y responde por escrito si tu problema cumple las 10 condiciones. Si no cumple al menos 7, el patrón no aplica.</p>
+
+  <h3>Si ya sabes que aplica pero no tienes dominio concreto</h3>
+  <p><strong>2 horas.</strong> Ejecuta la Fase A del <a href="0.5-plan.html">Doc 0.5 §2</a>: elige dominio, escribe los 3 contratos, confirma las 3 reglas.</p>
+
+  <h3>Si tienes dominio y quieres código funcionando</h3>
+  <p><strong>4-6 horas.</strong> Abre <a href="0.6-setup.html">Doc 0.6 §3</a> e implementa el IMR del Peldaño 0. Tres archivos Python, ~150 líneas.</p>
+
+  <h3>Si ya tienes el IMR funcionando</h3>
+  <p><strong>2 días.</strong> Ejecuta la Fase C (validación) del <a href="0.5-plan.html">Doc 0.5 §4</a>. Después sube a Peldaño 1 con <a href="0.6-setup.html">Doc 0.6 §4</a>.</p>
+
+  <h3>Si ya has llegado al Peldaño 5</h3>
+  <p><strong>1 día de decisión.</strong> Aplica las 4 reglas del <a href="0.5-plan.html">Doc 0.5 §9</a>. Si todas son "sí", abre <a href="2-implementacion.html">Doc 2</a> y planifica Peldaño 6+.</p>
+
+  <div class="pq">
+    No hace falta leer los 8 documentos. Hace falta saber cuál abrir hoy. El resto vendrá cuando llegues.
+  </div>
+</div>
+
+</div>
+</div>
+
+<footer>
+  SSEP · Índice maestro · Documento 00 de 8
+  <div class="ft-dots">
+    <div class="ft-dot" style="background:var(--l1)"></div>
+    <div class="ft-dot" style="background:var(--l2)"></div>
+    <div class="ft-dot" style="background:var(--l3)"></div>
+    <div class="ft-dot" style="background:var(--l4)"></div>
+    <div class="ft-dot" style="background:var(--l5)"></div>
+    <div class="ft-dot" style="background:var(--sec)"></div>
+  </div>
+</footer>
+
+</body>
+</html>

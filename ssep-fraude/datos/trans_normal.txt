@@ -1,0 +1,1 @@
+45.30,ES,14,false,supermarket,ES

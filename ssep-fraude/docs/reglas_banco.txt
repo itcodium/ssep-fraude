@@ -1,0 +1,19 @@
+Reglas internas del banco:
+
+§1.1: Ante una transacción sospechosa, contactar al titular
+antes de bloquear.
+
+§1.2: El fraude confirmado con importe superior a 1000€
+requiere bloqueo inmediato de la tarjeta.
+
+§1.3: Si el titular no confirma en 30 minutos, proceder con
+bloqueo preventivo.
+
+§3.2: Patrón de riesgo alto: transacción en país distinto al
+habitual + horario nocturno + canal online.
+
+§3.3: Patrón de riesgo medio: importe >500€ en categoría
+electrónica o viajes.
+
+§3.4: Patrón de riesgo bajo: transacción en país habitual,
+horario comercial, categoría recurrente.

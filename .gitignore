@@ -1,0 +1,39 @@
+@"
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.Python
+.venv/
+venv/
+env/
+ENV/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Modelos entrenados (P1 en adelante)
+*.pkl
+*.joblib
+*.onnx
+*.pt
+*.h5
+
+# Datasets grandes (P1) - descargar desde Kaggle
+# Ver: ssep-fraude/Credit Card Fraud Detection (ULB)/README.md
+*.zip
+*.csv
+
+# Configuracion local
+.env
+.env.local
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+"@ | Out-File -FilePath .gitignore -Encoding UTF8

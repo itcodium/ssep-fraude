@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SSEP — Checklist de implementación</title>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,300;1,6..72,400&family=Geist:wght@300;400;500;600;700;800;900&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff; --ink:#0c0c0b; --ink2:#2d2d2b; --ink3:#787870;
+  --rule:#e4e4de; --rule2:#f5f5ef;
+  --l1:#c0390b; --l1-l:#fdeee9;
+  --l2:#1a5c3a; --l2-l:#e4f5ec;
+  --l3:#1c6ea4; --l3-l:#eef2fb;
+  --l4:#7b2d8b; --l4-l:#f5eaf9;
+  --l5:#b45309; --l5-l:#fef3e2;
+  --sec:#0a2540; --sec-l:#e8eef5;
+  --blocker:#c0392b;
+  --blocker-l:#fdf0ee;
+  --mono:'Geist Mono',monospace;
+  --head:'Geist',sans-serif;
+  --body:'Newsreader',Georgia,serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--body);background:var(--bg);color:var(--ink);line-height:1.7;font-size:17px;}
+
+nav{background:var(--ink);position:sticky;top:0;z-index:200;}
+.nav-in{max-width:1180px;margin:0 auto;display:flex;align-items:center;padding:10px 28px;gap:4px;flex-wrap:wrap;}
+.nav-logo{font-family:var(--head);font-size:13px;font-weight:800;color:white;margin-right:14px;letter-spacing:-.3px;text-decoration:none;}
+.nav-a{font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.38);text-decoration:none;padding:4px 9px;border-radius:3px;transition:all .12s;white-space:nowrap;}
+.nav-a:hover{background:rgba(255,255,255,.1);color:white;}
+
+.hero{background:var(--ink);color:white;position:relative;overflow:hidden;}
+.hero-stripe{height:5px;background:linear-gradient(90deg,
+  var(--l1) 0 16.6%,var(--l2) 16.6% 33.3%,var(--l3) 33.3% 50%,
+  var(--l4) 50% 66.6%,var(--l5) 66.6% 83.3%,var(--sec) 83.3% 100%);}
+.hero-in{max-width:1180px;margin:0 auto;padding:60px 28px 50px;}
+.hero-eye{font-family:var(--mono);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.28);margin-bottom:18px;}
+.hero h1{font-family:var(--head);font-size:clamp(32px,4.6vw,52px);font-weight:900;line-height:.95;letter-spacing:-1.5px;margin-bottom:18px;}
+.hero h1 .accent{color:#5ba3ff;}
+.hero-desc{font-family:var(--body);font-size:17px;font-style:italic;font-weight:300;color:rgba(255,255,255,.55);max-width:640px;line-height:1.6;margin-bottom:32px;}
+
+/* Progress bar sticky dentro del hero */
+.progress-wrap{background:rgba(255,255,255,.05);border-radius:10px;padding:18px 22px;max-width:680px;}
+.progress-lbl{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;font-family:var(--head);}
+.progress-lbl-l{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4);}
+.progress-lbl-r{font-family:var(--mono);font-size:12px;color:white;font-weight:500;letter-spacing:.5px;}
+.progress-bar{height:6px;background:rgba(255,255,255,.1);border-radius:3px;overflow:hidden;margin-bottom:10px;}
+.progress-fill{height:100%;background:linear-gradient(90deg,#5ba3ff,#7bcca0);border-radius:3px;transition:width .3s ease;}
+.progress-mini{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;}
+.pm-item{font-family:var(--mono);font-size:9px;letter-spacing:1px;text-transform:uppercase;padding:5px 4px;border-radius:3px;background:rgba(255,255,255,.08);color:rgba(255,255,255,.45);text-align:center;transition:all .2s;}
+.pm-item.done{background:rgba(123,204,160,.25);color:#7bcca0;}
+.pm-item.active{background:rgba(91,163,255,.25);color:#5ba3ff;}
+
+.layout{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:200px 1fr;gap:0;}
+@media(max-width:900px){.layout{grid-template-columns:1fr;}}
+.sidebar{border-right:1px solid var(--rule);padding:28px 14px;position:sticky;top:48px;height:calc(100vh - 48px);overflow-y:auto;}
+@media(max-width:900px){.sidebar{display:none;}}
+.sb-hdr{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin-bottom:8px;padding-left:8px;}
+.sb-a{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:5px;font-family:var(--head);font-size:12px;font-weight:500;text-decoration:none;color:var(--ink2);transition:background .12s;margin-bottom:1px;}
+.sb-a:hover{background:var(--rule2);}
+.sb-a .cnt{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--ink3);}
+.sb-a .cnt.done{color:var(--l2);font-weight:600;}
+.sb-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+
+.content{padding:0 0 80px;}
+.chapter{padding:0 44px;}
+@media(max-width:680px){.chapter{padding:0 20px;}}
+.ch-hdr{padding:48px 0 22px;border-bottom:2px solid var(--ink);margin-bottom:28px;display:flex;align-items:flex-end;gap:16px;}
+.ch-n{font-family:var(--head);font-size:60px;font-weight:900;line-height:1;color:var(--rule);letter-spacing:-3px;flex-shrink:0;}
+.ch-title{font-family:var(--head);font-size:24px;font-weight:800;letter-spacing:-.5px;line-height:1.0;}
+.ch-sub{font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:1.5px;text-transform:uppercase;margin-top:5px;}
+.ch-status{margin-left:auto;font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:5px 12px;border-radius:20px;font-weight:600;}
+
+.fase-card{border:1.5px solid var(--rule);border-radius:12px;margin-bottom:22px;overflow:hidden;}
+.fase-card.completed{border-color:var(--l2);}
+.fase-hdr{display:flex;align-items:center;gap:14px;padding:16px 22px;border-bottom:1px solid var(--rule);background:var(--rule2);}
+.fase-hdr-t{font-family:var(--head);font-size:16px;font-weight:800;color:var(--ink);letter-spacing:-.2px;}
+.fase-hdr-sub{font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:1px;text-transform:uppercase;margin-left:auto;}
+.fase-hdr-prog{font-family:var(--mono);font-size:11px;color:var(--ink2);font-weight:600;padding:3px 10px;border-radius:20px;background:white;border:1px solid var(--rule);}
+.fase-card.completed .fase-hdr{background:var(--l2-l);border-bottom-color:var(--l2);}
+.fase-card.completed .fase-hdr-prog{background:var(--l2);color:white;border-color:var(--l2);}
+
+.task{display:grid;grid-template-columns:44px 1fr;border-bottom:1px solid var(--rule);transition:background .15s;}
+.task:last-child{border-bottom:none;}
+.task:hover{background:var(--rule2);}
+.task.checked{background:#f5f5ef;}
+.task.checked .task-name{text-decoration:line-through;color:var(--ink3);}
+.task.checked .task-desc{opacity:.6;}
+.task-n{padding:16px 0;display:flex;align-items:flex-start;justify-content:center;background:var(--rule2);border-right:1px solid var(--rule);font-family:var(--mono);font-size:11px;color:var(--ink3);letter-spacing:.5px;font-weight:600;padding-top:20px;}
+.task.checked .task-n{background:var(--l2-l);color:var(--l2);}
+.task-b{padding:14px 18px 14px 18px;}
+.task-row{display:flex;align-items:flex-start;gap:12px;cursor:pointer;user-select:none;}
+.task-checkbox{width:20px;height:20px;flex-shrink:0;border:2px solid var(--rule);border-radius:4px;background:white;margin-top:3px;position:relative;transition:all .15s;cursor:pointer;}
+.task-checkbox:hover{border-color:var(--ink3);}
+.task-checkbox.checked{background:var(--l2);border-color:var(--l2);}
+.task-checkbox.checked::after{content:'✓';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:white;font-family:var(--mono);font-size:13px;font-weight:800;}
+.task-content{flex:1;}
+.task-name{font-family:var(--head);font-size:14px;font-weight:700;color:var(--ink);margin-bottom:4px;line-height:1.35;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.task-desc{font-family:var(--body);font-size:13.5px;color:var(--ink2);line-height:1.55;font-weight:300;}
+.task-time{font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:.5px;margin-top:6px;display:inline-block;padding:2px 8px;background:var(--rule2);border-radius:3px;}
+.task.blocker .task-desc{color:#7a2a22;}
+.task.blocker .task-name::after{content:'BLOQUEADOR';font-family:var(--mono);font-size:8px;letter-spacing:1.5px;padding:2px 7px;border-radius:3px;background:var(--blocker-l);color:var(--blocker);font-weight:700;}
+
+.gate{display:flex;align-items:flex-start;gap:10px;padding:14px 22px;background:var(--l3-l);border-top:1px solid var(--l3);font-family:var(--head);font-size:13px;color:#0d3258;line-height:1.55;}
+.gate-icon{font-family:var(--mono);font-weight:800;flex-shrink:0;margin-top:1px;color:var(--l3);}
+.gate strong{color:var(--l3);font-weight:700;}
+.fase-card.completed .gate{background:var(--l2-l);border-top-color:var(--l2);}
+.fase-card.completed .gate-icon,.fase-card.completed .gate strong{color:var(--l2);}
+
+.actions{display:flex;gap:12px;flex-wrap:wrap;margin:34px 0;padding:20px 22px;background:var(--rule2);border-radius:10px;border:1px solid var(--rule);}
+.btn{font-family:var(--head);font-size:13px;font-weight:700;padding:10px 18px;border-radius:6px;border:1.5px solid;cursor:pointer;transition:all .15s;letter-spacing:-.1px;}
+.btn-primary{background:var(--ink);color:white;border-color:var(--ink);}
+.btn-primary:hover{background:var(--ink2);}
+.btn-secondary{background:white;color:var(--ink);border-color:var(--rule);}
+.btn-secondary:hover{background:var(--rule2);}
+.btn-danger{background:white;color:var(--blocker);border-color:var(--blocker);}
+.btn-danger:hover{background:var(--blocker-l);}
+.actions-info{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--ink3);letter-spacing:.5px;align-self:center;}
+
+.pq{margin:40px 0;padding:26px 32px;border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);font-family:var(--head);font-size:clamp(17px,2.2vw,21px);font-weight:700;line-height:1.3;text-align:center;letter-spacing:-.3px;}
+
+footer{background:var(--ink);color:rgba(255,255,255,.28);padding:22px 28px;font-family:var(--mono);font-size:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
+.ft-dots{display:flex;gap:5px;}
+.ft-dot{width:8px;height:8px;border-radius:50%;}
+
+code{font-family:var(--mono);font-size:12.5px;background:var(--rule2);padding:2px 6px;border-radius:3px;color:var(--l1);}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--ink);color:white;font-family:var(--head);font-size:13px;padding:12px 22px;border-radius:8px;font-weight:500;letter-spacing:.2px;z-index:1000;transition:transform .3s ease;box-shadow:0 4px 20px rgba(0,0,0,.2);}
+.toast.show{transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-in">
+    <a class="nav-logo" href="index.html">SSEP</a>
+    <a class="nav-a" href="0-base.html">0 · Base</a>
+    <a class="nav-a" href="0.5-plan.html">0.5 · Plan</a>
+    <a class="nav-a" href="0.6-setup.html">0.6 · Setup</a>
+    <a class="nav-a" href="0.7-escalado.html">0.7 · Escalado</a>
+    <a class="nav-a" href="1-patron.html">1 · Patrón</a>
+    <a class="nav-a" href="2-implementacion.html">2 · Implementación</a>
+    <a class="nav-a" href="3-metalkube.html">3 · MetalKube</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-stripe"></div>
+  <div class="hero-in">
+    <div class="hero-eye">Checklist de implementación · progreso guardado localmente</div>
+    <h1>Del dominio<br>al <span class="accent">sistema medible</span>.
+      <span class="smaller">3 fases + 5 peldaños · 30 tareas · guardado automático en tu navegador</span>
+    </h1>
+    <p class="hero-desc">
+      Marca cada tarea a medida que la completas. Tu progreso se guarda en localStorage de este navegador. Puedes cerrar la pestaña y volver cuando quieras — todo sigue donde lo dejaste.
+    </p>
+    <div class="progress-wrap">
+      <div class="progress-lbl">
+        <span class="progress-lbl-l">Progreso total</span>
+        <span class="progress-lbl-r" id="progress-summary">0 / 30 completadas</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+      <div class="progress-mini">
+        <div class="pm-item" data-stage="A">Fase A</div>
+        <div class="pm-item" data-stage="B">Fase B</div>
+        <div class="pm-item" data-stage="C">Fase C</div>
+        <div class="pm-item" data-stage="P1">P1</div>
+        <div class="pm-item" data-stage="P2">P2</div>
+        <div class="pm-item" data-stage="P3">P3</div>
+        <div class="pm-item" data-stage="P4">P4</div>
+        <div class="pm-item" data-stage="P5">P5</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+
+<div class="sidebar">
+  <div class="sb-hdr">Etapas</div>
+  <a class="sb-a" href="#fase-a"><span class="sb-dot" style="background:var(--l1)"></span>Fase A · Diseño <span class="cnt" data-cnt="A">0/3</span></a>
+  <a class="sb-a" href="#fase-b"><span class="sb-dot" style="background:var(--l2)"></span>Fase B · IMR <span class="cnt" data-cnt="B">0/6</span></a>
+  <a class="sb-a" href="#fase-c"><span class="sb-dot" style="background:var(--l3)"></span>Fase C · Validación <span class="cnt" data-cnt="C">0/3</span></a>
+  <a class="sb-a" href="#p1"><span class="sb-dot" style="background:var(--l4)"></span>P1 · Modelo <span class="cnt" data-cnt="P1">0/4</span></a>
+  <a class="sb-a" href="#p2"><span class="sb-dot" style="background:var(--l5)"></span>P2 · RAG <span class="cnt" data-cnt="P2">0/5</span></a>
+  <a class="sb-a" href="#p3"><span class="sb-dot" style="background:#5c34c0"></span>P3 · LLM <span class="cnt" data-cnt="P3">0/3</span></a>
+  <a class="sb-a" href="#p4"><span class="sb-dot" style="background:var(--sec)"></span>P4 · Observabilidad <span class="cnt" data-cnt="P4">0/3</span></a>
+  <a class="sb-a" href="#p5"><span class="sb-dot" style="background:#0d7a5f"></span>P5 · Evaluación <span class="cnt" data-cnt="P5">0/3</span></a>
+</div>
+
+<div class="content">
+
+<!-- ============ FASE A ============ -->
+<div class="chapter" id="fase-a">
+  <div class="ch-hdr">
+    <div class="ch-n">A</div>
+    <div>
+      <div class="ch-title">Fase A · Diseño de la base</div>
+      <div class="ch-sub">0.5 día · sin código · obligatoria</div>
+    </div>
+    <div class="ch-status" id="status-A" style="background:var(--l1-l);color:var(--l1)">Pendiente</div>
+  </div>
+
+  <div class="fase-card" data-stage-card="A">
+    <div class="fase-hdr">
+      <div class="fase-hdr-t">3 tareas · sin código</div>
+      <div class="fase-hdr-sub">Prerequisito de todo</div>
+      <div class="fase-hdr-prog" data-cnt="A">0 / 3</div>
+    </div>
+
+    <div class="task" data-task="A1">
+      <div class="task-n">A1</div>
+      <div class="task-b">
+        <label class="task-row">
+          <div class="task-checkbox"></div>
+          <div class="task-content">
+            <div class="task-name">Elegir dominio concreto</div>
+            <div class="task-desc">Un caso específico: motores, fraude, médico, u otro. Debe cumplir las 10 condiciones del Doc 0 §1.</div>
+            <span class="task-time">2-4 h</span>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="task" data-task="A2">
+      <div class="task-n">A2</div>
+      <div class="task-b">
+        <label class="task-row">
+          <div class="task-checkbox"></div>
+          <div class="task-content">
+            <div class="task-name">Definir los 3 contratos</div>
+            <div class="task-desc">JSON exacto de <code>evento</code>, <code>predicción</code> y <code>explicación</code> para ese dominio. Los campos base se mantienen; los específicos se añaden.</div>
+            <span class="task-time">3-4 h</span>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="task" data-task="A3">
+      <div class="task-n">A3</div>
+      <div class="task-b">
+        <label class="task-row">
+          <div class="task-checkbox"></div>
+          <div class="task-content">
+            <div class="task-name">Confirmar las 3 reglas</div>
+            <div class="task-desc">Verificar que en el dominio elegido: cada capa tiene una responsabilidad, la capa 3 no modifica la predicción, y la abstención es posible.</div>
+            <span class="task-time">1 h</span>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="gate">
+      <span class="gate-icon">→</span>
+      <div><strong>Gate de salida:</strong> puedes explicar en 2 frases qué problema resuelves y qué pasa entre cada capa. Si no puedes, no sigas.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ FASE B ============ -->
+<div class="chapter" id="fase-b">
+  <div class="ch-hdr">
+    <div class="ch-n">B</div>
+    <div>
+      <div class="ch-title">Fase B · Implementación Mínima de Referencia</div>
+      <div class="ch-sub">2 días · ~150 líneas Python · obligatoria</div>
+    </div>
+    <div class="ch-status" id="status-B" style="background:var(--l2-l);color:var(--l2)">Pendiente</div>
+  </div>
+
+  <div class="fase-card" data-stage-card="B">
+    <div class="fase-hdr">
+      <div class="fase-hdr-t">6 tareas · código mínimo</div>
+      <div class="fase-hdr-sub">3 archivos Python</div>
+      <div class="fase-hdr-prog" data-cnt="B">0 / 6</div>
+    </div>
+
+    <div class="task" data-task="B1">
+      <div class="task-n">B1</div>
+      <div class="task-b">
+        <label class="task-row">
+          <div class="task-checkbox"></div>
+          <div class="task-content">
+            <div class="task-name">Crear estructura del proyecto</div>
+            <div class="task-desc">Carpeta <code>ssep/</code> con subcarpetas <code>docs/</code> y <code>datos/</code>.</div>
+            <span class="task-time">30 min</span>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="task" data-task="B2">
+      <div class="task-n">B2</div>
+      <div class="task-b">
+        <label class="task-row">
+          <div class="task-checkbox"></div>
+          <div class="task-content">
+            <div class="task-name">Capa 1 — Ingesta</div>
+            <div class="task-desc"><code>capa1_ingestion.py</code>: leer señal, extraer features, producir evento con el contrato exacto.</div>
+            <span class="task-time">2-3 h</span>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="task" data-task="B3">
+      <div class="task-n">B3</div>
+      <div class="task-b">
+        <label class="task-row">
+          <div class="task-checkbox"></div>
+          <div class="task-content">
+            <div class="task-name">Capa 2 — Modelo</div>
+            <div class="task-desc"><code>capa2_model.py</code>: clasificador trivial (reglas) o sklearn muy pequeño.</div>
+            <span class="task-time">3-4 h</span>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="task" data-task="B4">
+      <div class="task-n">B4</div>
+      <div class="task-b">
+        <label class="task-row">
+          <div class="task-checkbox"></div>
+          <div class="task-content">
+            <div class="task-name">Capa 3 — Explicación</div>
+            <div class="task-desc"><code>capa3_explanation.py</code>: retrieval simple, síntesis con plantilla, abstención si no hay fuentes.</div>
+            <span class="task-time">4-6 h</span>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="task" data-task="B5">
+      <div class="task-n">B5</div>
+      <div class="task-b">
+        <label class="task-row">
+          <div class="task-checkbox"></div>
+          <div class="task-content">
+            <div class="task-name">Orquestador</div>
+            <div class="task-desc"><code>main.py</code>: conectar las 3 capas, ejecutar con 3 casos de prueba.</div>
+            <span class="task-time">1-2 h</span>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="task" data-task="B6">
+      <div class="task-n">B6</div>
+      <div class="task-b">
+        <label class="task-row">
+          <div class="task-checkbox"></div>
+          <div class="task-content">
+            <div class="task-name">Datos y documentos</div>
+            <div class="task-desc">3 documentos en <code>docs/</code> (texto plano), 3 señales en <code>datos/</code> (o generadas).</div>
+            <span class="task-time">2-3 h</span>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="gate">
+      <span class="gate-icon">→</span>
+      <div><strong>Gate de salida:</strong> <code>python main.py</code> corre sin errores y produce output en las 3 capas.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ FASE C ============ -->
+<div class="chapter" id="fase-c">
+  <div class="ch-hdr">
+    <div class="ch-n">C</div>
+    <div>
+      <div class="ch-title">Fase C · Validación</div>
+      <div class="ch-sub">0.5 día · obligatoria</div>
+    </div>
+    <div class="ch-status" id="status-C" style="background:var(--l3-l);color:var(--l3)">Pendiente</div>
+  </div>
+
+  <div class="fase-card" data-stage-card="C">
+    <div class="fase-hdr">
+      <div class="fase-hdr-t">3 tareas · verificar reglas</div>
+      <div class="fase-hdr-sub">Gate de la base</div>
+      <div class="fase-hdr-prog" data-cnt="C">0 / 3</div>
+    </div>
+
+    <div class="task" data-task="C1">
+      <div class="task-n">C1</div>
+      <div class="task-b">
+        <label class="task-row">
+          <div class="task-checkbox"></div>
+          <div class="task-content">
+            <div class="task-name">Ejecutar con los 3 casos</div>
+            <div class="task-desc">Verificar que el flujo end-to-end produce output coherente en cada uno.</div>
+            <span class="task-time">1-2 h</span>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="task" data-task="C2">
+      <div class="task-n">C2</div>
+      <div class="task-b">
+        <label class="task-row">
+          <div class="task-checkbox"></div>
+          <div class="task-content">
+            <div class="task-name">Verificar regla 3 — abstención</div>
+            <div class="task-desc">El sistema debe decir "no tengo información" cuando no hay docs. Probar con un caso sin documentación.</div>
+            <span class="task-time">1 h</span>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="task" data-task="C3">
+      <div class="task-n">C3</div>
+      <div class="task-b">
+        <label class="task-row">
+          <div class="task-checkbox"></div>
+          <div class="task-content">
+            <div class="task-name">Verificar regla 2 — no modifica</div>
+            <div class="task-desc">La capa 3 no altera <code>label</code> ni <code>confidence</code>. Comparar predicción de entrada con el label de salida.</div>
+            <span class="task-time">1 h</span>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="gate">
+      <span class="gate-icon">→</span>
+      <div><strong>Gate de salida:</strong> puedes mostrar el output a alguien ajeno al proyecto y entiende qué ha pasado sin explicación.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ P1 ============ -->
+<div class="chapter" id="p1">
+  <div class="ch-hdr">
+    <div class="ch-n">P1</div>
+    <div>
+      <div class="ch-title">Peldaño 1 · Modelo real</div>
+      <div class="ch-sub">3-5 días · bloqueador: dataset etiquetado</div>
+    </div>
+    <div class="ch-status" id="status-P1" style="background:var(--l4-l);color:var(--l4)">Pendiente</div>
+  </div>
+
+  <div class="fase-card" data-stage-card="P1">
+    <div class="fase-hdr">
+      <div class="fase-hdr-t">4 tareas · sustituir clasificador trivial</div>
+      <div class="fase-hdr-sub">1 bloqueador</div>
+      <div class="fase-hdr-prog" data-cnt="P1">0 / 4</div>
+    </div>
+
+    <div class="task blocker" data-task="P1.1">
+      <div class="task-n">P1.1</div>
+      <div class="task-b">
+        <label class="task-row">
+          <div class="task-checkbox"></div>
+          <div class="task-content">
+            <div class="task-name">Dataset mínimo</div>
+            <div class="task-desc">100-500 ejemplos etiquetados del dominio. Es el bloqueador más lento del peldaño. Empieza a recolectar en Fase A.</div>
+            <span class="task-time">1-3 días</span>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="task" data-task="P1.2">
+      <div class="task-n">P1.2</div>
+      <div class="task-b">
+        <label class="task-row">
+          <div class="task-checkbox"></div>
+          <div class="task-content">
+            <div class="task-name">Entrenamiento</div>
+            <div class="task-desc">Modelo pequeño: sklearn, XGBoost, o PyTorch según dominio.</div>
+            <span class="task-time">1-2 días</span>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="task" data-task="P1.3">
+      <div class="task-n">P1.3</div>
+      <div class="task-b">
+        <label class="task-row">
+          <div class="task-checkbox"></div>
+          <div class="task-content">
+            <div class="task-name">Serving</div>
+            <div class="task-desc">FastAPI o función que carga el modelo y sirve predicciones.</div>
+            <span class="task-time">0.5 días</span>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="task" data-task="P1.4">
+      <div class="task-n">P1.4</div>
+      <div class="task-b">
+        <label class="task-row">
+          <div class="task-checkbox"></div>
+          <div class="task-content">
+            <div class="task-name">Integrar en IMR</div>
+            <div class="task-desc">Sustituir la función <code>classify()</code> por la llamada al modelo real. <strong>Sin tocar las otras dos capas.</strong></div>
+            <span class="task-time">0.5 días</span>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="gate">
+      <span class="gate-icon">→</span>
+      <div><strong>Gate de salida:</strong> <code>curl</code> al endpoint devuelve predicción con <code>label</code>, <code>confidence</code>, <code>uncertainty</code>. Accuracy >0.7 en validación.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ P2 ============ -->
+<div class="chapter" id="p2">
+  <div class="ch-hdr">
+    <div class="ch-n">P2</div>
+    <div>
+      <div class="ch-title">Peldaño 2 · RAG real</div>
+      <div class="ch-sub">5-7 días · bloqueador: documentos reales</div>
+    </div>
+    <div class="ch-status" id="status-P2" style="background:var(--l5-l);color:var(--l5)">Pendiente</div>
+  </div>
+
+  <div class="fase-card" data-stage-card="P2">
+    <div class="fase-hdr">
+      <div class="fase-hdr-t">5 tareas · sustituir búsqueda por keyword</div>
+      <div class="fase-hdr-sub">1 bloqueador</div>
+      <div class="fase-hdr-prog" data-cnt="P2">0 / 5</div>
+    </div>
+
+    <div class="task blocker" data-task="P2.1">
+      <div class="task-n">P2.1</div>
+      <div class="task-b">
+        <label class="task-row">
+          <div class="task-checkbox"></div>
+          <div class="task-content">
+            <div class="task-name">Preparar documentos reales</div>
+            <div class="task-desc">20-50 documentos reales en texto plano. Depende de terceros: fabricantes, legal, clientes.</div>
+            <span class="task-time">1-3 días</span>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="task" data-task="P2.2">
+      <div class="task-n">P2.2</div>
+      <div class="task-b">
+        <label class="task-row">
+          <div class="task-checkbox"></div>
+          <div class="task-content">
+            <div class="task-name">Chunking semántico</div>
+            <div class="task-desc">Dividir en fragmentos con sentido semántico, no por caracteres fijos. Objetivo: chunks por sección, párrafo o tabla completa.</div>
+            <span class="task-time">1 día</span>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="task" data-task="P2.3">
+      <div class="task-n">P2.3</div>
+      <div class="task-b">
+        <label class="task-row">
+          <div class="task-checkbox"></div>
+          <div class="task-content">
+            <div class="task-name">Embeddings + vector store</div>
+            <div class="task-desc">pgvector o Chroma local. BGE o similar para embeddings.</div>
+            <span class="task-time">1 día</span>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="task" data-task="P2.4">
+      <div class="task-n">P2.4</div>
+      <div class="task-b">
+        <label class="task-row">
+          <div class="task-checkbox"></div>
+          <div class="task-content">
+            <div class="task-name">Búsqueda + reranker</div>
+            <div class="task-desc">Top-K + cross-encoder pequeño (ms-marco-MiniLM) con threshold 0.5.</div>
+            <span class="task-time">1-2 días</span>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="task" data-task="P2.5">
+      <div class="task-n">P2.5</div>
+      <div class="task-b">
+        <label class="task-row">
+          <div class="task-checkbox"></div>
+          <div class="task-content">
+            <div class="task-name">Integrar en IMR</div>
+            <div class="task-desc">Sustituir la búsqueda por keyword. <strong>Sin tocar las otras dos capas.</strong></div>
+            <span class="task-time">0.5-1 día</span>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="gate">
+      <span class="gate-icon">→</span>
+      <div><strong>Gate de salida:</strong> dado un query, el sistema recupera top-5 chunks relevantes con score >0.5 y los cita en la explicación.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ P3 ============ -->
+<div class="chapter" id="p3">
+  <div class="ch-hdr">
+    <div class="ch-n">P3</div>
+    <div>
+      <div class="ch-title">Peldaño 3 · LLM real</div>
+      <div class="ch-sub">3-5 días · gate: P2 validado</div>
+    </div>
+    <div class="ch-status" id="status-P3" style="background:#f5eaf9;color:#5c34c0">Pendiente</div>
+  </div>
+
+  <div class="fase-card" data-stage-card="P3">
+    <div class="fase-hdr">
+      <div class="fase-hdr-t">3 tareas · sustituir plantilla por LLM</div>
+      <div class="fase-hdr-sub">Decisión de cumplimiento</div>
+      <div class="fase-hdr-prog" data-cnt="P3">0 / 3</div>
+    </div>
+
+    <div class="task" data-task="P3.1">
+      <div class="task-n">P3.1</div>
+      <div class="task-b">
+        <label class="task-row">
+          <div class="task-checkbox"></div>
+          <div class="task-content">
+            <div class="task-name">Levantar Ollama local o API externa</div>
+            <div class="task-desc">Ollama con Llama 3.2 3B o Gemma 2 2B para dominios regulados. Claude / GPT-4o-mini para el resto.</div>
+            <span class="task-time">1 día</span>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="task" data-task="P3.2">
+      <div class="task-n">P3.2</div>
+      <div class="task-b">
+        <label class="task-row">
+          <div class="task-checkbox"></div>
+          <div class="task-content">
+            <div class="task-name">Prompt grounded</div>
+            <div class="task-desc">Plantilla que fuerza el uso exclusivo de los chunks como fuente. Aquí se gana o se pierde la calidad.</div>
+            <span class="task-time">1-2 días</span>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="task" data-task="P3.3">
+      <div class="task-n">P3.3</div>
+      <div class="task-b">
+        <label class="task-row">
+          <div class="task-checkbox"></div>
+          <div class="task-content">
+            <div class="task-name">Integrar en IMR</div>
+            <div class="task-desc">Sustituir la síntesis por la llamada al LLM. <strong>Sin tocar las otras dos capas.</strong></div>
+            <span class="task-time">1-2 días</span>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="gate">
+      <span class="gate-icon">→</span>
+      <div><strong>Gate de salida:</strong> la explicación es generada por LLM, cita fuentes, y no inventa cuando no hay chunks. Faithfulness >0.7 en 10 queries manuales.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ P4 ============ -->
+<div class="chapter" id="p4">
+  <div class="ch-hdr">
+    <div class="ch-n">P4</div>
+    <div>
+      <div class="ch-title">Peldaño 4 · Observabilidad</div>
+      <div class="ch-sub">3-5 días · paralelizable con P1-P3</div>
+    </div>
+    <div class="ch-status" id="status-P4" style="background:var(--sec-l);color:var(--sec)">Pendiente</div>
+  </div>
+
+  <div class="fase-card" data-stage-card="P4">
+    <div class="fase-hdr">
+      <div class="fase-hdr-t">3 tareas · Langfuse self-hosted</div>
+      <div class="fase-hdr-sub">No bloquea el desarrollo</div>
+      <div class="fase-hdr-prog" data-cnt="P4">0 / 3</div>
+    </div>
+
+    <div class="task" data-task="P4.1">
+      <div class="task-n">P4.1</div>
+      <div class="task-b">
+        <label class="task-row">
+          <div class="task-checkbox"></div>
+          <div class="task-content">
+            <div class="task-name">Desplegar Langfuse</div>
+            <div class="task-desc">Docker Compose local (5 contenedores: web, worker, Postgres, ClickHouse, Redis). Self-hosted obligatorio si hay datos de cliente.</div>
+            <span class="task-time">1 día</span>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="task" data-task="P4.2">
+      <div class="task-n">P4.2</div>
+      <div class="task-b">
+        <label class="task-row">
+          <div class="task-checkbox"></div>
+          <div class="task-content">
+            <div class="task-name">Instrumentar con @observe()</div>
+            <div class="task-desc">Decorar la función principal. Trazas automáticas de input, output, tokens, coste, latencia.</div>
+            <span class="task-time">0.5 día</span>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="task" data-task="P4.3">
+      <div class="task-n">P4.3</div>
+      <div class="task-b">
+        <label class="task-row">
+          <div class="task-checkbox"></div>
+          <div class="task-content">
+            <div class="task-name">Validar trazas</div>
+            <div class="task-desc">Ver que cada request tiene su trace completo en la UI de Langfuse.</div>
+            <span class="task-time">1-2 días</span>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="gate">
+      <span class="gate-icon">→</span>
+      <div><strong>Gate de salida:</strong> 100% de requests al gateway aparecen en Langfuse con trace completo.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ P5 ============ -->
+<div class="chapter" id="p5">
+  <div class="ch-hdr">
+    <div class="ch-n">P5</div>
+    <div>
+      <div class="ch-title">Peldaño 5 · Evaluación</div>
+      <div class="ch-sub">5-7 días · bloqueador: queries de prueba</div>
+    </div>
+    <div class="ch-status" id="status-P5" style="background:#e0f5ee;color:#0d7a5f">Pendiente</div>
+  </div>
+
+  <div class="fase-card" data-stage-card="P5">
+    <div class="fase-hdr">
+      <div class="fase-hdr-t">3 tareas · RAGAS + baseline</div>
+      <div class="fase-hdr-sub">1 bloqueador</div>
+      <div class="fase-hdr-prog" data-cnt="P5">0 / 3</div>
+    </div>
+
+    <div class="task blocker" data-task="P5.1">
+      <div class="task-n">P5.1</div>
+      <div class="task-b">
+        <label class="task-row">
+          <div class="task-checkbox"></div>
+          <div class="task-content">
+            <div class="task-name">Preparar queries de prueba</div>
+            <div class="task-desc">20-100 queries con respuesta esperada (<code>ground_truth</code>). Trabajo manual. Es el bloqueador real del peldaño.</div>
+            <span class="task-time">2-3 días</span>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="task" data-task="P5.2">
+      <div class="task-n">P5.2</div>
+      <div class="task-b">
+        <label class="task-row">
+          <div class="task-checkbox"></div>
+          <div class="task-content">
+            <div class="task-name">Configurar RAGAS</div>
+            <div class="task-desc">Pipeline de evaluación con las 4 métricas: faithfulness, answer_relevancy, context_precision, context_recall.</div>
+            <span class="task-time">1 día</span>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="task" data-task="P5.3">
+      <div class="task-n">P5.3</div>
+      <div class="task-b">
+        <label class="task-row">
+          <div class="task-checkbox"></div>
+          <div class="task-content">
+            <div class="task-name">Establecer baseline</div>
+            <div class="task-desc">Ejecutar evaluación, documentar scores, definir gate de calidad (faithfulness >0.8).</div>
+            <span class="task-time">1-2 días</span>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="gate">
+      <span class="gate-icon">→</span>
+      <div><strong>Gate de salida:</strong> faithfulness >0.8 en baseline. Si no, el sistema no está listo para producción.</div>
+    </div>
+  </div>
+</div>
+
+<!-- Actions -->
+<div class="actions">
+  <button class="btn btn-primary" onclick="exportProgress()">↧ Exportar progreso</button>
+  <button class="btn btn-secondary" onclick="expandAll()">Expandir todo</button>
+  <button class="btn btn-secondary" onclick="collapseAll()">Colapsar todo</button>
+  <button class="btn btn-danger" onclick="resetAll()">Reiniciar todo</button>
+  <span class="actions-info" id="actions-info">Última actualización: —</span>
+</div>
+
+<div class="pq">
+  Marca cada tarea cuando la termines. El gate de cada etapa indica cuándo puedes pasar a la siguiente. No saltes etapas — cada una asume que la anterior está validada.
+</div>
+
+</div>
+</div>
+
+<footer>
+  SSEP · Checklist de implementación · Progreso guardado en localStorage
+  <div class="ft-dots">
+    <div class="ft-dot" style="background:var(--l1)"></div>
+    <div class="ft-dot" style="background:var(--l2)"></div>
+    <div class="ft-dot" style="background:var(--l3)"></div>
+    <div class="ft-dot" style="background:var(--l4)"></div>
+    <div class="ft-dot" style="background:var(--l5)"></div>
+    <div class="ft-dot" style="background:var(--sec)"></div>
+  </div>
+</footer>
+
+<div class="toast" id="toast">Progreso guardado</div>
+
+<script>
+(function() {
+  const STORAGE_KEY = 'ssep-checklist-v1';
+  const STAGES = ['A', 'B', 'C', 'P1', 'P2', 'P3', 'P4', 'P5'];
+
+  // Estado: { taskId: boolean }
+  let state = {};
+
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        state = JSON.parse(raw);
+      }
+    } catch (e) {
+      console.warn('Error cargando estado:', e);
+      state = {};
+    }
+  }
+
+  function saveState() {
+    try {
+      const toSave = { ...state, _updated: new Date().toISOString() };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
+      updateActionsInfo();
+    } catch (e) {
+      console.warn('Error guardando estado:', e);
+    }
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg || 'Progreso guardado';
+    t.classList.add('show');
+    clearTimeout(t._timeout);
+    t._timeout = setTimeout(() => t.classList.remove('show'), 1800);
+  }
+
+  function updateActionsInfo() {
+    const el = document.getElementById('actions-info');
+    if (!el) return;
+    const updated = state._updated;
+    if (updated) {
+      const d = new Date(updated);
+      const formatted = d.toLocaleString('es-ES', {
+        day: '2-digit', month: '2-digit', year: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+      });
+      el.textContent = 'Última actualización: ' + formatted;
+    } else {
+      el.textContent = 'Sin progreso guardado todavía';
+    }
+  }
+
+  function updateProgress() {
+    // Global
+    const allTasks = document.querySelectorAll('.task[data-task]');
+    const total = allTasks.length;
+    let done = 0;
+    allTasks.forEach(t => {
+      if (state[t.dataset.task]) done++;
+    });
+    const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('progress-summary').textContent = `${done} / ${total} completadas`;
+
+    // Por etapa
+    const stageCounts = {};
+    STAGES.forEach(s => stageCounts[s] = { done: 0, total: 0 });
+
+    document.querySelectorAll('[data-stage-card]').forEach(card => {
+      const stage = card.dataset.stageCard;
+      const tasks = card.querySelectorAll('.task[data-task]');
+      let sDone = 0;
+      tasks.forEach(t => {
+        if (state[t.dataset.task]) sDone++;
+      });
+      stageCounts[stage] = { done: sDone, total: tasks.length };
+
+      // Card completa
+      const isComplete = sDone === tasks.length && tasks.length > 0;
+      card.classList.toggle('completed', isComplete);
+
+      // Contadores de la card
+      card.querySelectorAll('[data-cnt="' + stage + '"]').forEach(el => {
+        el.textContent = `${sDone} / ${tasks.length}`;
+      });
+
+      // Status badge del chapter
+      const statusEl = document.getElementById('status-' + stage);
+      if (statusEl) {
+        if (isComplete) {
+          statusEl.textContent = '✓ Completado';
+        } else if (sDone > 0) {
+          statusEl.textContent = 'En progreso';
+        } else {
+          statusEl.textContent = 'Pendiente';
+        }
+      }
+    });
+
+    // Sidebar counters
+    document.querySelectorAll('[data-cnt]').forEach(el => {
+      if (el.closest('.fase-hdr')) return; // skip card counters
+      const stage = el.dataset.cnt;
+      if (stageCounts[stage]) {
+        el.textContent = `${stageCounts[stage].done}/${stageCounts[stage].total}`;
+        if (stageCounts[stage].done === stageCounts[stage].total && stageCounts[stage].total > 0) {
+          el.classList.add('done');
+        } else {
+          el.classList.remove('done');
+        }
+      }
+    });
+
+    // Progress mini (top)
+    document.querySelectorAll('.pm-item').forEach(el => {
+      const stage = el.dataset.stage;
+      if (stageCounts[stage]) {
+        const s = stageCounts[stage];
+        el.classList.toggle('done', s.done === s.total && s.total > 0);
+        el.classList.toggle('active', s.done > 0 && s.done < s.total);
+      }
+    });
+  }
+
+  function toggleTask(taskEl) {
+    const taskId = taskEl.dataset.task;
+    if (!taskId) return;
+
+    const newState = !state[taskId];
+    state[taskId] = newState;
+
+    const checkbox = taskEl.querySelector('.task-checkbox');
+    if (newState) {
+      checkbox.classList.add('checked');
+      taskEl.classList.add('checked');
+    } else {
+      checkbox.classList.remove('checked');
+      taskEl.classList.remove('checked');
+    }
+
+    saveState();
+    updateProgress();
+    showToast(newState ? '✓ Tarea completada' : '○ Tarea desmarcada');
+  }
+
+  function initTask(taskEl) {
+    const taskId = taskEl.dataset.task;
+    const checkbox = taskEl.querySelector('.task-checkbox');
+
+    if (state[taskId]) {
+      checkbox.classList.add('checked');
+      taskEl.classList.add('checked');
+    }
+
+    const row = taskEl.querySelector('.task-row');
+    if (row) {
+      row.addEventListener('click', function(e) {
+        e.preventDefault();
+        toggleTask(taskEl);
+      });
+    }
+  }
+
+  // Export progress as JSON download
+  window.exportProgress = function() {
+    const data = {
+      generated_at: new Date().toISOString(),
+      total_tasks: document.querySelectorAll('.task[data-task]').length,
+      completed_tasks: Object.values(state).filter(v => v === true).length,
+      state: state
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `ssep-progreso-${new Date().toISOString().slice(0,10)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('✓ Progreso exportado');
+  };
+
+  window.resetAll = function() {
+    if (!confirm('¿Seguro que quieres reiniciar todo el progreso? Esta acción no se puede deshacer.')) {
+      return;
+    }
+    state = {};
+    localStorage.removeItem(STORAGE_KEY);
+    document.querySelectorAll('.task[data-task]').forEach(t => {
+      t.classList.remove('checked');
+      const cb = t.querySelector('.task-checkbox');
+      if (cb) cb.classList.remove('checked');
+    });
+    updateProgress();
+    updateActionsInfo();
+    showToast('↺ Progreso reiniciado');
+  };
+
+  window.expandAll = function() {
+    document.querySelectorAll('.chapter').forEach(c => c.style.display = 'block');
+    showToast('Todas las etapas visibles');
+  };
+
+  window.collapseAll = function() {
+    // Nothing to collapse currently — placeholder for future
+    showToast('Las etapas ya están visibles');
+  };
+
+  // Init
+  document.addEventListener('DOMContentLoaded', function() {
+    loadState();
+    document.querySelectorAll('.task[data-task]').forEach(initTask);
+    updateProgress();
+    updateActionsInfo();
+  });
+
+  // Sincronizar entre pestañas
+  window.addEventListener('storage', function(e) {
+    if (e.key === STORAGE_KEY) {
+      loadState();
+      document.querySelectorAll('.task[data-task]').forEach(taskEl => {
+        const taskId = taskEl.dataset.task;
+        const checkbox = taskEl.querySelector('.task-checkbox');
+        if (state[taskId]) {
+          checkbox.classList.add('checked');
+          taskEl.classList.add('checked');
+        } else {
+          checkbox.classList.remove('checked');
+          taskEl.classList.remove('checked');
+        }
+      });
+      updateProgress();
+      updateActionsInfo();
+      showToast('Progreso sincronizado desde otra pestaña');
+    }
+  });
+})();
+</script>
+
+</body>
+</html>

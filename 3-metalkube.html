@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MetalKube — Documento 3 · Ejemplo práctico</title>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,300;1,6..72,400&family=Geist:wght@300;400;500;600;700;800;900&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff; --ink:#0c0c0b; --ink2:#2d2d2b; --ink3:#787870;
+  --rule:#e4e4de; --rule2:#f5f5ef;
+
+  --l1:#c0390b; --l1-l:#fdeee9;
+  --l2:#1a5c3a; --l2-l:#e4f5ec;
+  --l3:#1c6ea4; --l3-l:#eef2fb;
+  --l4:#7b2d8b; --l4-l:#f5eaf9;
+  --l5:#b45309; --l5-l:#fef3e2;
+  --sec:#0a2540; --sec-l:#e8eef5;
+
+  --mono:'Geist Mono',monospace;
+  --head:'Geist',sans-serif;
+  --body:'Newsreader',Georgia,serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--body);background:var(--bg);color:var(--ink);line-height:1.7;font-size:17px;}
+
+nav{background:var(--ink);position:sticky;top:0;z-index:200;}
+.nav-in{max-width:1180px;margin:0 auto;display:flex;align-items:center;padding:10px 28px;gap:4px;flex-wrap:wrap;}
+.nav-logo{font-family:var(--head);font-size:13px;font-weight:800;color:white;margin-right:14px;letter-spacing:-.3px;}
+.nav-a{font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.38);text-decoration:none;padding:4px 9px;border-radius:3px;transition:all .12s;white-space:nowrap;}
+.nav-a:hover{background:rgba(255,255,255,.1);color:white;}
+
+.hero{background:var(--ink);color:white;position:relative;overflow:hidden;}
+.hero-stripe{height:5px;background:linear-gradient(90deg,
+  var(--l1) 0 16.6%,var(--l2) 16.6% 33.3%,var(--l3) 33.3% 50%,
+  var(--l4) 50% 66.6%,var(--l5) 66.6% 83.3%,var(--sec) 83.3% 100%);}
+.hero-in{max-width:1180px;margin:0 auto;padding:78px 28px 64px;}
+.hero-eye{font-family:var(--mono);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.28);margin-bottom:20px;}
+.hero h1{font-family:var(--head);font-size:clamp(38px,5.4vw,66px);font-weight:900;line-height:.95;letter-spacing:-1.8px;margin-bottom:22px;}
+.hero h1 .accent{color:#5ba3ff;}
+.hero h1 .smaller{font-size:.55em;font-weight:500;color:rgba(255,255,255,.35);letter-spacing:-.5px;display:block;margin-top:14px;}
+.hero-desc{font-family:var(--body);font-size:18px;font-style:italic;font-weight:300;color:rgba(255,255,255,.5);max-width:680px;line-height:1.65;margin-bottom:44px;}
+.hero-meta{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;background:rgba(255,255,255,.06);border-radius:12px;overflow:hidden;}
+@media(max-width:700px){.hero-meta{grid-template-columns:1fr 1fr;}}
+.hm{padding:18px 16px;background:rgba(255,255,255,.03);}
+.hm-k{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:6px;}
+.hm-v{font-family:var(--head);font-size:13px;font-weight:600;line-height:1.3;}
+.hm-v span{color:rgba(255,255,255,.5);font-weight:400;}
+
+.layout{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:220px 1fr;gap:0;}
+@media(max-width:900px){.layout{grid-template-columns:1fr;}}
+.sidebar{border-right:1px solid var(--rule);padding:28px 14px;position:sticky;top:48px;height:calc(100vh - 48px);overflow-y:auto;}
+@media(max-width:900px){.sidebar{display:none;}}
+.sb-section{margin-bottom:22px;}
+.sb-hdr{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin-bottom:8px;padding-left:8px;}
+.sb-a{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:5px;font-family:var(--head);font-size:12px;font-weight:500;text-decoration:none;color:var(--ink2);transition:background .12s;margin-bottom:1px;}
+.sb-a:hover{background:var(--rule2);}
+.sb-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.sb-a .layer-num{font-family:var(--mono);font-size:10px;color:var(--ink3);width:16px;}
+
+.content{padding:0 0 80px;}
+.chapter{padding:0 44px;}
+@media(max-width:680px){.chapter{padding:0 20px;}}
+.ch-hdr{padding:58px 0 26px;border-bottom:2px solid var(--ink);margin-bottom:34px;display:flex;align-items:flex-end;gap:16px;}
+.ch-n{font-family:var(--head);font-size:70px;font-weight:900;line-height:1;color:var(--rule);letter-spacing:-3px;flex-shrink:0;}
+.ch-title{font-family:var(--head);font-size:26px;font-weight:800;letter-spacing:-.5px;line-height:1.0;}
+.ch-sub{font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:1.5px;text-transform:uppercase;margin-top:5px;}
+.ch-badge{margin-left:auto;font-family:var(--mono);font-size:9px;padding:5px 12px;border-radius:50px;color:white;flex-shrink:0;letter-spacing:.5px;}
+
+p{margin-bottom:20px;color:var(--ink2);line-height:1.78;font-weight:300;}
+strong{color:var(--ink);font-weight:600;}
+em{font-style:italic;}
+h3{font-family:var(--head);font-size:19px;font-weight:700;margin:38px 0 12px;letter-spacing:-.3px;padding-left:14px;border-left:3px solid var(--ink);}
+h4{font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin:22px 0 8px;}
+
+ol,ul{margin:0 0 20px 22px;color:var(--ink2);}
+li{margin-bottom:8px;line-height:1.7;font-weight:300;}
+li strong{color:var(--ink);}
+
+.callout{margin:22px 0;padding:16px 20px;border-radius:6px;border-left:4px solid;font-size:15px;line-height:1.68;font-family:var(--head);}
+.callout.ok{background:var(--l2-l);border-color:var(--l2);color:#0a3020;}
+.callout.info{background:var(--l3-l);border-color:var(--l3);color:#0d3258;}
+.callout.warn{background:var(--l5-l);border-color:var(--l5);color:#5c2d00;}
+.callout.danger{background:var(--l1-l);border-color:var(--l1);color:#5c1a05;}
+.clbl{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;font-weight:600;margin-bottom:5px;display:block;}
+
+/* Tables */
+.tbl{margin:20px 0;border:1.5px solid var(--ink);border-radius:12px;overflow:hidden;font-family:var(--head);}
+.tbl-hdr{background:var(--ink);color:white;display:grid;padding:0;}
+.tbl-hdr>div{padding:10px 14px;font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;}
+.tbl-row{display:grid;border-bottom:1px solid var(--rule);}
+.tbl-row:last-child{border-bottom:none;}
+.tbl-row>div{padding:12px 14px;font-size:13px;color:var(--ink2);border-right:1px solid var(--rule);line-height:1.5;}
+.tbl-row>div:last-child{border-right:none;}
+.tbl-tech{font-size:13px;font-weight:700;color:var(--ink);font-family:var(--head);}
+.tbl-row:nth-child(even){background:var(--rule2);}
+.c3{grid-template-columns:180px 1fr 1fr;}
+.c4{grid-template-columns:170px 1fr 1fr 1fr;}
+.c5{grid-template-columns:150px 1fr 1fr 1fr 1fr;}
+@media(max-width:680px){.tbl-hdr,.tbl-row{grid-template-columns:1fr!important;} .tbl-row>div,.tbl-hdr>div{border-right:none;border-bottom:1px solid var(--rule);}}
+
+/* Layer cards */
+.layer-card{margin:24px 0;border:1.5px solid;border-radius:12px;overflow:hidden;}
+.layer-hdr{padding:14px 20px;color:white;display:flex;align-items:center;gap:12px;font-family:var(--head);}
+.layer-hdr-n{font-family:var(--mono);font-size:10px;opacity:.65;letter-spacing:2px;}
+.layer-hdr-t{font-size:15px;font-weight:800;letter-spacing:-.2px;}
+.layer-hdr-tag{margin-left:auto;font-family:var(--mono);font-size:9px;opacity:.65;letter-spacing:1.5px;text-transform:uppercase;}
+.layer-body{padding:18px 22px;background:white;}
+.layer-body p{font-size:14.5px;line-height:1.68;margin-bottom:14px;}
+.layer-body ul{font-size:14px;margin-bottom:14px;}
+.layer-body ul li{line-height:1.6;}
+.layer-code{margin:16px 0 0 0;background:#f8f8f4;border:1px solid var(--rule);border-radius:8px;padding:16px 18px;overflow-x:auto;}
+.layer-code pre{font-family:var(--mono);font-size:12px;line-height:1.7;color:var(--ink2);white-space:pre;margin:0;}
+.layer-code code{font-family:var(--mono);background:none;padding:0;color:var(--ink2);}
+
+.layer-card.l1{border-color:var(--l1);} .layer-card.l1 .layer-hdr{background:var(--l1);}
+.layer-card.l2{border-color:var(--l2);} .layer-card.l2 .layer-hdr{background:var(--l2);}
+.layer-card.l3{border-color:var(--l3);} .layer-card.l3 .layer-hdr{background:var(--l3);}
+.layer-card.l4{border-color:var(--l4);} .layer-card.l4 .layer-hdr{background:var(--l4);}
+.layer-card.l5{border-color:var(--l5);} .layer-card.l5 .layer-hdr{background:var(--l5);}
+.layer-card.sec{border-color:var(--sec);} .layer-card.sec .layer-hdr{background:var(--sec);}
+
+/* Phase timeline */
+.phases{margin:30px 0;}
+.phase{display:grid;grid-template-columns:110px 1fr;border-bottom:1px solid var(--rule);}
+.phase:last-child{border-bottom:none;}
+.phase-n{padding:18px 16px;background:var(--rule2);border-right:1px solid var(--rule);font-family:var(--head);}
+.phase-num{font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);margin-bottom:3px;}
+.phase-name{font-size:13px;font-weight:700;color:var(--ink);line-height:1.25;}
+.phase-body{padding:18px 22px;font-family:var(--head);}
+.phase-title{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:8px;}
+.phase-list{font-size:13.5px;color:var(--ink2);line-height:1.7;list-style:none;margin:0;padding:0;}
+.phase-list li{margin-bottom:4px;padding-left:16px;position:relative;font-family:var(--head);font-weight:400;}
+.phase-list li::before{content:'—';position:absolute;left:0;color:var(--ink3);}
+.phase-list li.done::before{content:'✓';color:var(--l2);font-weight:700;font-family:var(--mono);}
+.phase-list li.new::before{content:'+';color:var(--l1);font-weight:700;font-family:var(--mono);}
+.phase-list li.warn::before{content:'⚠';color:var(--l5);font-weight:700;}
+
+/* Failure timeline */
+.timeline{margin:28px 0;border:1.5px solid var(--ink);border-radius:14px;overflow:hidden;}
+.timeline-hdr{background:var(--ink);color:white;padding:14px 22px;font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;display:flex;justify-content:space-between;}
+.timeline-body{background:#fafaf8;}
+.tl-event{display:grid;grid-template-columns:100px 1fr;border-bottom:1px solid var(--rule);}
+.tl-event:last-child{border-bottom:none;}
+.tl-time{padding:16px 20px;font-family:var(--mono);font-size:12px;color:var(--ink3);background:var(--rule2);border-right:1px solid var(--rule);}
+.tl-body{padding:16px 22px;font-family:var(--head);}
+.tl-title{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+.tl-detail{font-size:13px;color:var(--ink2);line-height:1.65;}
+.tl-detail code{font-family:var(--mono);font-size:11.5px;background:var(--rule2);padding:1px 5px;border-radius:3px;color:var(--ink2);}
+.tl-tag{font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;padding:2px 8px;border-radius:30px;color:white;font-weight:500;}
+.tl-tag.l1{background:var(--l1);}
+.tl-tag.l2{background:var(--l2);}
+.tl-tag.l3{background:var(--l3);}
+.tl-tag.l4{background:var(--l4);}
+.tl-tag.l5{background:var(--l5);}
+.tl-tag.sec{background:var(--sec);}
+.tl-tag.ok{background:var(--l2);}
+
+/* Decisions table */
+.decisions{margin:20px 0;border:1.5px solid var(--ink);border-radius:12px;overflow:hidden;font-family:var(--head);}
+.decisions .tbl-hdr{grid-template-columns:180px 1fr 1.4fr;}
+.decisions .tbl-row{grid-template-columns:180px 1fr 1.4fr;}
+
+/* MVP table */
+.mvp{margin:20px 0;border:1.5px solid var(--ink);border-radius:12px;overflow:hidden;font-family:var(--head);}
+.mvp .tbl-hdr{grid-template-columns:220px 130px 1fr;}
+.mvp .tbl-row{grid-template-columns:220px 130px 1fr;}
+.mvp-ok{color:var(--l2);font-weight:700;font-family:var(--mono);font-size:11px;letter-spacing:1px;}
+.mvp-no{color:var(--l1);font-weight:700;font-family:var(--mono);font-size:11px;letter-spacing:1px;}
+.mvp-warn{color:var(--l5);font-weight:700;font-family:var(--mono);font-size:11px;letter-spacing:1px;}
+
+/* Metric cards */
+.metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin:22px 0;}
+@media(max-width:680px){.metrics{grid-template-columns:1fr;}}
+.metric-card{border:1.5px solid var(--rule);border-radius:12px;padding:18px 20px;background:white;}
+.metric-cat{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--rule);}
+.metric-item{font-size:13.5px;color:var(--ink2);padding:5px 0;line-height:1.55;display:flex;gap:10px;align-items:flex-start;font-family:var(--head);}
+.metric-item::before{content:'▸';color:var(--ink3);font-family:var(--mono);font-size:10px;margin-top:4px;flex-shrink:0;}
+.metric-item b{color:var(--ink);font-weight:700;}
+
+/* Pull quote */
+.pq{margin:40px 0;padding:26px 32px;border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);font-family:var(--head);font-size:clamp(17px,2.2vw,21px);font-weight:700;line-height:1.3;text-align:center;letter-spacing:-.3px;}
+
+/* Solid grid */
+.solid-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0;}
+@media(max-width:680px){.solid-grid{grid-template-columns:1fr;}}
+.solid-card{border:1.5px solid var(--l2);border-radius:10px;padding:14px 18px;background:var(--l2-l);font-family:var(--head);}
+.solid-card-t{font-size:13.5px;font-weight:700;color:var(--l2);margin-bottom:4px;display:flex;align-items:center;gap:6px;}
+.solid-card-t::before{content:'✓';font-family:var(--mono);font-weight:800;}
+.solid-card-d{font-size:13px;color:#0a3020;line-height:1.55;}
+
+/* Stack matrix */
+.stack-matrix{margin:24px 0;border:1.5px solid var(--ink);border-radius:12px;overflow:hidden;font-family:var(--head);}
+.stack-matrix .tbl-hdr{grid-template-columns:140px 1fr 1fr 1fr;}
+.stack-matrix .tbl-row{grid-template-columns:140px 1fr 1fr 1fr;}
+.stack-cell{font-size:12.5px;line-height:1.5;}
+.stack-cell b{color:var(--ink);font-weight:700;display:block;font-size:13px;margin-bottom:2px;}
+.stack-cell span{color:var(--ink3);}
+
+footer{background:var(--ink);color:rgba(255,255,255,.28);padding:22px 28px;font-family:var(--mono);font-size:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
+.ft-dots{display:flex;gap:5px;}
+.ft-dot{width:8px;height:8px;border-radius:50%;}
+
+code{font-family:var(--mono);font-size:12.5px;background:var(--rule2);padding:2px 6px;border-radius:3px;color:var(--l1);}
+</style>
+</head>
+<body>
+  <nav>
+    <div class="nav-in">
+      <a class="nav-logo" href="index.html">SSEP</a>
+      <a class="nav-a" href="0-base.html">0 · Base</a>
+      <a class="nav-a" href="0.5-plan.html">0.5 · Plan</a>
+      <a class="nav-a" href="0.6-setup.html">0.6 · Setup</a>
+      <a class="nav-a" href="0.7-escalado.html">0.7 · Escalado</a>
+      <a class="nav-a" href="1-patron.html">1 · Patrón</a>
+      <a class="nav-a" href="2-implementacion.html">2 · Implementación</a>
+      <a class="nav-a" href="3-metalkube.html">3 · MetalKube</a>
+    </div>
+  </nav>
+
+<div class="hero">
+  <div class="hero-stripe"></div>
+  <div class="hero-in">
+    <div class="hero-eye">Documento 3 · Ejemplo práctico · v0.2</div>
+    <h1>MetalKube —<br>mantenimiento predictivo<br>de <span class="accent">motores industriales</span>.
+      <span class="smaller">Instancia concreta del patrón SSEP · stack seleccionado · decisiones · roadmap por fases</span>
+    </h1>
+    <p class="hero-desc">
+      MetalKube es un sistema que escucha motores eléctricos industriales, clasifica el tipo de fallo con un modelo de audio, genera una explicación técnica grounded en manuales de fabricante, y asiste al técnico de campo en la decisión. Este documento aplica los documentos 1 y 2 a un caso concreto.
+    </p>
+    <div class="hero-meta">
+      <div class="hm"><div class="hm-k">Depende de</div><div class="hm-v">Doc 1 (patrón) <span>+ Doc 2 (implementación)</span></div></div>
+      <div class="hm"><div class="hm-k">Dominio</div><div class="hm-v">Motores eléctricos <span>· mantenimiento predictivo</span></div></div>
+      <div class="hm"><div class="hm-k">Stack</div><div class="hm-v">Medio <span>— evolutivo a Completo</span></div></div>
+      <div class="hm"><div class="hm-k">Roadmap</div><div class="hm-v">12+ meses <span>· 11 fases</span></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+
+<div class="sidebar">
+  <div class="sb-section">
+    <div class="sb-hdr">Contenido</div>
+    <a class="sb-a" href="#intro"><span class="layer-num">00</span>Intro</a>
+    <a class="sb-a" href="#dominio"><span class="layer-num">01</span>El dominio</a>
+    <a class="sb-a" href="#instancia"><span class="layer-num">02</span>Instancia del patrón</a>
+    <a class="sb-a" href="#flujo"><span class="layer-num">03</span>Flujo end-to-end</a>
+    <a class="sb-a" href="#decisiones"><span class="layer-num">04</span>Decisiones no obvias</a>
+    <a class="sb-a" href="#mvp"><span class="layer-num">05</span>Qué se dejó fuera</a>
+    <a class="sb-a" href="#metricas"><span class="layer-num">06</span>Métricas de éxito</a>
+    <a class="sb-a" href="#roadmap"><span class="layer-num">07</span>Roadmap por fases</a>
+    <a class="sb-a" href="#solido"><span class="layer-num">08</span>Lo que ya es sólido</a>
+  </div>
+  <div class="sb-section">
+    <div class="sb-hdr">Capas</div>
+    <a class="sb-a" href="#capa-1"><span class="sb-dot" style="background:var(--l1)"></span>Ingestion</a>
+    <a class="sb-a" href="#capa-2"><span class="sb-dot" style="background:var(--l2)"></span>Model</a>
+    <a class="sb-a" href="#capa-3"><span class="sb-dot" style="background:var(--l3)"></span>Explanation</a>
+    <a class="sb-a" href="#capa-4"><span class="sb-dot" style="background:var(--l4)"></span>Decision</a>
+    <a class="sb-a" href="#capa-5"><span class="sb-dot" style="background:var(--l5)"></span>Governance</a>
+    <a class="sb-a" href="#capa-sec"><span class="sb-dot" style="background:var(--sec)"></span>Security</a>
+  </div>
+</div>
+
+<div class="content">
+
+<!-- INTRO -->
+<div id="intro" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">00</div>
+    <div>
+      <div class="ch-title">Cómo leer este documento</div>
+      <div class="ch-sub">El puente entre el patrón y la realidad</div>
+    </div>
+  </div>
+
+  <p>Los documentos 1 y 2 describen el patrón SSEP y el catálogo de herramientas para materializarlo. Este documento muestra una instancia concreta: <strong>MetalKube</strong>, un sistema de mantenimiento predictivo de motores eléctricos industriales.</p>
+
+  <p>La relación entre los tres documentos es la siguiente:</p>
+
+  <div class="tbl">
+    <div class="tbl-hdr" style="grid-template-columns:140px 1fr 1fr;">
+      <div>Documento</div>
+      <div>Qué contiene</div>
+      <div>Cómo se usa aquí</div>
+    </div>
+    <div class="tbl-row" style="grid-template-columns:140px 1fr 1fr;">
+      <div class="tbl-tech">Doc 1 — Patrón</div>
+      <div>Las 5 capas invariantes, las reglas estructurales, las variaciones por dominio</div>
+      <div>Es el esqueleto. MetalKube instancia cada capa.</div>
+    </div>
+    <div class="tbl-row" style="grid-template-columns:140px 1fr 1fr;">
+      <div class="tbl-tech">Doc 2 — Implementación</div>
+      <div>Catálogo de herramientas por capa, stacks de referencia, anti-selecciones</div>
+      <div>Es el menú. MetalKube elige el stack Medio con evolución a Completo.</div>
+    </div>
+    <div class="tbl-row" style="grid-template-columns:140px 1fr 1fr;">
+      <div class="tbl-tech">Doc 3 — Este</div>
+      <div>La instancia concreta: decisiones, flujo, roadmap, métricas</div>
+      <div>Es la receta. Cada elección se justifica con el contexto real del proyecto.</div>
+    </div>
+  </div>
+
+  <div class="callout info">
+    <span class="clbl">Nota sobre el estado actual</span>
+    MetalKube ya existe parcialmente. Tiene un LLM Gateway v15 con circuit breakers y semantic cache, un AudioCNN de 3 clases con 92% de accuracy, Qdrant con 125 vectores, MLflow, Prometheus y ArgoCD. Este documento describe la evolución de ese sistema hacia el patrón SSEP completo, no un proyecto desde cero.
+  </div>
+</div>
+
+<!-- 01 DOMINIO -->
+<div id="dominio" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">01</div>
+    <div>
+      <div class="ch-title">El dominio</div>
+      <div class="ch-sub">Problema de negocio · señal física · por qué SSEP aplica</div>
+    </div>
+  </div>
+
+  <h3>El problema de negocio</h3>
+
+  <p>Los motores eléctricos industriales fallan sin aviso. Un rodamiento desgastado, una desalineación de eje, un cortocircuito en el estator — cada fallo tiene una ventana de detección temprana de horas o días durante la cual el coste de reparación es bajo. Pasada esa ventana, el coste de reparación se multiplica por 10 o por 100, y se suma el coste de la parada no planificada de la línea de producción.</p>
+
+  <div class="tbl">
+    <div class="tbl-hdr c3">
+      <div>Tipo de fallo</div>
+      <div>Coste si se detecta temprano</div>
+      <div>Coste si se detecta tarde</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Rodamiento desgastado</div>
+      <div>€500 — reemplazo programado en parada rutinaria</div>
+      <div>€15,000 — parada no planificada + daño al eje</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Desalineación de eje</div>
+      <div>€800 — realineación en próxima parada</div>
+      <div>€25,000 — daño a acoplamiento + rodamientos secundarios</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Cortocircuito de estator</div>
+      <div>€2,000 — rebobinado programado</div>
+      <div>€80,000 — motor destruido + daño a equipo aguas abajo</div>
+    </div>
+  </div>
+
+  <p>El mantenimiento preventivo basado en calendario (cambiar piezas cada X horas) funciona pero es caro: cambia piezas que aún funcionan. El mantenimiento predictivo basado en señal (escuchar el motor, clasificar su estado) es el estado del arte, pero requiere infraestructura que la mayoría de plantas no tiene.</p>
+
+  <h3>La señal física</h3>
+
+  <p>Un motor eléctrico emite un patrón acústico que depende de su estado mecánico y eléctrico. Un rodamiento nuevo suena distinto a uno desgastado. Una desalineación de eje produce una firma acústica distinta a un cortocircuito de estator. Estas diferencias son detectables por un experto humano con años de experiencia, y son clasificables por un modelo ML si se le dan ejemplos suficientes.</p>
+
+  <p>La señal se captura con un sensor piezoeléctrico o MEMS montado en la carcasa del motor. La frecuencia de muestreo es 16 kHz mono, suficiente para capturar las frecuencias características de fallos mecánicos (típicamente <8 kHz).</p>
+
+  <h3>Por qué SSEP aplica aquí</h3>
+
+  <div class="tbl">
+    <div class="tbl-hdr c3">
+      <div>Condición del patrón (Doc 1 §1)</div>
+      <div>¿Se cumple?</div>
+      <div>Cómo se materializa</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Señal física continua</div>
+      <div>✓</div>
+      <div>Audio de miles de motores, 16 kHz, ventanas de 1s</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Modelo clasifica pero no explica</div>
+      <div>✓</div>
+      <div>CNN clasifica en 3 (objetivo: 30) clases. No puede decir "reemplaza el rodamiento"</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Conocimiento experto documentado</div>
+      <div>✓</div>
+      <div>Manuales Siemens, ABB, WEG + normativa ISO 10816 + historial de fallos</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Coste de falso negativo alto</div>
+      <div>✓</div>
+      <div>Un fallo no detectado cuesta €15k-80k por parada no planificada</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Coste de falso positivo importa</div>
+      <div>✓</div>
+      <div>Un técnico que corre por nada pierde confianza. 30% de falsos positivos → alertas ignoradas</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Producción ≠ entrenamiento</div>
+      <div>✓</div>
+      <div>Ruido de planta, sensores que envejecen, motores nuevos con firma distinta</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Operador humano decide</div>
+      <div>✓</div>
+      <div>El técnico de campo decide, el sistema asiste</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">LLM especializable</div>
+      <div>✓</div>
+      <div>Gemma 4 2B + LoRA sobre diagnósticos en lugar de modelo general</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Entorno regulado</div>
+      <div>✓</div>
+      <div>Clientes enterprise en industria: SOC2, ISO 27001, datos de producción confidenciales</div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">Flujos multi-paso</div>
+      <div>✓</div>
+      <div>Clasificar → diagnosticar → decidir urgencia → generar orden de trabajo → esperar aprobación</div>
+    </div>
+  </div>
+</div>
+
+<!-- 02 INSTANCIA -->
+<div id="instancia" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">02</div>
+    <div>
+      <div class="ch-title">Instancia del patrón</div>
+      <div class="ch-sub">Cómo se materializa cada una de las 5 capas</div>
+    </div>
+    <div class="ch-badge" style="background:var(--ink)">Stack Medio</div>
+  </div>
+
+  <!-- CAPA 1 -->
+  <div id="capa-1" class="layer-card l1">
+    <div class="layer-hdr">
+      <span class="layer-hdr-n">CAPA 01</span>
+      <span class="layer-hdr-t">Ingestion — captura y transporte de audio industrial</span>
+      <span class="layer-hdr-tag">MQTT + Kafka</span>
+    </div>
+    <div class="layer-body">
+      <p>Cada motor tiene un <strong>sensor de audio</strong> conectado a un <strong>dispositivo edge</strong> (Raspberry Pi 4 o Jetson Nano) que captura ventanas de 1s a 16 kHz. El edge <strong>pre-procesa en origen</strong>: convierte el audio crudo en mel-spectrograma (128 mels × 64 frames) y lo serializa como tensor FP16 (~16 KB).</p>
+
+      <p>Este pre-procesado es <strong>obligatorio</strong>: enviar WAV crudo de 1000 motores a 16 kHz sería ~256 MB/s. Enviar mel-spectrogramas es ~16 MB/s. <strong>Reducción de 16x en tráfico de red</strong>, que en una planta industrial es la diferencia entre viable y no viable.</p>
+
+      <div class="layer-code">
+<pre>EDGE (por motor):
+  sensor → audio 1s 16kHz mono
+    → mel-spectrograma (128 mels × 64 frames)
+    → tensor FP16 (~16 KB)
+    → MQTT topic: motores/{device_id}/features
+
+GATEWAY DE PLANTA (uno por planta):
+  MQTT → Kafka bridge (EMQX + kafka-connect)
+    → topic: metal-kube.features.v1
+    → particionado por device_id
+    → Schema Registry: Avro FeatureBatch v1</pre>
+      </div>
+
+      <h4>Decisiones concretas</h4>
+      <ul>
+        <li><strong>MQTT en edge, Kafka en centro.</strong> MQTT tolera redes inestables de planta; Kafka da replay y consumer groups. No son alternativas, son capas.</li>
+        <li><strong>Particionado por <code>device_id</code>.</strong> Garantiza orden por dispositivo sin bloquear entre dispositivos.</li>
+        <li><strong>Schema Avro v1 con campos obligatorios + opcionales.</strong> <code>FeatureBatch {device_id, timestamp, tensor[128][64], sensor_metadata?, edge_version?}</code>. Los opcionales permiten añadir telemetría sin romper consumers.</li>
+        <li><strong>Dead Letter Queue</strong> para mensajes malformados. Sin DLQ, un campo nuevo en un dispositivo rompe el pipeline entero.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- CAPA 2 -->
+  <div id="capa-2" class="layer-card l2">
+    <div class="layer-hdr">
+      <span class="layer-hdr-n">CAPA 02</span>
+      <span class="layer-hdr-t">Model — clasificador calibrado + LLM especializado</span>
+      <span class="layer-hdr-tag">FastAPI + Ollama + MLflow</span>
+    </div>
+    <div class="layer-body">
+      <p>Dos modelos conviven en esta capa. El <strong>clasificador de audio</strong> (AudioCNN v2) convierte el mel-spectrograma en un diagnóstico con confidence calibrada e incertidumbre epistémica. El <strong>LLM especializado</strong> (Gemma 4 2B fine-tuned con LoRA) se usará en la capa 3 para generar explicaciones técnicas, pero vive aquí como artefacto versionado.</p>
+
+      <div class="layer-code">
+<pre>INFERENCE SERVICE (FastAPI + ONNX Runtime):
+  consume metal-kube.features.v1 (aiokafka)
+    → batch de 32 tensores → ONNX Runtime → GPU opcional
+    → AudioCNN v2: 3 clases (actual) → 30 clases (objetivo)
+    → calibración: temperature scaling (T=1.4)
+    → incertidumbre: MC Dropout (10 forward passes)
+    → output: {label, confidence, epistemic_uncertainty,
+                model_version, feature_attribution}
+  publica metal-kube.predictions.v1
+
+LLM SERVING (Ollama):
+  base: Gemma 4 2B
+  fine-tuned: Gemma 4 2B + LoRA (Unsloth, RTX 3060)
+  formato: GGUF q4_k_m
+  registry: MLflow, versión por experimento
+  canary: 10% del tráfico cuando hay nueva versión</pre>
+      </div>
+
+      <h4>Decisiones concretas</h4>
+      <ul>
+        <li><strong>Calibración con temperature scaling.</strong> El AudioCNN actual produce probabilidades sobreconfiadas. Una predicción con <code>softmax=0.95</code> en realidad acierta el 70% de las veces. Después de calibration, <code>0.95</code> significa <code>0.93</code> real. Prerequisito para que los thresholds de la capa 4 sean significativos.</li>
+        <li><strong>MC Dropout para incertidumbre epistémica.</strong> 10 forward passes con dropout activo. Varianza alta = "no sé". Es lo que permite al sistema decir "envía esto a revisión humana" en lugar de "fallo crítico".</li>
+        <li><strong>No hay entrenamiento online.</strong> El modelo se reentrena offline con datos del feedback loop. Deliberado: el modelo en producción no aprende, para que su comportamiento sea auditable.</li>
+        <li><strong>Fine-tuning condicional.</strong> Solo se activa en Fase 4 del roadmap, tras validar que RAGAS mide bien y hay baseline establecida. Sin baseline no hay forma de saber si el fine-tuning mejora algo.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- CAPA 3 -->
+  <div id="capa-3" class="layer-card l3">
+    <div class="layer-hdr">
+      <span class="layer-hdr-n">CAPA 03</span>
+      <span class="layer-hdr-t">Explanation — RAG sobre manuales de fabricante</span>
+      <span class="layer-hdr-tag">Qdrant + Claude + reranker</span>
+    </div>
+    <div class="layer-body">
+      <p>El servicio RAG convierte la predicción (<code>label=rodamiento_desgaste_leve, confidence=0.71</code>) en una explicación accionable ("según manual Siemens 1LA7 §4.3, esto es normal después de 8000h; inspección visual en próxima parada programada").</p>
+
+      <div class="layer-code">
+<pre>RAG SERVICE (FastAPI):
+  1. Domain Guard
+     embeddings + clasificador → ¿query técnica de motores?
+  2. Retriever
+     Qdrant colección: manuales_motores
+     Hybrid: BM25 + denso (BGE-large)
+     top-20 candidatos
+  3. Reranker
+     cross-encoder ms-marco-MiniLM → top-5
+     threshold mínimo: 0.5 (era 0.3)
+  4. Synthesizer
+     LCEL chain + Gemma4 fine-tuned (o Claude)
+     prompt con contexto de predicción + chunks rerankeados
+  5. Verifier (síncrono, 0 tokens)
+     NLI model → grounding score
+     si score <0.7 → respuesta con disclaimer
+  6. Verifier (background, 20% sampling)
+     LLM-as-judge → métricas RAGAS asíncronas</pre>
+      </div>
+
+      <h4>Decisiones concretas</h4>
+      <ul>
+        <li><strong>Threshold 0.5 en lugar de 0.3.</strong> El threshold 0.3 actual recupera chunks con similitud 0.31 que son ruido semántico. El synthesizer los usa y alucina. 0.5 es el punto donde el chunk empieza a ser relevante. Sacrifica recall por precision — correcto cuando el coste de alucinar es alto.</li>
+        <li><strong>Reranker cross-encoder obligatorio.</strong> El retrieval denso solo no distingue entre "rodamiento desgastado" y "rodamiento nuevo" — son semánticamente idénticos. El cross-encoder evalúa el par (query, chunk) conjuntamente y sí los distingue.</li>
+        <li><strong>Verifier síncrono sin tokens.</strong> NLI model compara cada frase de la respuesta con los chunks. Coste: ~50ms, 0 tokens. Si el grounding score es bajo, la respuesta se marca con disclaimer.</li>
+        <li><strong>LLM-as-judge en background.</strong> Muestreo 20%, métricas a Langfuse asíncronas. No bloquea la respuesta al operador.</li>
+        <li><strong>Chunking semántico, no por caracteres.</strong> La versión actual usa chunks de 512 caracteres con overlap de 50. Esto parte tablas de especificaciones por la mitad. Objetivo: chunking por sección semántica con tamaño variable.</li>
+      </ul>
+
+      <h4>Documentos indexados</h4>
+
+      <div class="tbl">
+        <div class="tbl-hdr c3">
+          <div>Fuente</div>
+          <div>Estado actual</div>
+          <div>Objetivo</div>
+        </div>
+        <div class="tbl-row c3">
+          <div class="tbl-tech">Manuales sintéticos</div>
+          <div>20 docs, 125 chunks — <span style="color:var(--l1)">eliminar</span></div>
+          <div>N/A</div>
+        </div>
+        <div class="tbl-row c3">
+          <div class="tbl-tech">Manuales reales fabricante</div>
+          <div>0</div>
+          <div>200-500 docs (Siemens, ABB, WEG)</div>
+        </div>
+        <div class="tbl-row c3">
+          <div class="tbl-tech">Procedimientos internos</div>
+          <div>0</div>
+          <div>50-100 docs validados por ingenieros</div>
+        </div>
+        <div class="tbl-row c3">
+          <div class="tbl-tech">Historial de fallos anotado</div>
+          <div>0</div>
+          <div>Crece continuamente vía feedback loop</div>
+        </div>
+        <div class="tbl-row c3">
+          <div class="tbl-tech">Normativa (ISO 10816, IEC 60034)</div>
+          <div>0</div>
+          <div>10-20 documentos</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CAPA 4 -->
+  <div id="capa-4" class="layer-card l4">
+    <div class="layer-hdr">
+      <span class="layer-hdr-n">CAPA 04</span>
+      <span class="layer-hdr-t">Decision — routing + agente + alertas</span>
+      <span class="layer-hdr-tag">SetFit + LangGraph + Alertmanager</span>
+    </div>
+    <div class="layer-body">
+      <p>La capa 4 decide qué hacer con la predicción. Tiene tres subcomponentes: un classifier que enruta la query, un motor de alertas que decide si avisar al técnico, y un agente LangGraph que orquesta casos multi-paso.</p>
+
+      <div class="layer-code">
+<pre>DECISION SERVICE (FastAPI):
+
+  1. Request Classifier (SetFit)
+     output: {dominio: motores|general,
+              tipo: diagnóstico|procedimiento|definición,
+              urgencia: alta|baja}
+
+  2. Routing Decision
+     Path A: LLM directo         (~800ms, $0.001/req)
+     Path B: RAG completo        (~2s, $0.01/req)
+     Path C: RAG + verificación  (~4s, $0.03/req)
+
+  3. Motor Fault Agent (LangGraph) — solo casos multi-paso
+     Node 1: Classifier    → AudioCNN vía /predict
+     Node 2: Diagnose      → Gemma4 fine-tuned + RAG
+     Node 3: Severity      → conditional edge por confidence
+        LOW  → Node 5 (auto)
+        HIGH → Node 4 (human gate)
+     Node 4: Human Gate    → interrupt_before, Redis checkpoint
+     Node 5: WorkOrder     → Pydantic schema, output validado
+
+  4. Alert Engine
+     dedup: Redis, ventana 5min por device_id
+     niveles:
+       confidence >0.9 + incertidumbre <0.1 + fallo_crítico
+         → PagerDuty inmediato + técnico on-call
+       confidence 0.7-0.9 O fallo medio
+         → Slack canal #mantenimiento
+       confidence <0.7 OR incertidumbre alta
+         → sin alerta, log para revisión silenciosa
+     dedup secundaria: mismo label en 30min → escalar</pre>
+      </div>
+
+      <h4>Decisiones concretas</h4>
+      <ul>
+        <li><strong>SetFit para el classifier.</strong> Con 200-500 queries etiquetadas (que hay que producir), SetFit entrena con 8-16 ejemplos por clase. DistilBERT requiere 10x más datos. En 6 meses, cuando haya 5000 queries etiquetadas, migrar a DistilBERT.</li>
+        <li><strong>Tres paths, no dos.</strong> Path A para conversacional, Path B para diagnóstico estándar, Path C para casos ambiguos o de alto riesgo. Antes solo había A y B, decididos por la presencia de un campo en el payload.</li>
+        <li><strong>Agente solo cuando hace falta.</strong> El Motor Fault Agent se activa cuando el classifier detecta caso técnico complejo <em>y</em> la confidence del AudioCNN está en zona media. Para casos simples, el routing A/B/C es suficiente.</li>
+        <li><strong>Umbral de incertidumbre explícito.</strong> Si MC Dropout da varianza alta, el sistema <strong>no alerta</strong> aunque el label diga "fallo crítico". Registra para revisión. Esto es lo que evita falsos positivos que matan la confianza del técnico.</li>
+        <li><strong>Dedup doble.</strong> Ventana de 5min elimina repeticiones. Ventana de 30min con escalado detecta persistencia (un motor con fallo real genera eventos durante horas; si persiste, escala).</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- CAPA 5 -->
+  <div id="capa-5" class="layer-card l5">
+    <div class="layer-hdr">
+      <span class="layer-hdr-n">CAPA 05</span>
+      <span class="layer-hdr-t">Governance — drift, trazas, evaluación, analytics</span>
+      <span class="layer-hdr-tag">Evidently + Langfuse + RAGAS + ClickHouse</span>
+    </div>
+    <div class="layer-body">
+      <p>La capa 5 vigila que el sistema sigue funcionando en producción y cierra el loop con el mundo real. Se divide en cinco bloques: drift detection, evaluación RAG, trazabilidad, almacenamiento analítico y feedback loop.</p>
+
+      <div class="layer-code">
+<pre>GOVERNANCE (background, no bloqueante):
+
+DRIFT DETECTION (cada 6h):
+  data drift: Evidently AI sobre features de entrada
+    PSI por feature, KS-test multivariante
+    alerta si PSI >0.2 sostenido 3 ventanas
+  prediction drift: distribución de labels
+    alerta si chi² p-value <0.01
+  concept drift (sin labels): NannyML CBPE
+
+EVALUACIÓN RAG (diario):
+  RAGAS sobre muestra de 100 queries
+    faithfulness >0.8
+    answer_relevancy >0.75
+    context_precision >0.7
+    context_recall >0.7
+    answer_correctness >0.7
+  si falla → abre issue GitHub + Slack
+
+TRAZABILIDAD:
+  Langfuse self-hosted
+  trace_id propagado: MQTT → Kafka → FastAPI →
+    Gateway → RAG → Langfuse
+  auto-instrumentación de LangGraph nodes
+
+ANALÍTICA (ClickHouse):
+  llm_requests      → coste por usuario, drift proveedor
+  ml_predictions    → drift de clases, degradación latencia
+  security_events   → intentos injection, auditoría
+  audit_log         → accesos a secretos (SOC2)
+
+FEEDBACK LOOP:
+  UI técnico: valida/corrige predicciones
+  almacenamiento: SeaweedFS + DVC versionado
+  priorización: muestreo por incertidumbre alta
+  trigger: cuando 500 nuevas etiquetas → reentrenamiento</pre>
+      </div>
+
+      <h4>Decisiones concretas</h4>
+      <ul>
+        <li><strong>Drift cada 6h, no cada minuto.</strong> El drift es un fenómeno lento. Comprobarlo cada minuto es coste sin ganancia. Cada 6h con ventana de 24h es suficiente.</li>
+        <li><strong>PSI (Population Stability Index) como métrica principal.</strong> Interpretable: PSI <0.1 sin cambio, 0.1-0.2 cambio moderado, >0.2 cambio significativo. Más fácil de comunicar que KS-test.</li>
+        <li><strong>NannyML para concept drift sin labels.</strong> En producción industrial, los labels llegan semanas después (cuando el técnico confirma). NannyML estima performance usando solo confianza del modelo.</li>
+        <li><strong>RAGAS diario sobre muestra.</strong> Evaluar cada query es caro. 100 queries al día da señal suficiente.</li>
+        <li><strong>ClickHouse no sustituye a Prometheus.</strong> Prometheus para alertas en tiempo real. ClickHouse para preguntas históricas (coste, drift, compliance).</li>
+        <li><strong>Reentrenamiento con trigger de 500 etiquetas.</strong> No reentrenar cada semana: esperar a tener datos suficientes. Evita sobreajuste a ruido reciente.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SECURITY -->
+  <div id="capa-sec" class="layer-card sec">
+    <div class="layer-hdr">
+      <span class="layer-hdr-n">TRANSV.</span>
+      <span class="layer-hdr-t">Security — input + output guardrails</span>
+      <span class="layer-hdr-tag">Heurísticas + NeMo + Pydantic</span>
+    </div>
+    <div class="layer-body">
+      <p>Capa transversal. Input validation antes de la capa 3. Output validation después. Auditoría en Langfuse + ClickHouse + Loki.</p>
+
+      <div class="layer-code">
+<pre>INPUT:
+  Heurísticas: regex sobre "ignore previous", "reveal prompt"
+    → bloqueo inmediato, log a Langfuse + ClickHouse
+  LLM-as-judge: Llama 3.2 1B vía Ollama (ya existente)
+    → clasifica intent sospechoso si heurísticas dudan
+
+OUTPUT:
+  NeMo Guardrails: flujos Colang
+    → no revelar system prompt
+    → no responder fuera de dominio
+    → no incluir credenciales/API keys
+  Pydantic: endpoints estructurados (WorkOrder, diagnóstico)
+    → si no valida schema → 500 genérico
+
+AUDITORÍA:
+  Langfuse: span de seguridad en cada traza
+  ClickHouse: tabla security_events
+  Loki: búsqueda de patrones de ataque</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 03 FLUJO -->
+<div id="flujo" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">03</div>
+    <div>
+      <div class="ch-title">Flujo end-to-end</div>
+      <div class="ch-sub">Un fallo real: motor MTR-0421, planta Barcelona</div>
+    </div>
+  </div>
+
+  <p>Este es el recorrido de un fallo de rodamiento desde la primera señal hasta la intervención del técnico. El objetivo es mostrar cómo las cinco capas cooperan en un caso realista, incluyendo el comportamiento del sistema en estados de baja confianza.</p>
+
+  <div class="timeline">
+    <div class="timeline-hdr">
+      <span>Motor MTR-0421 · Rodamiento eje de salida · Degradación progresiva</span>
+      <span>Ventana temporal: 14h</span>
+    </div>
+    <div class="timeline-body">
+
+      <div class="tl-event">
+        <div class="tl-time">06:00:00</div>
+        <div class="tl-body">
+          <div class="tl-title">Motor funciona normal <span class="tl-tag l1">Ingestion</span></div>
+          <div class="tl-detail">Audio → mel-spec → MQTT → Kafka. Evento publicado en <code>metal-kube.features.v1</code>.</div>
+        </div>
+      </div>
+
+      <div class="tl-event">
+        <div class="tl-time">06:00:01</div>
+        <div class="tl-body">
+          <div class="tl-title">Inference <span class="tl-tag l2">Model</span></div>
+          <div class="tl-detail"><code>{label: normal, confidence: 0.94, unc: 0.03}</code> → No alerta. Log a ClickHouse.</div>
+        </div>
+      </div>
+
+      <div class="tl-event">
+        <div class="tl-time">14:23:17</div>
+        <div class="tl-body">
+          <div class="tl-title">Degradación incipiente <span class="tl-tag l2">Model</span></div>
+          <div class="tl-detail">Audio cambia sutilmente. Predicción: <code>{label: rodamiento_desgaste_leve, confidence: 0.68, unc: 0.22}</code>. Confidence <0.7 → no alerta, log para revisión.</div>
+        </div>
+      </div>
+
+      <div class="tl-event">
+        <div class="tl-time">14:23:21</div>
+        <div class="tl-body">
+          <div class="tl-title">Segunda ventana confirma <span class="tl-tag l4">Decision</span></div>
+          <div class="tl-detail">Nueva predicción: <code>{label: rodamiento_desgaste_leve, confidence: 0.71, unc: 0.18}</code>. Confidence 0.7-0.9 → Slack #mantenimiento. Dedup: primera alerta en ventana 5min → envía.</div>
+        </div>
+      </div>
+
+      <div class="tl-event">
+        <div class="tl-time">14:23:25</div>
+        <div class="tl-body">
+          <div class="tl-title">RAG Service invocado <span class="tl-tag l3">Explanation</span></div>
+          <div class="tl-detail">Query: "Motor MTR-0421, posible rodamiento_desgaste_leve, confianza 0.71. ¿Qué significa y qué hago?" → Domain Guard: pasa → Retriever: top-20 → Reranker: top-5 con score >0.5 → Synthesizer: Gemma4 + chunks → Verifier: grounding 0.89 → sin disclaimer.</div>
+        </div>
+      </div>
+
+      <div class="tl-event">
+        <div class="tl-time">14:23:30</div>
+        <div class="tl-body">
+          <div class="tl-title">Técnico recibe en Slack <span class="tl-tag ok">Operador</span></div>
+          <div class="tl-detail">"El patrón acústico sugiere desgaste leve del rodamiento de salida. Según manual Siemens 1LA7 §4.3, esto es normal después de 8000h. Acción recomendada: inspección visual en próxima parada programada. Si el score sube a >0.85, programar reemplazo inmediato. Fuentes: [1] Siemens 1LA7 §4.3, [2] ISO 10816-3 §5.2"</div>
+        </div>
+      </div>
+
+      <div class="tl-event">
+        <div class="tl-time">14:23:45</div>
+        <div class="tl-body">
+          <div class="tl-title">Técnico confirma <span class="tl-tag ok">Operador</span></div>
+          <div class="tl-detail">Va al motor, confirma visualmente: desgaste leve. Marca en UI: "correcto, programar inspección".</div>
+        </div>
+      </div>
+
+      <div class="tl-event">
+        <div class="tl-time">14:30:00</div>
+        <div class="tl-body">
+          <div class="tl-title">Feedback almacenado <span class="tl-tag l5">Governance</span></div>
+          <div class="tl-detail">Feature batch + label confirmado → SeaweedFS versionado con DVC. Este caso entra en el dataset de reentrenamiento.</div>
+        </div>
+      </div>
+
+      <div class="tl-event">
+        <div class="tl-time">20:15:33</div>
+        <div class="tl-body">
+          <div class="tl-title">Rodamiento empeora <span class="tl-tag l2">Model</span></div>
+          <div class="tl-detail">Múltiples ventanas. <code>{label: rodamiento_desgaste_severo, confidence: 0.91, unc: 0.07}</code> → confidence >0.9 + fallo crítico.</div>
+        </div>
+      </div>
+
+      <div class="tl-event">
+        <div class="tl-time">20:15:34</div>
+        <div class="tl-body">
+          <div class="tl-title">Alerta escala a PagerDuty <span class="tl-tag l4">Decision</span></div>
+          <div class="tl-detail">Dedup: 3ª alerta del mismo device en 30min → escalado. Técnico on-call recibe llamada.</div>
+        </div>
+      </div>
+
+      <div class="tl-event">
+        <div class="tl-time">20:15:40</div>
+        <div class="tl-body">
+          <div class="tl-title">RAG con contexto severo <span class="tl-tag l3">Explanation</span></div>
+          <div class="tl-detail">Respuesta con acciones: parada inmediata + reemplazo. Fuentes citadas. Grounding 0.91.</div>
+        </div>
+      </div>
+
+      <div class="tl-event">
+        <div class="tl-time">20:20:00</div>
+        <div class="tl-body">
+          <div class="tl-title">Motor parado <span class="tl-tag ok">Operador</span></div>
+          <div class="tl-detail">Rodamiento reemplazado. Sin daño mayor. Coste: €800 (reemplazo programado en urgencia) vs €15,000 si hubiera fallado en línea.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <p><strong>Tiempo total desde primera señal fuerte (14:23) hasta acción del técnico: <5 minutos.</strong></p>
+
+  <div class="callout ok">
+    <span class="clbl">✓ El sistema hizo lo correcto en cada momento</span>
+    A las 14:23 con confidence 0.68 <strong>no alertó</strong> — habría sido un falso positivo si el técnico hubiera ido por nada. A las 14:23 con confidence 0.71 <strong>sí alertó por Slack</strong> — nivel medio, revisable. A las 20:15 con confidence 0.91 <strong>alertó por PagerDuty</strong> — nivel crítico, llamada. Los tres niveles son la diferencia entre un sistema útil y un sistema que genera fatiga de alertas.
+  </div>
+</div>
+
+<!-- 04 DECISIONES -->
+<div id="decisiones" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">04</div>
+    <div>
+      <div class="ch-title">Decisiones no obvias</div>
+      <div class="ch-sub">Alternativas que se descartaron y por qué</div>
+    </div>
+  </div>
+
+  <p>Cada decisión de este sistema tiene una alternativa obvia que se descartó por una razón concreta. Documentarlas es lo que permite revisarlas cuando el contexto cambie.</p>
+
+  <div class="decisions">
+    <div class="tbl-hdr">
+      <div>Decisión</div>
+      <div>Alternativa obvia</div>
+      <div>Por qué se eligió</div>
+    </div>
+    <div class="tbl-row">
+      <div class="tbl-tech">Mel-spectrograma en edge</div>
+      <div>Enviar WAV crudo</div>
+      <div>16x reducción de ancho de banda. Requiere firmware actualizable, pero es la diferencia entre viable y no viable con miles de motores.</div>
+    </div>
+    <div class="tbl-row">
+      <div class="tbl-tech">MQTT + Kafka (dos capas)</div>
+      <div>Solo Kafka</div>
+      <div>MQTT tolera redes industriales inestables. Kafka da replay y consumer groups. Las dos capas resuelven problemas distintos.</div>
+    </div>
+    <div class="tbl-row">
+      <div class="tbl-tech">Temperature scaling</div>
+      <div>Confiar en softmax</div>
+      <div>Softmax sin calibrar está sobreconfiado. Los thresholds de la capa 4 no significan nada sin calibration previa.</div>
+    </div>
+    <div class="tbl-row">
+      <div class="tbl-tech">MC Dropout</div>
+      <div>Confiar solo en confidence</div>
+      <div>Permite distinguir "no sé" (varianza alta) de "estoy seguro" (varianza baja). Es lo que evita falsos positivos en zona de incertidumbre.</div>
+    </div>
+    <div class="tbl-row">
+      <div class="tbl-tech">Threshold 0.5 en reranker</div>
+      <div>Mantener 0.3</div>
+      <div>0.3 recupera ruido semántico. Sacrifica recall por precision cuando alucinar es caro. Impacto: faithfulness sube >15% sin cambiar el modelo base.</div>
+    </div>
+    <div class="tbl-row">
+      <div class="tbl-tech">3 paths de routing</div>
+      <div>2 paths (A/B)</div>
+      <div>Path C para casos ambiguos reduce falsos positivos en casos de alto riesgo. El coste del path C (4s, $0.03) solo se paga cuando la situación lo justifica.</div>
+    </div>
+    <div class="tbl-row">
+      <div class="tbl-tech">3 niveles de alerta</div>
+      <div>Alerta / no alerta</div>
+      <div>Nivel medio (Slack) reduce fatiga sin perder información. Con 2 niveles, los casos ambiguos se convierten en ruido.</div>
+    </div>
+    <div class="tbl-row">
+      <div class="tbl-tech">No usar LLM para routing</div>
+      <div>Sí usar LLM</div>
+      <div>Un classifier SetFit de 50ms decide mejor que un LLM de 800ms. Menos coste, más rápido, más determinista, auditable.</div>
+    </div>
+    <div class="tbl-row">
+      <div class="tbl-tech">Reentrenar con 500 etiquetas</div>
+      <div>Reentrenar cada semana</div>
+      <div>Evita sobreajuste a ruido reciente. Requiere infraestructura de feedback que llegue a ese volumen — lo cual es un prerequisito.</div>
+    </div>
+    <div class="tbl-row">
+      <div class="tbl-tech">trace_id desde el sensor</div>
+      <div>Generar en gateway</div>
+      <div>Permite reconstruir la historia completa desde la señal física. Coste cero, valor enorme en post-mortem de incidentes.</div>
+    </div>
+    <div class="tbl-row">
+      <div class="tbl-tech">Fine-tuning solo tras RAGAS</div>
+      <div>Fine-tuning directo</div>
+      <div>Sin baseline no puedes saber si el fine-tuning mejora algo. RAGAS primero, fine-tuning después, comparación explícita.</div>
+    </div>
+    <div class="tbl-row">
+      <div class="tbl-tech">Langfuse self-hosted</div>
+      <div>LangSmith SaaS</div>
+      <div>Los traces contienen prompts + completions con datos de cliente. Enviarlos a un SaaS es brecha SOC2/ISO27001.</div>
+    </div>
+  </div>
+</div>
+
+<!-- 05 MVP -->
+<div id="mvp" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">05</div>
+    <div>
+      <div class="ch-title">Qué se dejó fuera del MVP</div>
+      <div class="ch-sub">Regla: incluir todo lo barato + crítico · dejar fuera lo que requiere escala</div>
+    </div>
+  </div>
+
+  <p>MetalKube no necesita implementar el patrón completo desde el día uno. La estrategia es incluir primero todo lo que es barato <em>y</em> crítico, y posponer todo lo que requiere volumen real o equipo dedicado.</p>
+
+  <div class="mvp">
+    <div class="tbl-hdr">
+      <div>Componente</div>
+      <div>MVP</div>
+      <div>Razón</div>
+    </div>
+    <div class="tbl-row">
+      <div class="tbl-tech">Kafka + Spark Streaming</div>
+      <div><span class="mvp-no">✗ FUERA</span></div>
+      <div>Menos de 50 motores reales. FastAPI + aiokafka es suficiente hasta Fase 9 del roadmap.</div>
+    </div>
+    <div class="tbl-row">
+      <div class="tbl-tech">Flink</div>
+      <div><span class="mvp-no">✗ FUERA</span></div>
+      <div>Latencia actual: 2s. Objetivo: 5s. No hace falta exactamente-once ni event-time processing complejo.</div>
+    </div>
+    <div class="tbl-row">
+      <div class="tbl-tech">Feature store (Feast)</div>
+      <div><span class="mvp-no">✗ FUERA</span></div>
+      <div>Se necesita cuando hay >3 modelos compartiendo features. Con 1 clasificador y 1 LLM, sobra.</div>
+    </div>
+    <div class="tbl-row">
+      <div class="tbl-tech">Multi-dominio RAG</div>
+      <div><span class="mvp-no">✗ FUERA</span></div>
+      <div>Primero validar un dominio (motores). El classifier multi-dominio después, cuando el primero funcione.</div>
+    </div>
+    <div class="tbl-row">
+      <div class="tbl-tech">A/B testing de modelos ML</div>
+      <div><span class="mvp-no">✗ FUERA</span></div>
+      <div>Se necesita >100 motores para tener poder estadístico. Con 50, cualquier diferencia es ruido.</div>
+    </div>
+    <div class="tbl-row">
+      <div class="tbl-tech">Rollback automático de prompts</div>
+      <div><span class="mvp-warn">⚠ MANUAL</span></div>
+      <div>ArgoCD ya permite rollback manual con un click. Automatizar en Fase 10, no antes.</div>
+    </div>
+    <div class="tbl-row">
+      <div class="tbl-tech">Grounding score con NLI</div>
+      <div><span class="mvp-ok">✓ INCLUIR</span></div>
+      <div>Barato (50ms, 0 tokens) y bloquea alucinaciones. Impacto desproporcionado.</div>
+    </div>
+    <div class="tbl-row">
+      <div class="tbl-tech">Drift detection (Evidently)</div>
+      <div><span class="mvp-ok">✓ INCLUIR</span></div>
+      <div>Es el gap más crítico del sistema actual. Sin esto, el sistema falla en silencio.</div>
+    </div>
+    <div class="tbl-row">
+      <div class="tbl-tech">Reranker cross-encoder</div>
+      <div><span class="mvp-ok">✓ INCLUIR</span></div>
+      <div>El mayor impacto sobre calidad de RAG sin cambiar el modelo base.</div>
+    </div>
+    <div class="tbl-row">
+      <div class="tbl-tech">Threshold 0.5 (vs 0.3)</div>
+      <div><span class="mvp-ok">✓ INCLUIR</span></div>
+      <div>Cambio de una línea de código. Impacto desproporcionado en calidad.</div>
+    </div>
+    <div class="tbl-row">
+      <div class="tbl-tech">DVC + versionado de datos</div>
+      <div><span class="mvp-ok">✓ INCLUIR</span></div>
+      <div>Sin esto, los experimentos no son reproducibles. Prerequisito para todo lo demás.</div>
+    </div>
+    <div class="tbl-row">
+      <div class="tbl-tech">Langfuse self-hosted</div>
+      <div><span class="mvp-ok">✓ INCLUIR</span></div>
+      <div>Es la base de la observabilidad. Sin trazas, no sabes qué está pasando.</div>
+    </div>
+    <div class="tbl-row">
+      <div class="tbl-tech">RAGAS</div>
+      <div><span class="mvp-ok">✓ INCLUIR</span></div>
+      <div>Sin baseline no puedes mejorar el RAG. Es el termómetro del sistema.</div>
+    </div>
+    <div class="tbl-row">
+      <div class="tbl-tech">NeMo Guardrails</div>
+      <div><span class="mvp-ok">✓ INCLUIR</span></div>
+      <div>Bloqueante para compliance. Si el cliente es enterprise, es requisito.</div>
+    </div>
+    <div class="tbl-row">
+      <div class="tbl-tech">ClickHouse</div>
+      <div><span class="mvp-ok">✓ INCLUIR</span></div>
+      <div>Necesario para auditoría + analytics de coste. Sin esto, no hay evidencia SOC2.</div>
+    </div>
+  </div>
+
+  <div class="callout warn">
+    <span class="clbl">⚠ Regla del MVP</span>
+    Incluir todo lo que es barato + crítico. Dejar fuera todo lo que requiere >100 dispositivos reales o equipo dedicado. La deuda técnica del MVP no debe ser "lo que no hemos construido", sino "lo que hemos construido mal".
+  </div>
+</div>
+
+<!-- 06 MÉTRICAS -->
+<div id="metricas" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">06</div>
+    <div>
+      <div class="ch-title">Métricas de éxito</div>
+      <div class="ch-sub">Cómo saber si MetalKube funciona</div>
+    </div>
+  </div>
+
+  <div class="metrics">
+    <div class="metric-card">
+      <div class="metric-cat">Métricas técnicas</div>
+      <div class="metric-item"><b>Latencia p95 end-to-end:</b> señal → Slack al técnico <5 segundos</div>
+      <div class="metric-item"><b>Latencia p99 path síncrono:</b> predicción + explicación <8 segundos</div>
+      <div class="metric-item"><b>Precisión del modelo</b> en producción: F1 macro >0.85 sobre las 10-30 clases</div>
+      <div class="metric-item"><b>Grounding score medio</b> de explicaciones: >0.8</div>
+      <div class="metric-item"><b>RAGAS faithfulness:</b> >0.85</div>
+      <div class="metric-item"><b>Cobertura del feedback loop:</b> >60% de predicciones críticas confirmadas por técnico en <72h</div>
+      <div class="metric-item"><b>Time to recovery</b> tras drift: <14 días desde detección hasta reentrenamiento desplegado</div>
+      <div class="metric-item"><b>Coste LLM por predicción crítica:</b> <$0.05</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-cat">Métricas operacionales</div>
+      <div class="metric-item"><b>Tasa de falsos positivos:</b> <10% de alertas PagerDuty son incorrectas</div>
+      <div class="metric-item"><b>Tasa de falsos negativos:</b> <2% de fallos reales no alertados</div>
+      <div class="metric-item"><b>Uptime del path síncrono:</b> >99.5% (excluyendo caída de LLM)</div>
+      <div class="metric-item"><b>Uptime con LLM caído:</b> >99.9% (predicción sigue funcionando, solo sin explicación)</div>
+      <div class="metric-item"><b>Coste total mensual:</b> <$5k infra + LLM por uso</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-cat">Métricas de negocio</div>
+      <div class="metric-item"><b>Reducción de paradas no planificadas:</b> objetivo >30% en 12 meses</div>
+      <div class="metric-item"><b>Reducción de mantenimiento innecesario:</b> objetivo >20% (cambios por calendario → cambios por estado)</div>
+      <div class="metric-item"><b>Confianza del técnico:</b> >70% de alertas confirmadas como útiles en encuesta trimestral</div>
+      <div class="metric-item"><b>Tiempo hasta resolución:</b> reducción del 40% en tiempo medio entre primera alerta y acción</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-cat">Métricas de compliance</div>
+      <div class="metric-item"><b>100% de requests al gateway con traza completa</b> en Langfuse</div>
+      <div class="metric-item"><b>Coste total mensual consultable en <1s</b> por usuario y modelo</div>
+      <div class="metric-item"><b>0 intentos de injection exitosos</b> en producción</div>
+      <div class="metric-item"><b>100% de endpoints estructurados con Pydantic estricto</b></div>
+      <div class="metric-item"><b>3 queries SOC2 respondidas en <1s:</b> accesos a secretos últimos 30d, cambios RBAC, intentos auth fallidos</div>
+    </div>
+  </div>
+</div>
+
+<!-- 07 ROADMAP -->
+<div id="roadmap" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">07</div>
+    <div>
+      <div class="ch-title">Roadmap por fases</div>
+      <div class="ch-sub">11 fases · 12+ meses · cada fase es autónoma</div>
+    </div>
+  </div>
+
+  <p>El orden importa. Cada fase construye sobre la anterior y ninguna requiere volver atrás. Si el proyecto se detiene en cualquier fase, el sistema ya es útil.</p>
+
+  <div class="phases">
+
+    <div class="phase">
+      <div class="phase-n">
+        <div class="phase-num">FASE 00</div>
+        <div class="phase-name">Saneamiento</div>
+      </div>
+      <div class="phase-body">
+        <div class="phase-title">Semana 0-2 · Sin esto, todo lo demás mide basura</div>
+        <ul class="phase-list">
+          <li class="new">Threshold RAG: 0.3 → 0.5</li>
+          <li class="new">Reranker cross-encoder (ms-marco-MiniLM)</li>
+          <li class="new">Mover LLM-as-judge a background (20% sampling)</li>
+          <li class="new">DVC para versionado de datos</li>
+          <li class="new">Chunking semántico (no por caracteres)</li>
+          <li class="new">Reemplazar manuales sintéticos por reales (mínimo 50 docs)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-n">
+        <div class="phase-num">FASE 01</div>
+        <div class="phase-name">Observabilidad</div>
+      </div>
+      <div class="phase-body">
+        <div class="phase-title">Mes 1 · Cimientos de la capa 5</div>
+        <ul class="phase-list">
+          <li>Desplegar Langfuse self-hosted en el cluster</li>
+          <li>Instrumentar el gateway con <code>@observe()</code></li>
+          <li>correlation_id → trace_id en Langfuse</li>
+          <li>Validar que cada request tiene traza completa</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-n">
+        <div class="phase-num">FASE 02</div>
+        <div class="phase-name">Evaluación RAG</div>
+      </div>
+      <div class="phase-body">
+        <div class="phase-title">Mes 2 · Termómetro del sistema</div>
+        <ul class="phase-list">
+          <li>RAGAS pipeline sobre el RAG actual</li>
+          <li>Baseline: faithfulness, relevancy, precision, recall</li>
+          <li>Scores empujados a Langfuse por trace</li>
+          <li>Gate de deploy: faithfulness >0.8</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-n">
+        <div class="phase-num">FASE 03</div>
+        <div class="phase-name">Calibración + Drift</div>
+      </div>
+      <div class="phase-body">
+        <div class="phase-title">Mes 3 · Cerrar el fallo silencioso</div>
+        <ul class="phase-list">
+          <li>Temperature scaling del AudioCNN</li>
+          <li>MC Dropout para incertidumbre epistémica</li>
+          <li>Evidently AI: data drift + prediction drift</li>
+          <li>Alertas de drift en Prometheus</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-n">
+        <div class="phase-num">FASE 04</div>
+        <div class="phase-name">Fine-tuning LLM</div>
+      </div>
+      <div class="phase-body">
+        <div class="phase-title">Mes 4 · Solo si Fase 02 está estable</div>
+        <ul class="phase-list">
+          <li class="warn">Gate de entrada: RAGAS baseline establecida</li>
+          <li>Dataset: Qdrant manuales + feedback de técnicos</li>
+          <li>Unsloth + LoRA en RTX 3060</li>
+          <li>Export GGUF → Ollama</li>
+          <li>RAGAS comparativo base vs fine-tuned</li>
+          <li>Canary deploy 10% → gate → 100%</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-n">
+        <div class="phase-num">FASE 05</div>
+        <div class="phase-name">Agente</div>
+      </div>
+      <div class="phase-body">
+        <div class="phase-title">Mes 5 · Solo si hay casos multi-paso reales</div>
+        <ul class="phase-list">
+          <li class="warn">Gate de entrada: casos multi-paso identificados</li>
+          <li>LangGraph: 5 nodos (Classifier → Diagnose → Severity → HumanGate → WorkOrder)</li>
+          <li>Redis checkpointer (ya existente)</li>
+          <li>interrupt_before para human-in-the-loop</li>
+          <li>Trazabilidad automática por Langfuse</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-n">
+        <div class="phase-num">FASE 06</div>
+        <div class="phase-name">Seguridad</div>
+      </div>
+      <div class="phase-body">
+        <div class="phase-title">Mes 6 · Prerequisito para clientes enterprise</div>
+        <ul class="phase-list">
+          <li>Heurísticas input validation en el gateway</li>
+          <li>NeMo Guardrails output validation</li>
+          <li>Pydantic estricto en endpoints estructurados</li>
+          <li>Tabla <code>security_events</code> en ClickHouse</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-n">
+        <div class="phase-num">FASE 07</div>
+        <div class="phase-name">Analítica</div>
+      </div>
+      <div class="phase-body">
+        <div class="phase-title">Mes 7 · Coste + compliance</div>
+        <ul class="phase-list">
+          <li>ClickHouse en el cluster</li>
+          <li>ETL async: gateway + ml-serving → ClickHouse</li>
+          <li>Tablas: llm_requests, ml_predictions, security_events, audit_log</li>
+          <li>Grafana: dashboards históricos (coste, drift, compliance)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-n">
+        <div class="phase-num">FASE 08</div>
+        <div class="phase-name">Feedback loop</div>
+      </div>
+      <div class="phase-body">
+        <div class="phase-title">Mes 8 · Único cierre real con el mundo</div>
+        <ul class="phase-list">
+          <li>UI técnicos para confirmar/corregir predicciones</li>
+          <li>Correcciones → SeaweedFS versionado con DVC</li>
+          <li>Trigger de reentrenamiento a 500 etiquetas</li>
+          <li>NannyML para concept drift sin labels</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-n">
+        <div class="phase-num">FASE 09</div>
+        <div class="phase-name">IoT real-time</div>
+      </div>
+      <div class="phase-body">
+        <div class="phase-title">Mes 9-12 · Solo si >50 motores reales</div>
+        <ul class="phase-list">
+          <li class="warn">Gate de entrada: >50 dispositivos reales</li>
+          <li>MQTT en edge + pre-procesado en firmware</li>
+          <li>Kafka + Schema Registry Avro + DLQ</li>
+          <li>Backpressure monitoring + consumer lag</li>
+          <li>trace_id desde el sensor</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-n">
+        <div class="phase-num">FASE 10</div>
+        <div class="phase-name">Gobierno automatizado</div>
+      </div>
+      <div class="phase-body">
+        <div class="phase-title">Mes 13+ · Madurez operacional</div>
+        <ul class="phase-list">
+          <li>Rollback automático de modelos y prompts</li>
+          <li>A/B testing de versiones</li>
+          <li>Multi-dominio RAG</li>
+          <li>Feature store (si >3 modelos comparten features)</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="pq">
+    Cada fase es autónoma. Si el proyecto se detiene en Fase 02, ya tienes un sistema que mide su propia calidad. Si se detiene en Fase 05, tienes un agente con human-in-the-loop. Si llega a Fase 10, tienes una plataforma industrial completa.
+  </div>
+</div>
+
+<!-- 08 SÓLIDO -->
+<div id="solido" class="chapter">
+  <div class="ch-hdr">
+    <div class="ch-n">08</div>
+    <div>
+      <div class="ch-title">Lo que MetalKube ya tiene y es sólido</div>
+      <div class="ch-sub">No todo es gap · hay partes correctas que conviene preservar</div>
+    </div>
+  </div>
+
+  <p>El 40% del patrón SSEP ya está implementado en MetalKube. Este es el inventario de lo que funciona y no se debe tocar durante la evolución hacia el patrón completo.</p>
+
+  <div class="solid-grid">
+    <div class="solid-card">
+      <div class="solid-card-t">Circuit breaker por proveedor LLM</div>
+      <div class="solid-card-d">En el gateway. Si Ollama cae, fallback a OpenAI. Si OpenAI cae, fallback a Anthropic. Degradación elegante sin intervención humana.</div>
+    </div>
+    <div class="solid-card">
+      <div class="solid-card-t">Semantic cache con Qdrant threshold 0.85</div>
+      <div class="solid-card-d">Bien calibrado. ~20% de hit rate adicional sobre el exact cache de Redis. Ahorro de coste real medido.</div>
+    </div>
+    <div class="solid-card">
+      <div class="solid-card-t">GitOps estricto con ArgoCD</div>
+      <div class="solid-card-d">Sin kubectl directo. Todo cambio de infra es un commit auditado. Raro de encontrar en proyectos de este tamaño.</div>
+    </div>
+    <div class="solid-card">
+      <div class="solid-card-t">MLflow gate de evaluación antes de promoción</div>
+      <div class="solid-card-d">Base correcta para los gates de Fase 10. Solo falta añadir los pasos de DVC y las métricas de drift.</div>
+    </div>
+    <div class="solid-card">
+      <div class="solid-card-t">Argo Workflows para pipeline ML</div>
+      <div class="solid-card-d">Ya existe el pipeline. Añadir <code>dvc pull</code> en los steps lo hace reproducible de punta a punta.</div>
+    </div>
+    <div class="solid-card">
+      <div class="solid-card-t">Langfuse para trazabilidad</div>
+      <div class="solid-card-d">Parcial, pero la base está. La instrumentación completa con <code>@observe()</code> es una semana de trabajo.</div>
+    </div>
+    <div class="solid-card">
+      <div class="solid-card-t">Qdrant + Redis duales para caching</div>
+      <div class="solid-card-d">Arquitectura correcta de dos niveles. Redis para exact match, Qdrant para semántico. Patrón estándar bien aplicado.</div>
+    </div>
+    <div class="solid-card">
+      <div class="solid-card-t">Kubernetes HA + Cilium CNI + GitOps</div>
+      <div class="solid-card-d">Infraestructura de base production-grade. El 80% de proyectos que intentan este patrón no la tienen al empezar.</div>
+    </div>
+  </div>
+
+  <div class="callout ok">
+    <span class="clbl">✓ El 40% está hecho</span>
+    La distancia entre MetalKube actual y un sistema que cumple SSEP completo es del 60%. Y ninguna de las fases requiere rehacer lo que ya existe — todo se construye encima. Eso es lo que hace el roadmap viable.
+  </div>
+
+  <div class="pq">
+    El patrón SSEP no es una meta. Es un marco para decidir qué construir después. MetalKube ya tiene el 40% del marco. El otro 60% es un roadmap de 12 meses que puede detenerse en cualquier fase sin perder lo hecho.
+  </div>
+</div>
+
+</div>
+</div>
+
+<footer>
+  MetalKube · Ejemplo práctico · v0.2 · Documento 3 de 3
+  <div class="ft-dots">
+    <div class="ft-dot" style="background:var(--l1)"></div>
+    <div class="ft-dot" style="background:var(--l2)"></div>
+    <div class="ft-dot" style="background:var(--l3)"></div>
+    <div class="ft-dot" style="background:var(--l4)"></div>
+    <div class="ft-dot" style="background:var(--l5)"></div>
+    <div class="ft-dot" style="background:var(--sec)"></div>
+  </div>
+</footer>
+
+</body>
+</html>
