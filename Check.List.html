@@ -578,7 +578,7 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--rule2);padding:2p
 
     <div class="gate">
       <span class="gate-icon">→</span>
-      <div><strong>Gate:</strong> recupera top-5 chunks relevantes con score >0.5.</div>
+      <div><strong>Gate:</strong> recupera top-5 chunks relevantes con score &gt;0.25. <em>⚠ Parcial: falta P2.1 (docs reales) y P2.4 (reranker bge).</em></div>
     </div>
   </div>
 </div>
@@ -643,7 +643,7 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--rule2);padding:2p
 
     <div class="gate">
       <span class="gate-icon">→</span>
-      <div><strong>Gate:</strong> faithfulness >0.7 en 10 queries manuales.</div>
+      <div><strong>Gate:</strong> faithfulness &gt;0.7 en 10 queries manuales.</div>
     </div>
   </div>
 </div>
@@ -764,7 +764,7 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--rule2);padding:2p
           <div class="task-checkbox"></div>
           <div class="task-content">
             <div class="task-name">Establecer baseline</div>
-            <div class="task-desc">Ejecutar evaluación, faithfulness >0.8.</div>
+            <div class="task-desc">Ejecutar evaluación, faithfulness &gt;0.8.</div>
             <span class="task-time">1-2 días</span>
           </div>
         </div>
@@ -773,7 +773,7 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--rule2);padding:2p
 
     <div class="gate">
       <span class="gate-icon">→</span>
-      <div><strong>Gate:</strong> faithfulness >0.8 en baseline.</div>
+      <div><strong>Gate:</strong> faithfulness &gt;0.8 en baseline.</div>
     </div>
   </div>
 </div>
@@ -796,14 +796,15 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--rule2);padding:2p
 console.log('[checklist] script iniciado');
 
 // ============ ESTADO ============
-var STORAGE_KEY = 'ssep-checklist-v5';
+var STORAGE_KEY = 'ssep-checklist-v6';
 
-// 16 tareas completadas por defecto (Fases A+B+C + P1)
+// 19 tareas completadas por defecto (Fases A+B+C + P1 + P2.2+P2.3+P2.5)
 var DEFAULT_STATE = {
   A1: true, A2: true, A3: true,
   B1: true, B2: true, B3: true, B4: true, B5: true, B6: true,
   C1: true, C2: true, C3: true,
-  P1_1: true, P1_2: true, P1_3: true, P1_4: true
+  P1_1: true, P1_2: true, P1_3: true, P1_4: true,
+  P2_2: true, P2_3: true, P2_5: true
 };
 
 var state = {};
@@ -818,7 +819,7 @@ function loadState() {
     } else {
       state = JSON.parse(JSON.stringify(DEFAULT_STATE));
       try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) {}
-      console.log('[checklist] DEFAULT_STATE aplicado (16 tareas)');
+      console.log('[checklist] DEFAULT_STATE aplicado (19 tareas)');
     }
   } catch (e) {
     console.warn('[checklist] localStorage error, usando DEFAULT:', e);
