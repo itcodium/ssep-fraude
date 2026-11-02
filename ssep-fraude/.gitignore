@@ -1,0 +1,9 @@
+
+
+# P2 - RAG artifacts (regenerables desde docs/)
+chunks.json
+chroma_db/
+.cache/
+
+# P2 - backups de reorganizacion
+_backup_p2_*/
