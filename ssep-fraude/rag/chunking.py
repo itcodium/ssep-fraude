@@ -1,8 +1,14 @@
 """
-P2.2 - Chunking semantico (v2 robusta).
+P2.2 - Chunking semantico (v4: filtro de TOC + descarte de titulos).
 
 Divide por seccion/párrafo/linea con marcador, sin depender
 del formato exacto de line endings.
+
+Nuevo en v4:
+- Ignora lineas de tabla de contenidos (puntos suspensivos)
+- Descarta chunks que sean solo un titulo de seccion sin cuerpo
+- MIN_CHUNK_CHARS subido a 100
+- Eliminado patron generico \d+\s+[A-Z] (capturaba TOC)
 
 Uso:
     python chunk_docs.py
@@ -13,35 +19,51 @@ import re
 from pathlib import Path
 
 
-MIN_CHUNK_CHARS = 50
+MIN_CHUNK_CHARS = 100
 MAX_CHUNK_CHARS = 1000
 
 # Marcadores de seccion al inicio de una linea
 SECTION_PATTERN = re.compile(
     r"^\s*("
+    # --- Patrones originales (docs sintéticos en español) ---
     r"PCI-DSS\s+§[\d.]+"
     r"|§[\d.]+"
     r"|Caso\s+\d{4}-\d+"
     r"|Reglas internas[^:\n]*:"
     r"|Procedimiento[^:\n]*:"
+    # --- Normativa inglesa ---
+    r"|Requirement\s+\d+(?:\.\d+)*"      # PCI DSS v4.0.1: "Requirement 10.2.1"
+    r"|Recommendation\s+\d+"             # FATF: "Recommendation 20"
+    r"|Appendix\s+[A-Z]"                 # "Appendix B"
+    # --- Papers arXiv ---
+    r"|\d+\.\d+\s+[A-Z][^\n]{3,60}"      # "1.1 Credit card transactions dataset"
+    r"|Abstract"
+    r"|Introduction"
+    r"|Conclusion"
     r")",
     re.MULTILINE,
 )
+
+# Patron para detectar lineas de tabla de contenidos (puntos suspensivos)
+TOC_PATTERN = re.compile(r"\.\s*\.\s*\.")
 
 
 def _split_into_blocks(text):
     """
     Divide el texto en bloques logicos.
-    1. Divide por lineas que empiezan con marcador de seccion
-    2. Si el bloque resultante es muy grande, lo subdivide por doble newline
+    1. Ignora lineas de tabla de contenidos
+    2. Divide por lineas que empiezan con marcador de seccion
     """
     lines = text.split("\n")
     blocks = []
     current = []
 
     for line in lines:
+        # Ignorar lineas de tabla de contenidos (puntos suspensivos)
+        if TOC_PATTERN.search(line):
+            continue
+
         if SECTION_PATTERN.match(line) and current:
-            # Cerrar bloque actual
             block = "\n".join(current).strip()
             if block:
                 blocks.append(block)
@@ -114,6 +136,13 @@ def chunk_file(path: Path) -> list:
         for subblock in subblocks:
             if len(subblock) < MIN_CHUNK_CHARS:
                 continue
+
+            # Descartar si es solo un titulo de seccion (sin cuerpo)
+            first_line = subblock.split("\n")[0].strip()
+            rest = subblock[len(first_line):].strip()
+            if len(rest) < 30:
+                continue
+
             chunks.append({
                 "id": f"{path.stem}_{chunk_counter:03d}",
                 "text": subblock,

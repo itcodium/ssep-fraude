@@ -194,7 +194,7 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--rule2);padding:2p
 <div class="hero">
   <div class="hero-stripe"></div>
   <div class="hero-in">
-    <div class="hero-eye">FraudeSSEP · README · v0.4</div>
+    <div class="hero-eye">FraudeSSEP · README · v1.0</div>
     <h1>Implementación mínima<br>del patrón SSEP<br>en <span class="accent">fraude financiero</span>.
       <span class="smaller">3 capas · 3 contratos · 3 reglas · pipeline RAG completo</span>
     </h1>
@@ -202,10 +202,10 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--rule2);padding:2p
       Este proyecto materializa el patrón SSEP en un caso concreto: detección de fraude en transacciones con tarjeta. No es un sistema de producción — es la Implementación Mínima de Referencia (IMR) que valida que la arquitectura del patrón tiene sentido en este dominio.
     </p>
     <div class="hero-meta">
-      <div class="hm"><div class="hm-k">Estado</div><div class="hm-v">Fases A+B+C+P1+P2 <span>completadas</span></div></div>
-      <div class="hm"><div class="hm-k">Progreso</div><div class="hm-v">19 / 30 <span>tareas</span></div></div>
+      <div class="hm"><div class="hm-k">Estado</div><div class="hm-v">Fases A+B+C+P1 · P2 <span>parcial</span></div></div>
+      <div class="hm"><div class="hm-k">Progreso</div><div class="hm-v">19 / 31 <span>tareas</span></div></div>
       <div class="hm"><div class="hm-k">Archivos</div><div class="hm-v">20 <span>· 5 carpetas</span></div></div>
-      <div class="hm"><div class="hm-k">Próximo</div><div class="hm-v">P2.1 <span>· docs reales</span></div></div>
+      <div class="hm"><div class="hm-k">Próximo</div><div class="hm-v">P2.1 <span>· Tier 1 (sintético)</span></div></div>
     </div>
   </div>
 </div>
@@ -302,7 +302,7 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--rule2);padding:2p
   </div>
 
   <h3>Objetivo inmediato</h3>
-  <p>Validar el patrón SSEP en el dominio de fraude con una implementación de <strong>~190 líneas de Python</strong> que corre en cualquier portátil sin infraestructura.</p>
+  <p>Validar el patrón SSEP en el dominio de fraude con una implementación de <strong>~190 líneas de Python</strong> (Fases A+B+C) que corre en cualquier portátil sin infraestructura. <strong>Objetivo real:</strong> un <em>IMR productivo-simple</em> — funciona end-to-end con corpus suficiente, genera explicación generativa grounded con LLM, es medible con RAGAS. No es un sistema de producción.</p>
 
   <h3>Objetivo final</h3>
   <p>Demostrar que el patrón SSEP (5 capas + gobierno continuo) es aplicable a cualquier dominio que cumpla las 10 condiciones del Doc 0, y que fraude es un dominio válido para validarlo.</p>
@@ -322,7 +322,7 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--rule2);padding:2p
     <div class="ch-n">03</div>
     <div>
       <div class="ch-title">Estado actual</div>
-      <div class="ch-sub">19 de 30 tareas · 63%</div>
+      <div class="ch-sub">19 de 31 tareas · 61%</div>
     </div>
   </div>
 
@@ -378,8 +378,8 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--rule2);padding:2p
       </div>
       <div class="phase-body">
         <div class="phase-title">Embeddings + Chroma + reranker</div>
-        <div class="phase-d"><code>sentence-transformers</code> multilingüe + <code>chromadb</code> + cross-encoder <code>mmarco</code>. Chunking por sección (<code>§1.2</code>, <code>Caso 2024-0341</code>). Threshold 0.25. <strong>Pendiente P2.1:</strong> conseguir 20-50 documentos reales. <strong>Limitación conocida:</strong> con solo 12 chunks, el reranker a veces cita chunks no relevantes (ver changelog).</div>
-        <div class="phase-status"><span class="status progress">⚠ Parcial — P2.1 pendiente</span></div>
+        <div class="phase-d"><code>sentence-transformers</code> multilingüe + <code>chromadb</code> + cross-encoder <code>mmarco</code>. Chunking por sección (<code>§1.2</code>, <code>Caso 2024-0341</code>). Threshold 0.25. <strong>P2.1 desbloqueable en 2 niveles:</strong> Tier 1 (recomendado) = expandir corpus sintético a ~50 chunks coherentes (0.5-1 día); Tier 2 opcional = + PCI-DSS v4.0.1 real (2-3 días). <strong>P2.6 antes de P2.4:</strong> el fix de <code>_build_query</code> cambia los scores del reranker. <strong>P2.4 necesita 10-20 queries con ground_truth</strong> (P5.1 parcial) para calibrar con rigor. <strong>Limitación conocida:</strong> con 12 chunks el reranker a veces cita chunks no relevantes (ver changelog).</div>
+        <div class="phase-status"><span class="status progress">⚠ Parcial — P2.1 Tier 1 · P2.6 nuevo · P2.4 con P5.1 parcial</span></div>
       </div>
     </div>
   </div>
@@ -393,20 +393,48 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--rule2);padding:2p
       <div>Estado</div>
     </div>
     <div class="tbl-row c3">
+      <div class="tbl-tech">P2.1 · Docs</div>
+      <div>Tier 1: expandir corpus sintético a ~50 chunks (0.5-1 día). Tier 2 opcional: + PCI-DSS v4.0.1 real</div>
+      <div><span class="status progress">⚠ Desbloqueable en 2 niveles</span></div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">P2.6 · Preparar P3</div>
+      <div>Fix <code>_build_query</code> con features numéricas + documentar decisión ULB ↔ RAG · <strong>va antes de P2.4</strong></div>
+      <div><span class="status pending">⏸ Pendiente</span></div>
+    </div>
+    <div class="tbl-row c3">
+      <div class="tbl-tech">P2.4 · Reranker bge</div>
+      <div>Cross-encoder <code>bge-reranker-base</code> + threshold 0.5 calibrado con 10-20 queries de P5.1 parcial</div>
+      <div><span class="status pending">⏸ Bloqueada por P2.1 + P5.1 parcial</span></div>
+    </div>
+    <div class="tbl-row c3">
       <div class="tbl-tech">P3 · LLM</div>
       <div>Ollama local o API externa para síntesis</div>
       <div><span class="status pending">⏸ Pendiente</span></div>
     </div>
     <div class="tbl-row c3">
       <div class="tbl-tech">P4 · Observabilidad</div>
-      <div>Langfuse self-hosted + trazas</div>
-      <div><span class="status pending">⏸ Pendiente</span></div>
+      <div>Langfuse Cloud (gratis) o Docker mínimo + trazas</div>
+      <div><span class="status pending">⏸ Pendiente (paralelizable, 0.5-1 día)</span></div>
     </div>
     <div class="tbl-row c3">
       <div class="tbl-tech">P5 · Evaluación</div>
-      <div>RAGAS con 4 métricas</div>
+      <div>RAGAS 4 métricas · P5.1 parcial (10-20 queries) antes de P2.4</div>
       <div><span class="status pending">⏸ Pendiente</span></div>
     </div>
+  </div>
+
+  <div class="callout info" style="margin-top:20px;">
+    <span class="clbl">Ruta recomendada P2 → P3 (6-8 días con Tier 1)</span>
+    <strong>1.</strong> P2.1 Tier 1 · expandir corpus sintético a ~50 chunks (0.5-1 día)<br>
+    <strong>2.</strong> P2.6 · fix <code>_build_query</code> + documentar ULB ↔ RAG (1 día)<br>
+    <strong>3.</strong> P5.1 parcial · 10-20 queries con <code>ground_truth</code> (0.5-1 día)<br>
+    <strong>4.</strong> P2.4 · migrar a <code>bge</code> + calibrar threshold con las queries de (3) (0.5-1 día)<br>
+    <strong>5.</strong> Gate P2 · top-5 con score &gt;0.5 sobre ≥50 chunks<br>
+    <strong>6.</strong> <strong>P3 se puede empezar</strong> cuando el gate P2 esté cerrado (3-5 días)<br>
+    <strong>7.</strong> P4 mínimo (Langfuse Cloud) en paralelo con P3 (0.5-1 día)<br>
+    <strong>8.</strong> P5.2 + P5.3 · RAGAS + baseline con 20 queries (1-2 días) · cierre con rigor de P3<br>
+    <em>Opcional Tier 2:</em> + PCI-DSS v4.0.1 real (2-3 días) → validar extensibilidad a docs reales
   </div>
 </div>
 
@@ -722,8 +750,8 @@ Modelo guardado en model.pkl (0.3 MB)</div>
   </div>
 
   <div class="callout warn">
-    <span class="clbl">P2.1 pendiente</span>
-    Solo hay <strong>12 chunks</strong>. P2.1 requiere conseguir 20-50 documentos reales (PCI-DSS completo, guías Visa/Mastercard, papers arXiv, casos públicos) para mejorar la calidad del retrieval.
+    <span class="clbl">P2.1 desbloqueable en 2 niveles (recomendado: Tier 1)</span>
+    Solo hay <strong>12 chunks</strong>. <strong>Tier 1 (0.5-1 día, recomendado):</strong> expandir el corpus sintético a ~50 chunks coherentes (<code>reglas_banco</code> 6→20, <code>precedentes</code> 3→15, <code>normativa_pci</code> 3→15). Cero PDFs, cero cambios de chunker. <strong>Tier 2 (2-3 días, opcional):</strong> Tier 1 + solo PCI-DSS v4.0.1 real → requiere <code>pdf_to_txt.py</code> + adaptar <code>SECTION_PATTERN</code> para <code>Requirement X.Y</code>. <strong>No Tier 3 (5 frameworks):</strong> PSD2, FATF, Visa/MC, CNMV/BdE son overkill para un IMR.
   </div>
 
   <h3>Dataset de entrenamiento (P1 · ULB)</h3>
@@ -759,6 +787,11 @@ Modelo guardado en model.pkl (0.3 MB)</div>
       <div>creditcard.csv</div>
       <div><code>gitignored</code></div>
     </div>
+  </div>
+
+  <div class="callout warn" style="margin-top:20px;">
+    <span class="clbl">Limitación ULB ↔ RAG</span>
+    ULB usa features PCA anonimizadas (V1-V28). El RAG traduce solo features interpretables (<code>high_amount</code>, <code>odd_hour</code>, <code>online_electronics</code>, <code>country_mismatch</code>). Si se conecta ULB al RAG, la query será <code>"con V14, V17, V12"</code> y no recuperará nada útil. <strong>Decisión documentada en P2.6:</strong> o ULB es solo demo de métricas y no se conecta a P3, o se migra a IEEE-CIS con features interpretables.
   </div>
 </div>
 
@@ -828,7 +861,7 @@ __all__ = [<span style="color:#c0390b;">"explain"</span>]</div>
     <div class="tbl-row c3">
       <div class="tbl-tech">1. Query building</div>
       <div>Predicción → query en español natural</div>
-      <div><code>_build_query()</code> con risk_factors traducidos</div>
+      <div><code>_build_query()</code> con risk_factors traducidos <em>(P2.6: añadir features numéricas)</em></div>
     </div>
     <div class="tbl-row c3">
       <div class="tbl-tech">2. Embedding</div>
@@ -843,12 +876,12 @@ __all__ = [<span style="color:#c0390b;">"explain"</span>]</div>
     <div class="tbl-row c3">
       <div class="tbl-tech">4. Reranker</div>
       <div>Top-20 → top-3 por score</div>
-      <div><code>mmarco-mMiniLMv2-L12-H384-v1</code> + sigmoide</div>
+      <div><code>mmarco-mMiniLMv2-L12-H384-v1</code> + sigmoide <em>(P2.4: migrar a bge)</em></div>
     </div>
     <div class="tbl-row c3">
       <div class="tbl-tech">5. Threshold</div>
       <div>Filtrar scores &lt; 0.25</div>
-      <div>Abstención si nada pasa</div>
+      <div>Abstención si nada pasa <em>(P2.4: calibrar a 0.5 con 10-20 queries de P5.1 parcial)</em></div>
     </div>
     <div class="tbl-row c3">
       <div class="tbl-tech">6. Síntesis</div>
@@ -859,7 +892,7 @@ __all__ = [<span style="color:#c0390b;">"explain"</span>]</div>
 
   <div class="callout warn">
     <span class="clbl">Limitación conocida (12 chunks)</span>
-    Con solo 12 chunks, el reranker a veces cita chunks no relevantes: para <code>fraude_confirmado</code> (2400€) cita <code>Caso 2024-0287</code> (falso positivo de bajo importe). No cita <code>§1.2</code> (bloqueo inmediato). <strong>Se resuelve en P2.1</strong> con 20-50 docs reales + cambiar reranker a <code>BAAI/bge-reranker-base</code>.
+    Con solo 12 chunks, el reranker a veces cita chunks no relevantes: para <code>fraude_confirmado</code> (2400€) cita <code>Caso 2024-0287</code> (falso positivo de bajo importe). No cita <code>§1.2</code> (bloqueo inmediato). <strong>Se resuelve en P2.1</strong> (Tier 1: ~50 chunks sintéticos) + cambiando reranker a <code>BAAI/bge-reranker-base</code> (P2.4).
   </div>
 </div>
 
@@ -902,25 +935,25 @@ __all__ = [<span style="color:#c0390b;">"explain"</span>]</div>
 
     <div class="rm-row">
       <div class="rm-n">P2</div>
-      <div class="rm-body"><b>RAG real</b> · chunking semántico + embeddings + Chroma + reranker. <em>Pendiente P2.1: docs reales + tuning reranker</em></div>
+      <div class="rm-body"><b>RAG real</b> · chunking semántico + embeddings + Chroma + reranker <em>(P2.2, P2.3, P2.5 hechas)</em>. <em>Ruta: P2.1 Tier 1 (~50 chunks sintéticos) → P2.6 fix query → P5.1 parcial (10-20 queries) → P2.4 calibración → gate P2</em></div>
       <div class="rm-status" style="color:var(--l5);font-weight:700;">⚠ Parcial</div>
     </div>
 
     <div class="rm-row">
       <div class="rm-n">P3</div>
-      <div class="rm-body"><b>LLM real</b> · Ollama local o API externa + prompt grounded</div>
+      <div class="rm-body"><b>LLM real</b> · Ollama local o API externa + prompt grounded. <em><strong>Para empezar:</strong> gate P2 cerrado (P2.1 Tier 1 + P2.6 + P2.4 con P5.1 parcial). <strong>Para cerrar con rigor:</strong> P5.1 completo (20-100 queries) en paralelo — sin P5.1 completo, P3 se cierra ad-hoc con 10 queries manuales.</em></div>
       <div class="rm-status">⏸ Pendiente</div>
     </div>
 
     <div class="rm-row">
       <div class="rm-n">P4</div>
-      <div class="rm-body"><b>Observabilidad</b> · Langfuse self-hosted + @observe() · 100% requests trazados</div>
+      <div class="rm-body"><b>Observabilidad</b> · Langfuse Cloud (gratis) o Docker mínimo + @observe() · 100% requests trazados. <em>Paralelizable desde hoy · 0.5-1 día</em></div>
       <div class="rm-status">⏸ Pendiente</div>
     </div>
 
     <div class="rm-row">
       <div class="rm-n">P5</div>
-      <div class="rm-body"><b>Evaluación</b> · RAGAS 4 métricas + 20-100 queries de prueba + baseline</div>
+      <div class="rm-body"><b>Evaluación</b> · RAGAS 4 métricas + 20-100 queries de prueba + baseline. <em>P5.1 parcial (10-20 queries) necesaria <strong>antes</strong> de P2.4 para calibrar threshold. P5.1 completo en paralelo con P3.</em></div>
       <div class="rm-status">⏸ Pendiente</div>
     </div>
   </div>
@@ -948,9 +981,10 @@ __all__ = [<span style="color:#c0390b;">"explain"</span>]</div>
   <h4>Lo que sí puede cambiar</h4>
   <ul>
     <li>La implementación interna de cada capa (ej: <code>rag/retriever.py</code> evolucionará en P3)</li>
-    <li>El contenido de <code>docs/</code> (20-50 docs reales en P2.1)</li>
+    <li>El contenido de <code>docs/</code> (Tier 1: ~50 chunks sintéticos; Tier 2 opcional: + PCI-DSS v4.0.1 real)</li>
     <li>El reranker (<code>mmarco</code> → <code>bge-reranker-base</code> en P2.4)</li>
     <li>El synthesizer (plantilla → LLM en P3)</li>
+    <li>La query de retrieval (<code>_build_query</code> ampliada con features numéricas en P2.6)</li>
   </ul>
 
   <div class="pq">
@@ -968,8 +1002,8 @@ __all__ = [<span style="color:#c0390b;">"explain"</span>]</div>
 
   <h4>Ramas git</h4>
   <ul>
-    <li><code>main</code> — estable, con tag <code>v0.3-p1</code></li>
-    <li><code>feature/pN-descripcion</code> — trabajo de cada peldaño</li>
+    <li><code>main</code> — estable, con tags <code>v0.3-p1</code>, <code>v0.4-p2-parcial</code></li>
+    <li><code>feature/pN-descripcion</code> — trabajo de cada peldaño (actual: <code>feature/p3-llm-real</code>)</li>
     <li><code>hotfix/descripcion</code> — bugs urgentes sobre main</li>
   </ul>
 </div>
@@ -984,15 +1018,26 @@ __all__ = [<span style="color:#c0390b;">"explain"</span>]</div>
     </div>
   </div>
 
+  <h3>v1.0 — IMR productivo-simple (consolidado)</h3>
+  <ul>
+    <li>📝 <strong>Objetivo clarificado</strong>: IMR productivo-simple, no sistema de producción. Funciona end-to-end con corpus suficiente, genera explicación generativa grounded con LLM, es medible con RAGAS.</li>
+    <li>📝 <strong>P2.1 desbloqueable en 2 niveles</strong>: Tier 1 (recomendado) = expandir corpus sintético a ~50 chunks coherentes (0.5-1 día, cero PDFs); Tier 2 opcional = + PCI-DSS v4.0.1 real (2-3 días, requiere <code>pdf_to_txt.py</code> + adaptar <code>SECTION_PATTERN</code>). No Tier 3 (5 frameworks): PSD2, FATF, Visa/MC, CNMV/BdE son overkill para un IMR.</li>
+    <li>✅ <strong>P2.6 nueva tarea</strong>: fix <code>_build_query</code> con features numéricas + documentar decisión ULB ↔ RAG. <strong>Va antes de P2.4</strong>, porque cambiar la query cambia los scores del reranker y la calibración previa queda obsoleta.</li>
+    <li>📝 <strong>P2.4 calibración con 10-20 queries de P5.1 parcial</strong>: no se puede calibrar threshold sin queries con ground_truth. P5.1 parcial (10-20 queries) debe existir antes de P2.4.</li>
+    <li>📝 <strong>P4 simplificada</strong>: Langfuse Cloud (gratis) o Docker mínimo (0.5-1 día), no self-hosted con 5 contenedores (3-5 días).</li>
+    <li>📝 <strong>P5.1 necesaria para cierre con rigor de P3</strong>: sin P5.1, P3 se cierra ad-hoc con 10 queries manuales; con P5.1, P3 se cierra midiendo faithfulness sobre queries reales. Ejecutable en paralelo con P3 (no lo bloquea para empezar, sí para cerrarlo).</li>
+    <li>📝 <strong>Ruta consolidada</strong>: P2.1 Tier 1 → P2.6 → P5.1 parcial → P2.4 → gate P2 → P3 + P4 mínimo → P5.2/P5.3. <strong>Total: ~6-8 días hasta P3 cerrado con rigor</strong> (antes 20-25 días con el framing de 5 frameworks + P2.4 sin calibración).</li>
+    <li>📝 Checklist actualizado: 19/31 tareas (61%). P2 pasa de 3/5 a 3/6 por P2.6.</li>
+  </ul>
+
   <h3>v0.4 — P2 completado (RAG real)</h3>
   <ul>
     <li>✅ P2.2: <code>rag/chunking.py</code> — chunking por sección (<code>§1.2</code>, <code>Caso 2024-0341</code>, <code>PCI-DSS §10.2</code>)</li>
     <li>✅ P2.3: <code>rag/indexing.py</code> — embeddings multilingües (<code>paraphrase-multilingual-MiniLM</code>) + Chroma persistente</li>
     <li>✅ P2.5: <code>rag/retriever.py</code> — retrieval semántico + cross-encoder <code>mmarco</code> + síntesis</li>
     <li>✅ Reorganización en módulo <code>rag/</code> (port/adapter). <code>main.py</code> no cambia.</li>
-    <li>⚠️ P2.1 pendiente: 20-50 documentos reales. P2.4 pendiente: reranker <code>bge-reranker-base</code></li>
-    <li>📝 <strong>Limitación conocida:</strong> con 12 chunks, el reranker <code>mmarco</code> a veces cita chunks no relevantes (Caso 2024-0287 para <code>fraude_confirmado</code>). Se resuelve con 20-50 docs en P2.1 y cambiando reranker a <code>BAAI/bge-reranker-base</code>.</li>
-    <li>📝 Checklist 19/30 tareas (63%)</li>
+    <li>⚠️ P2.1 pendiente: docs reales. P2.4 pendiente: reranker <code>bge-reranker-base</code></li>
+    <li>📝 <strong>Limitación conocida:</strong> con 12 chunks, el reranker <code>mmarco</code> a veces cita chunks no relevantes (Caso 2024-0287 para <code>fraude_confirmado</code>). Se resuelve con Tier 1 (~50 chunks sintéticos) en P2.1 y cambiando reranker a <code>BAAI/bge-reranker-base</code> en P2.4.</li>
   </ul>
 
   <h3>v0.3 — P1 completado (modelo real)</h3>
@@ -1001,15 +1046,8 @@ __all__ = [<span style="color:#c0390b;">"explain"</span>]</div>
     <li>✅ P1.2: XGBoost entrenado (ROC-AUC 0.9685, Recall 0.8367, F1 0.8079)</li>
     <li>✅ P1.3: <code>model.py</code> con loader lazy + <code>classify_ulb()</code> + <code>test_model.py</code></li>
     <li>✅ P1.4: Adapter IMR/ULB en <code>capa2_model.py</code> (detecta formato y delega)</li>
+    <li>✅ <code>odd_hour</code> incluye 22h (<code>hour &gt;= 22</code>); fuentes ordenadas por prioridad (<code>reglas_banco.txt</code> primero); contrato del consumidor con <code>grounding 1.0</code> y sources sin sección; output de ejemplo actualizado al output real.</li>
     <li>✅ Tag <code>v0.3-p1</code> · Checklist 16/30 tareas (53%)</li>
-  </ul>
-
-  <h3>v0.2 — Detalles menores cerrados</h3>
-  <ul>
-    <li>✅ <code>odd_hour</code> ahora incluye 22h (<code>hour >= 22</code>)</li>
-    <li>✅ Fuentes ordenadas por prioridad (<code>reglas_banco.txt</code> primero)</li>
-    <li>✅ Contrato del consumidor actualizado (grounding 1.0, sources sin sección)</li>
-    <li>✅ Output de ejemplo actualizado al output real</li>
   </ul>
 
   <h3>v0.1 — Fases A + B + C completadas</h3>
@@ -1022,8 +1060,8 @@ __all__ = [<span style="color:#c0390b;">"explain"</span>]</div>
   </ul>
 
   <div class="callout ok">
-    <span class="clbl">✓ P2 cerrado (parcial)</span>
-    P2.2 + P2.3 + P2.5 completados: el pipeline RAG funciona end-to-end con embeddings, Chroma y reranker. Los contratos se cumplen. Las 3 reglas se cumplen. Pendiente P2.1 (20-50 docs reales) y P2.4 (reranker bge). El siguiente paso es P3 (LLM real) o completar P2.1 primero.
+    <span class="clbl">✓ Estado real: P2 con 3/6 · ruta a P3 cerrada con rigor (6-8 días con Tier 1)</span>
+    P2.2 + P2.3 + P2.5 completadas. P2.1 desbloqueable en 2 niveles: Tier 1 (sintético, ~50 chunks, 0.5-1 día) recomendado; Tier 2 (PCI-DSS v4.0.1 real) opcional. P2.6 (fix query) va antes de P2.4 (calibrar threshold), que a su vez necesita 10-20 queries de P5.1 parcial. P4 simplificada a Langfuse Cloud o Docker mínimo. <strong>Ruta de 6-8 días hasta P3 cerrado con rigor:</strong> P2.1 Tier 1 → P2.6 → P5.1 parcial → P2.4 → gate P2 → P3 + P4 mínimo en paralelo → P5.2/P5.3.
   </div>
 </div>
 
@@ -1031,7 +1069,7 @@ __all__ = [<span style="color:#c0390b;">"explain"</span>]</div>
 </div>
 
 <footer>
-  FraudeSSEP · README · v0.4 · Implementación mínima del patrón SSEP
+  FraudeSSEP · README · v1.0 · Implementación mínima del patrón SSEP
   <div class="ft-dots">
     <div class="ft-dot" style="background:var(--l1)"></div>
     <div class="ft-dot" style="background:var(--l2)"></div>

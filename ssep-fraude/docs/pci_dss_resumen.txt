@@ -1,0 +1,945 @@
+Requirement 10: Log and Monitor All Access to System Components and Cardholder Data 
+
+Sections 
+
+10.1 Processes and mechanisms for logging and monitoring all access to system components and cardholder data are defined and 
+understood.  
+
+10.2 Audit logs are implemented to support the detection of anomalies and suspicious activity, and the forensic analysis of events. 
+10.3 Audit logs are protected from destruction and unauthorized modifications. 
+10.4 Audit logs are reviewed to identify anomalies or suspicious activity. 
+10.5 Audit log history is retained and available for analysis. 
+10.6 Time-synchronization mechanisms support consistent time settings across all systems. 
+10.7 Failures of critical security control systems are detected, reported, and responded to promptly. 
+
+Overview 
+
+Logging mechanisms and the ability to track user activities are critical in preventing, detecting, or minimizing the impact of a data compromise. 
+The presence of logs on all system components and in the cardholder data environment (CDE) allows thorough tracking, alerting, and analysis 
+when something does go wrong. Determining the cause of a compromise is difficult, if not impossible, without system activity logs. 
+This requirement applies to user activities, including those by employees, contractors, consultants, and internal and external vendors, and other 
+third parties (for example, those providing support or maintenance services).  
+These requirements do not apply to user activity of consumers (cardholders). 
+Refer to Appendix G for definitions of PCI DSS terms. 
+
+ 
+
+  
+
+ 
+
+
+
+ 
+
+ 
+
+Requirements and Testing Procedures Guidance 
+
+10.1 Processes and mechanisms for logging and monitoring all access to system components and cardholder data are defined and 
+understood. 
+
+Defined Approach Requirements Defined Approach Testing Procedures Purpose 
+Requirement 10.1.1 is about effectively managing 
+
+10.1.1 All security policies and operational 10.1.1 Examine documentation and interview and maintaining the various policies and 
+procedures that are identified in Requirement 10 personnel to verify that security policies and procedures specified throughout Requirement 10. 
+are:  operational procedures identified in Requirement While it is important to define the specific policies 
+• Documented. 10 are managed in accordance with all elements or procedures called out in Requirement 10, it is 
+
+specified in this requirement. 
+• Kept up to date.  equally important to ensure they are properly 
+• In use. documented, maintained, and disseminated.  
+
+• Known to all affected parties. Good Practice 
+It is important to update policies and procedures 
+as needed to address changes in processes, 
+technologies, and business objectives. For this 
+
+Customized Approach Objective reason, consider updating these documents as 
+soon as possible after a change occurs and not 
+
+Expectations, controls, and oversight for meeting only on a periodic cycle.  
+activities within Requirement 10 are defined and Definitions 
+adhered to by affected personnel. All supporting Security policies define the entity’s security 
+activities are repeatable, consistently applied, and objectives and principles. Operational procedures 
+conform to management’s intent. describe how to perform activities, and define the 
+
+controls, methods, and processes that are 
+followed to achieve the desired result in a 
+consistent manner and in accordance with policy 
+objectives.  
+
+ 
+
+
+
+ 
+
+ 
+
+Requirements and Testing Procedures Guidance 
+
+Defined Approach Requirements Defined Approach Testing Procedures Purpose 
+If roles and responsibilities are not formally 
+
+10.1.2 Roles and responsibilities for performing 10.1.2.a Examine documentation to verify that assigned, personnel may not be aware of their 
+activities in Requirement 10 are documented, descriptions of roles and responsibilities for day-to-day responsibilities and critical activities 
+assigned, and understood. performing activities in Requirement 10 are may not occur.  
+
+documented and assigned. Good Practice 
+10.1.2.b Interview personnel with responsibility for Roles and responsibilities may be documented 
+performing activities in Requirement 10 to verify within policies and procedures or maintained 
+
+Customized Approach Objective that roles and responsibilities are assigned as within separate documents.  
+defined and are understood. As part of communicating roles and 
+
+Day-to-day responsibilities for performing all the responsibilities, entities can consider having 
+activities in Requirement 10 are allocated. personnel acknowledge their acceptance and 
+Personnel are accountable for successful, understanding of their assigned roles and 
+continuous operation of these requirements. responsibilities. 
+
+Examples 
+A method to document roles and responsibilities 
+is a responsibility assignment matrix that includes 
+who is responsible, accountable, consulted, and 
+informed (also called a RACI matrix). 
+
+ 
+
+
+
+ 
+
+ 
+
+Requirements and Testing Procedures Guidance 
+
+10.2 Audit logs are implemented to support the detection of anomalies and suspicious activity, and the forensic analysis of events. 
+
+Defined Approach Requirements Defined Approach Testing Procedures Purpose 
+Audit logs must exist for all system components. 
+
+10.2.1 Audit logs are enabled and active for all 10.2.1 Interview the system administrator and Audit logs send alerts the system administrator, 
+system components and cardholder data. examine system configurations to verify that audit provides data to other monitoring mechanisms, 
+
+logs are enabled and active for all system such as intrusion-detection systems (IDS) and 
+components. security information and event monitoring 
+
+systems (SIEM) tools, and provide a history trail 
+Customized Approach Objective for post-incident investigation.  
+
+Logging and analyzing security-relevant events 
+Records of all activities affecting system enable an organization to identify and trace 
+components and cardholder data are captured. potentially malicious activities. 
+
+Good Practice  
+When an entity considers which information to 
+record in their logs, it is important to remember 
+that information stored in audit logs is sensitive 
+and should be protected per requirements in this 
+standard. Care should be taken to only store 
+essential information in the audit logs to minimize 
+risk. 
+
+Defined Approach Requirements Defined Approach Testing Procedures Purpose  
+It is critical to have a process or system that links 
+
+10.2.1.1 Audit logs capture all individual user 10.2.1.1 Examine audit log configurations and log user access to system components accessed. 
+access to cardholder data. data to verify that all individual user access to Malicious individuals could obtain knowledge of a 
+
+cardholder data is logged. user account with access to systems in the CDE, 
+Customized Approach Objective or they could create a new, unauthorized account 
+
+to access cardholder data.  
+Records of all individual user access to cardholder 
+data are captured. Good Practice 
+
+A record of all individual access to cardholder 
+data can identify which accounts may have been 
+compromised or misused. 
+
+ 
+
+
+
+ 
+
+ 
+
+Requirements and Testing Procedures Guidance 
+
+Defined Approach Requirements Defined Approach Testing Procedures Purpose 
+Accounts with increased access privileges, such 
+
+10.2.1.2 Audit logs capture all actions taken by any 10.2.1.2 Examine audit log configurations and log as the “administrator” or “root” account, have the 
+individual with administrative access, including any data to verify that all actions taken by any potential to significantly impact the security or 
+interactive use of application or system accounts. individual with administrative access, including any operational functionality of a system. Without a 
+
+interactive use of application or system accounts, log of the activities performed, an organization is 
+Customized Approach Objective are logged. cannot trace any issues resulting from an 
+
+administrative mistake or misuse of privilege back 
+Records of all actions performed by individuals with to the specific action and account. 
+elevated privileges are captured. Definitions 
+
+The functions or activities considered to be 
+administrative are beyond those performed by 
+regular users as part of routine business 
+functions. 
+Refer to Appendix G for the definition of 
+“administrative access.” 
+
+Defined Approach Requirements Defined Approach Testing Procedures Purpose  
+Malicious users often attempt to alter audit logs to 
+
+10.2.1.3 Audit logs capture all access to audit logs. 10.2.1.3 Examine audit log configurations and log hide their actions. A record of access allows an 
+data to verify that access to all audit logs is organization to trace any inconsistencies or 
+captured. potential tampering of the logs to an individual 
+
+Customized Approach Objective account. Having logs identify changes, additions, 
+and deletions to the audit logs can help retrace 
+
+Records of all access to audit logs are captured. steps made by unauthorized personnel. 
+ 
+ 
+ 
+
+Defined Approach Requirements Defined Approach Testing Procedures Purpose  
+Malicious individuals will often perform multiple 
+
+10.2.1.4 Audit logs capture all invalid logical access access attempts on targeted systems. Multiple 
+attempts. 
+
+ 
+
+
+
+ 
+
+ 
+
+Requirements and Testing Procedures Guidance 
+
+Customized Approach Objective 10.2.1.4 Examine audit log configurations and log invalid login attempts may be an indication of an 
+data to verify that invalid logical access attempts unauthorized user’s attempts to “brute force” or 
+
+Records of all invalid access attempts are captured. are captured. guess a password. 
+
+ 
+
+
+
+ 
+
+ 
+
+Requirements and Testing Procedures Guidance 
+
+Defined Approach Requirements Defined Approach Testing Procedures Purpose  
+Logging changes to authentication credentials 
+
+10.2.1.5 Audit logs capture all changes to 10.2.1.5 Examine audit log configurations and log (including elevation of privileges, additions, and 
+identification and authentication credentials data to verify that changes to identification and deletions of accounts with administrative access) 
+including, but not limited to: authentication credentials are captured in provides residual evidence of activities. 
+• Creation of new accounts. accordance with all elements specified in this 
+
+requirement.  Malicious users may attempt to manipulate 
+• Elevation of privileges. authentication credentials to bypass them or 
+• All changes, additions, or deletions to accounts impersonate a valid account. 
+
+with administrative access. 
+
+Customized Approach Objective 
+
+Records of all changes to identification and 
+authentication credentials are captured. 
+
+Defined Approach Requirements Defined Approach Testing Procedures Purpose  
+Turning off or pausing audit logs before 
+
+10.2.1.6 Audit logs capture the following:  10.2.1.6 Examine audit log configurations and log performing illicit activities is common practice for 
+• All initialization of new audit logs, and  data to verify that all elements specified in this malicious users who want to avoid detection. 
+
+requirement are captured. 
+• All starting, stopping, or pausing of the existing Initialization of audit logs could indicate that that a 
+
+audit logs. user disabled the log function to hide their 
+actions. 
+
+Customized Approach Objective 
+
+Records of all changes to audit log activity status 
+are captured. 
+
+ 
+
+
+
+ 
+
+ 
+
+Requirements and Testing Procedures Guidance 
+
+Defined Approach Requirements Defined Approach Testing Procedures Purpose  
+Malicious software, such as malware, often 
+
+10.2.1.7 Audit logs capture all creation and deletion 10.2.1.7 Examine audit log configurations and log creates or replaces system-level objects on the 
+of system-level objects. data to verify that creation and deletion of system target system to control a particular function or 
+
+level objects is captured. operation on that system. By logging when 
+Customized Approach Objective system-level objects are created or deleted, it will 
+
+be easier to determine whether such 
+Records of alterations that indicate a system has modifications were authorized. 
+been modified from its intended functionality are 
+captured. 
+
+Defined Approach Requirements Defined Approach Testing Procedures Purpose  
+By recording these details for the auditable events 
+
+10.2.2 Audit logs record the following details for 10.2.2 Interview personnel and examine audit log at 10.2.1.1 through 10.2.1.7, a potential 
+each auditable event: configurations and log data to verify that all compromise can be quickly identified, with 
+• User identification. elements specified in this requirement are included sufficient detail to facilitate following up on 
+• Type of event. in log entries for each auditable event (from suspicious activities. 
+
+10.2.1.1 through 10.2.1.7). 
+• Date and time. 
+• Success and failure indication. 
+• Origination of event. 
+• Identity or name of affected data, system 
+
+component, resource, or service (for example, 
+name and protocol). 
+
+Customized Approach Objective 
+
+Sufficient data to be able to identify successful and 
+failed attempts and who, what, when, where, and 
+how for each event listed in requirement 10.2.1 are 
+captured. 
+
+ 
+
+
+
+ 
+
+ 
+
+Requirements and Testing Procedures Guidance 
+
+10.3 Audit logs are protected from destruction and unauthorized modifications. 
+
+Defined Approach Requirements Defined Approach Testing Procedures Purpose  
+Audit log files contain sensitive information, and 
+
+10.3.1 Read access to audit logs files is limited to 10.3.1 Interview system administrators and read access to the log files must be limited only to 
+those with a job-related need. examine system configurations and privileges to those with a valid business need. This access 
+
+verify that only individuals with a job-related need includes audit log files on the originating systems 
+have read access to audit log files. as well as anywhere else they are stored. 
+
+Customized Approach Objective Good Practice 
+Stored activity records cannot be accessed by Adequate protection of the audit logs includes 
+unauthorized personnel. strong access control that limits access to logs 
+
+based on “need to know” only and the use of 
+physical or network segregation to make the logs 
+harder to find and modify. 
+
+ 
+
+
+
+ 
+
+ 
+
+Requirements and Testing Procedures Guidance 
+
+Defined Approach Requirements Defined Approach Testing Procedures Purpose  
+Often a malicious individual who has entered the 
+
+10.3.2 Audit log files are protected to prevent 10.3.2 Examine system configurations and network will try to edit the audit logs to hide their 
+modifications by individuals. privileges and interview system administrators to activity. Without adequate protection of audit logs, 
+
+verify that current audit log files are protected from their completeness, accuracy, and integrity 
+modifications by individuals via access control cannot be guaranteed, and the audit logs can be 
+
+Customized Approach Objective mechanisms, physical segregation, and/or network rendered useless as an investigation tool after a 
+segregation. compromise. Therefore, audit logs should be 
+
+Stored activity records cannot be modified by protected on the originating systems as well as 
+personnel.  anywhere else they are stored. 
+
+Good Practice 
+Entities should attempt to prevent logs from being 
+exposed in public-accessible locations. 
+
+Defined Approach Requirements Defined Approach Testing Procedures Purpose 
+Promptly backing up the logs to a centralized log 
+
+10.3.3 Audit log files, including those for external- 10.3.3 Examine backup configurations or log files server or media that is difficult to alter keeps the 
+facing technologies, are promptly backed up to a to verify that current audit log files, including those logs protected, even if the system generating the 
+secure, central, internal log server(s) or other media for external-facing technologies, are promptly logs becomes compromised.  
+that is difficult to modify. backed up to a secure, central, internal log 
+
+server(s) or other media that is difficult to modify. Writing logs from external-facing technologies 
+such as wireless, network security controls, DNS, 
+
+Customized Approach Objective and mail servers, reduces the risk of those logs 
+being lost or altered. 
+
+Stored activity records are secured and preserved in 
+a central location to prevent unauthorized Good Practice 
+modification. Each entity determines the best way to back up 
+
+log files, whether via one or more centralized log 
+servers or other secure media. Logs may be 
+written directly, offloaded, or copied from external 
+systems to the secure internal system or media. 
+
+ 
+
+
+
+ 
+
+ 
+
+Requirements and Testing Procedures Guidance 
+
+Defined Approach Requirements Defined Approach Testing Procedures Purpose 
+File integrity monitoring or change-detection 
+
+10.3.4 File integrity monitoring or change-detection 10.3.4 Examine system settings, monitored files, systems check for changes to critical files and 
+mechanisms is used on audit logs to ensure that and results from monitoring activities to verify the notify when such changes are identified. For file 
+existing log data cannot be changed without use of file integrity monitoring or change-detection integrity monitoring purposes, an entity usually 
+generating alerts. software on audit logs. monitors files that do not regularly change, but 
+
+when changed, indicate a possible compromise.  
+Customized Approach Objective Good Practice 
+Stored activity records cannot be modified without Software used to monitor changes to audit logs 
+an alert being generated. should be configured to provide alerts when 
+
+existing log data or files are changed or deleted. 
+However, new log data being added to an audit 
+log should not generate an alert. 
+
+ 
+
+
+
+ 
+
+ 
+
+Requirements and Testing Procedures Guidance 
+
+10.4 Audit logs are reviewed to identify anomalies or suspicious activity. 
+
+Defined Approach Requirements Defined Approach Testing Procedures Purpose 
+Many breaches occur months before being detected. 
+
+10.4.1 The following audit logs are reviewed at least 10.4.1.a Examine security policies and procedures to Regular log reviews mean incidents can be quickly 
+once daily: verify that processes are defined for reviewing all identified and proactively addressed.  
+• All security events.  elements specified in this requirement at least once 
+
+daily. Good Practice 
+• Logs of all system components that store, process, Checking logs daily (7 days a week, 365 days a 
+
+or transmit CHD and/or SAD. 
+10.4.1.b Observe processes and interview year, including holidays) minimizes the amount of 
+
+• Logs of all critical system components. personnel to verify that all elements specified in time and exposure of a potential breach. Log 
+• Logs of all servers and system components that this requirement are reviewed at least once daily harvesting, parsing, and alerting tools, centralized 
+
+perform security functions (for example, network log management systems, event log analyzers, and 
+security controls, intrusion-detection security information and event management (SIEM) 
+systems/intrusion-prevention systems (IDS/IPS), solutions are examples of automated tools that can 
+authentication servers). be used to meet this requirement. 
+
+Daily review of security events—for example, 
+notifications or alerts that identify suspicious or 
+
+Customized Approach Objective anomalous activities—as well as logs from critical 
+system components, and logs from systems that 
+
+Potentially suspicious or anomalous activities are perform security functions, such as firewalls, 
+quickly identified to minimize impact. IDS/IPS, file integrity monitoring (FIM) systems, etc., 
+
+is necessary to identify potential issues.  
+The determination of “security event” will vary for 
+each organization and may include consideration for 
+the type of technology, location, and function of the 
+device. Organizations may also wish to maintain a 
+baseline of “normal” traffic to help identify anomalous 
+behavior.  
+An entity that uses third-party service providers to 
+perform log review services is responsible to provide 
+context about the entity’s environment to the service 
+providers, so it understands the entity’s environment, 
+has a baseline of “normal” traffic for the entity, and 
+can detect potential security issues and provide 
+accurate exceptions and anomaly notifications. 
+
+ 
+
+
+
+ 
+
+ 
+
+Requirements and Testing Procedures Guidance 
+
+Defined Approach Requirements Defined Approach Testing Procedures Purpose 
+Manual log reviews are difficult to perform, even 
+
+10.4.1.1 Automated mechanisms are used to 10.4.1.1 Examine log review mechanisms and for one or two systems, due to the amount of log 
+perform audit log reviews. interview personnel to verify that automated data that is generated. However, using log 
+
+mechanisms are used to perform log reviews. harvesting, parsing, and alerting tools, centralized 
+Customized Approach Objective log management systems, event log analyzers, 
+
+and security information and event management 
+Potentially suspicious or anomalous activities are (SIEM) solutions can help facilitate the process by 
+identified via a repeatable and consistent identifying log events that need to be reviewed.  
+mechanism. Good Practice 
+Applicability Notes Establishing a baseline of normal audit activity 
+
+patterns is critical to the effectiveness of an 
+This requirement is a best practice until 31 March automated log review mechanism. The analysis of 
+2025, after which it will be required and must be new audit activity against the established baseline 
+fully considered during a PCI DSS assessment. can significantly improve the identification of 
+
+suspicious or anomalous activities. 
+The entity should keep logging tools aligned with 
+any changes in their environment by periodically 
+reviewing tool settings and updating settings to 
+reflect any changes. 
+Further Information 
+Refer to the Information Supplement: Effective 
+Daily Log Monitoring for additional guidance. 
+
+ 
+
+
+
+ 
+
+ 
+
+Requirements and Testing Procedures Guidance 
+
+Defined Approach Requirements Defined Approach Testing Procedures Purpose 
+Periodic review of logs for all other system 
+
+10.4.2 Logs of all other system components (those 10.4.2.a Examine security policies and procedures components (not specified in Requirement 10.4.1) 
+not specified in Requirement 10.4.1) are reviewed to verify that processes are defined for reviewing helps to identify indications of potential issues or 
+periodically. logs of all other system components periodically. attempts to access critical systems via less-critical 
+
+systems.  
+10.4.2.b Examine documented results of log 
+reviews and interview personnel to verify that log 
+
+Customized Approach Objective reviews are performed periodically. 
+
+Potentially suspicious or anomalous activities for 
+other system components (not included in 10.4.1) 
+are reviewed in accordance with the entity’s 
+identified risk. 
+
+Applicability Notes 
+
+This requirement is applicable to all other in-scope 
+system components not included in Requirement 
+10.4.1. 
+
+ 
+
+
+
+ 
+
+ 
+
+Requirements and Testing Procedures Guidance 
+
+Defined Approach Requirements Defined Approach Testing Procedures Purpose 
+Entities can determine the optimum period to 
+
+10.4.2.1 The frequency of periodic log reviews for 10.4.2.1.a Examine the entity’s targeted risk review these logs based on criteria such as the 
+all other system components (not defined in analysis for the frequency of periodic log reviews complexity of each entity’s environment, the 
+Requirement 10.4.1) is defined in the entity’s for all other system components (not defined in number of types of systems that are required to 
+targeted risk analysis, which is performed Requirement 10.4.1) to verify the risk analysis was be evaluated, and the functions of such systems. 
+according to all elements specified in Requirement performed in accordance with all elements 
+12.3.1 specified at Requirement 12.3.1. 
+
+10.4.2.1.b Examine documented results of periodic 
+log reviews of all other system components (not 
+
+Customized Approach Objective defined in Requirement 10.4.1) and interview 
+personnel to verify log reviews are performed at 
+
+Log reviews for lower-risk system components are the frequency specified in the entity’s targeted risk 
+performed at a frequency that addresses the entity’s analysis performed for this requirement. 
+risk. 
+
+Applicability Notes 
+
+This requirement is a best practice until 31 March 
+2025, after which it will be required and must be 
+fully considered during a PCI DSS assessment. 
+
+ 
+
+
+
+ 
+
+ 
+
+Requirements and Testing Procedures Guidance 
+
+Defined Approach Requirements Defined Approach Testing Procedures Purpose 
+If exceptions and anomalies identified during the 
+
+10.4.3 Exceptions and anomalies identified during 10.4.3.a Examine security policies and procedures log-review process are not investigated, the entity 
+the review process are addressed. to verify that processes are defined for addressing may be unaware of unauthorized and potentially 
+
+exceptions and anomalies identified during the malicious activities occurring within their network.  
+review process. Good Practice 
+10.4.3.b Observe processes and interview Entities should consider how to address the 
+personnel to verify that, when exceptions and following when developing their processes for 
+
+Customized Approach Objective anomalies are identified, they are addressed. defining and managing exceptions and 
+anomalies:  
+
+Suspicious or anomalous activities are addressed. • How log review activities are recorded,  
+• How to rank and prioritize exceptions and 
+
+anomalies,  
+• What procedures should be in place to report 
+
+and escalate exceptions and anomalies, and  
+• Who is responsible for investigating and for 
+
+any remediation tasks. 
+
+ 
+
+
+
+ 
+
+ 
+
+Requirements and Testing Procedures Guidance 
+
+10.5 Audit log history is retained and available for analysis. 
+
+Defined Approach Requirements Defined Approach Testing Procedures Purpose 
+Retaining historical audit logs for at least 12 
+
+10.5.1 Retain audit log history for at least 12 10.5.1.a Examine documentation to verify that the months is necessary because compromises often 
+months, with at least the most recent three months following is defined: go unnoticed for significant lengths of time. 
+immediately available for analysis. • Audit log retention policies.  Having centrally stored log history allows 
+
+• Procedures for retaining audit log history for at investigators to better determine the length of 
+least 12 months, with at least the most recent time a potential breach was occurring, and the 
+three months immediately available online. possible system(s) impacted. By having three 
+
+months of logs immediately available, an entity 
+10.5.1.b Examine configurations of audit log can quickly identify and minimize impact of a data 
+history, interview personnel and examine audit logs breach.  
+to verify that audit logs history is retained for at Examples 
+least 12 months. Methods that allow logs to be immediately 
+
+available include storing logs online, archiving 
+10.5.1.c Interview personnel and observe logs, or restoring logs quickly from backups. 
+processes to verify that at least the most recent 
+
+Customized Approach Objective three months’ audit log history is immediately 
+available for analysis. 
+
+Historical records of activity are available 
+immediately to support incident response and are 
+retained for at least 12 months. 
+
+ 
+
+
+
+ 
+
+ 
+
+Requirements and Testing Procedures Guidance 
+
+10.6 Time-synchronization mechanisms support consistent time settings across all systems. 
+
+Defined Approach Requirements Defined Approach Testing Procedures Purpose 
+Time synchronization technology is used to 
+
+10.6.1 System clocks and time are synchronized 10.6.1 Examine system configuration settings to synchronize clocks on multiple systems. When 
+using time-synchronization technology. verify that time-synchronization technology is clocks are not properly synchronized, it can be 
+
+implemented and kept current. difficult, if not impossible, to compare log files 
+Customized Approach Objective from different systems and establish an exact 
+
+sequence of events, which is crucial for forensic 
+Common time is established across all systems. analysis following a breach.  
+
+For post-incident forensics teams, the accuracy 
+Applicability Notes and consistency of time across all systems and 
+
+the time of each activity are critical in determining 
+Keeping time-synchronization technology current how the systems were compromised.  
+includes managing vulnerabilities and patching the 
+technology according to PCI DSS Requirements Examples 
+6.3.1 and 6.3.3. Network Time Protocol (NTP) is one example of 
+
+time-synchronization technology. 
+
+ 
+
+
+
+ 
+
+ 
+
+Requirements and Testing Procedures Guidance 
+
+Defined Approach Requirements Defined Approach Testing Procedures Purpose 
+Using reputable time servers is a critical 
+
+10.6.2 Systems are configured to the correct and 10.6.2 Examine system configuration settings for component of the time synchronization process.  
+consistent time as follows: acquiring, distributing, and storing the correct time 
+
+Accepting time updates from specific, industry-
+• One or more designated time servers are in use. to verify the settings are configured in accordance 
+
+accepted external sources helps prevent a 
+• Only the designated central time server(s) with all elements specified in this requirement. 
+
+malicious individual from changing time settings 
+receives time from external sources. on systems.  
+
+• Time received from external sources is based on Good Practice 
+International Atomic Time or Coordinated Another option to prevent unauthorized use of 
+Universal Time (UTC). internal time servers is to encrypt updates with a 
+
+• The designated time server(s) accept time symmetric key and create access control lists that 
+updates only from specific industry-accepted specify the IP addresses of client machines that 
+external sources. will be provided with the time updates. 
+
+• Where there is more than one designated time 
+server, the time servers peer with one another to 
+keep accurate time. 
+
+• Internal systems receive time information only 
+from designated central time server(s). 
+
+Customized Approach Objective 
+
+The time on all systems is accurate and consistent. 
+
+ 
+
+
+
+ 
+
+ 
+
+Requirements and Testing Procedures Guidance 
+
+Defined Approach Requirements Defined Approach Testing Procedures Purpose 
+Attackers will try to change time configurations to 
+
+10.6.3 Time synchronization settings and data are 10.6.3.a Examine system configurations and time- hide their activity. Therefore, restricting the ability 
+protected as follows:  synchronization settings to verify that access to to change or modify time synchronization 
+• Access to time data is restricted to only time data is restricted to only personnel with a configurations or the system time to 
+
+personnel with a business need. business need. administrators will lessen the probability of an 
+• Any changes to time settings on critical systems attacker successfully changing time 
+
+are logged, monitored, and reviewed. 10.6.3.b Examine system configurations and time configurations. 
+synchronization settings and logs and observe 
+processes to verify that any changes to time 
+
+Customized Approach Objective settings on critical systems are logged, monitored, 
+and reviewed. 
+
+System time settings cannot be modified by 
+unauthorized personnel. 
+
+ 
+
+
+
+ 
+
+ 
+
+Requirements and Testing Procedures Guidance 
+
+10.7 Failures of critical security control systems are detected, reported, and responded to promptly. 
+
+Defined Approach Requirements Defined Approach Testing Procedures Purpose 
+Without formal processes to detect and alert 
+
+10.7.1 Additional requirement for service 10.7.1.a Additional testing procedure for when critical security controls fail, failures may go 
+providers only: Failures of critical security control service provider assessments only: Examine undetected for extended periods and provide 
+systems are detected, alerted, and addressed documentation to verify that processes are defined attackers ample time to compromise system 
+promptly, including but not limited to failure of the for the prompt detection and addressing of failures components and steal account data from the 
+following critical security control systems: of critical security control systems, including but CDE.  
+• Network security controls. not limited to failure of all elements specified in this 
+
+requirement. Good Practice 
+• IDS/IPS. The specific types of failures may vary, depending 
+• FIM. 10.7.1.b Additional testing procedure for on the function of the device system component 
+• Anti-malware solutions. service provider assessments only: Observe and technology in use. Typical failures include a 
+
+system ceasing to perform its security function or 
+• Physical access controls. detection and alerting processes and interview 
+
+personnel to verify that failures of critical security not functioning in its intended manner, such as a 
+• Logical access controls. control systems are detected and reported, and firewall erasing all its rules or going offline. 
+• Audit logging mechanisms. that failure of a critical security control results in the 
+• Segmentation controls (if used). generation of an alert. 
+
+Customized Approach Objective 
+
+Failures in critical security control systems are 
+promptly identified and addressed. 
+
+Applicability Notes 
+
+This requirement applies only when the entity being 
+assessed is a service provider. 
+This requirement will be superseded by 
+Requirement 10.7.2 as of 31 March 2025. 
+
+ 
+
+
+
+ 
+
+ 
+
+Requirements and Testing Procedures Guidance 
+
+Defined Approach Requirements Defined Approach Testing Procedures Purpose 
+Without formal processes to detect and alert 
+
+10.7.2 Failures of critical security control systems 10.7.2.a Examine documentation to verify that when critical security controls fail, failures may go 
+are detected, alerted, and addressed promptly, processes are defined for the prompt detection and undetected for extended periods and provide 
+including but not limited to failure of the following addressing of failures of critical security control attackers ample time to compromise system 
+critical security control systems: systems, including but not limited to failure of all components and steal account data from the 
+• Network security controls. elements specified in this requirement. CDE. 
+• IDS/IPS. 10.7.2.b Observe detection and alerting processes Good Practice 
+• Change-detection mechanisms. and interview personnel to verify that failures of The specific types of failures may vary, depending 
+• Anti-malware solutions. critical security control systems are detected and on the function of the device system component 
+• Physical access controls. reported, and that failure of a critical security and technology in use. However, typical failures 
+
+include a system no longer performing its security 
+• Logical access controls. control results in the generation of an alert. 
+
+function or not functioning in its intended 
+• Audit logging mechanisms. manner—for example, a firewall erasing its rules 
+• Segmentation controls (if used). or going offline. 
+• Audit log review mechanisms. 
+• Automated security testing tools (if used). 
+
+Customized Approach Objective 
+
+Failures in critical security control systems are 
+promptly identified and addressed. 
+
+Applicability Notes 
+
+This requirement applies to all entities, including 
+service providers, and will supersede Requirement 
+10.7.1 as of 31 March 2025. It includes two 
+additional critical security control systems not in 
+Requirement 10.7.1.  
+This requirement is a best practice until 31 March 
+2025, after which it will be required and must be 
+fully considered during a PCI DSS assessment. 
+
+ 
+
+
+
+ 
+
+ 
+
+Requirements and Testing Procedures Guidance 
+
+Defined Approach Requirements Defined Approach Testing Procedures Purpose 
+If alerts from failures of critical security control 
+
+10.7.3 Failures of any critical security control 10.7.3.a Examine documentation and interview systems are not responded to quickly and 
+systems are responded to promptly, including but personnel to verify that processes are defined and effectively, attackers may use this time to insert 
+not limited to:  implemented to respond to a failure of any critical malicious software, gain control of a system, or 
+• Restoring security functions.  security control system and include at least all steal data from the entity’s environment.  
+• Identifying and documenting the duration (date elements specified in this requirement. 
+
+Good Practice 
+and time from start to end) of the security failure.  10.7.3.b Examine records to verify that failures of Documented evidence (for example, records 
+
+• Identifying and documenting the cause(s) of critical security control systems are documented to within a problem management system) should 
+failure and documenting required remediation.  include:  provide support that processes and procedures 
+
+• Identifying and addressing any security issues • Identification of cause(s) of the failure.  are in place to respond to security failures. In 
+that arose during the failure.  addition, personnel should be aware of their 
+
+• Duration (date and time start and end) of the 
+• Determining whether further actions are required responsibilities in the event of a failure. Actions 
+
+security failure. 
+as a result of the security failure.  and responses to the failure should be captured in 
+
+• Details of the remediation required to address the documented evidence. 
+• Implementing controls to prevent the cause of the root cause. 
+
+failure from reoccurring.  
+• Resuming monitoring of security controls. 
+
+Customized Approach Objective 
+
+Failures of critical security control systems are 
+analyzed, contained, and resolved, and security 
+controls restored to minimize impact. Resulting 
+security issues are addressed, and measures taken 
+to prevent reoccurrence. 
+ 
+(continued on next page) 
+
+ 
+
+
+
+ 
+
+ 
+
+Requirements and Testing Procedures Guidance 
+
+Applicability Notes 
+
+This requirement applies only when the entity being 
+assessed is a service provider until 31 March 2025, 
+after which this requirement will apply to all entities. 
+This is a current v3.2.1 requirement that applies to 
+service providers only. However, this requirement is 
+a best practice for all other entities until 31 March 
+2025, after which it will be required and must be 
+fully considered during a PCI DSS assessment.

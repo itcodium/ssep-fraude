@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SSEP — Git Workflow</title>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,300;1,6..72,400&family=Geist:wght@300;400;500;600;700;800;900&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff; --ink:#0c0c0b; --ink2:#2d2d2b; --ink3:#787870;
+  --rule:#e4e4de; --rule2:#f5f5ef;
+  --l1:#c0390b; --l1-l:#fdeee9;
+  --l2:#1a5c3a; --l2-l:#e4f5ec;
+  --l3:#1c6ea4; --l3-l:#eef2fb;
+  --l4:#7b2d8b; --l4-l:#f5eaf9;
+  --l5:#b45309; --l5-l:#fef3e2;
+  --sec:#0a2540; --sec-l:#e8eef5;
+  --warn:#c0392b; --warn-l:#fdf0ee;
+  --ok:#1a5c3a; --ok-l:#e4f5ec;
+  --mono:'Geist Mono',monospace;
+  --head:'Geist',sans-serif;
+  --body:'Newsreader',Georgia,serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--body);background:var(--bg);color:var(--ink);line-height:1.7;font-size:17px;}
+
+nav{background:var(--ink);position:sticky;top:0;z-index:200;}
+.nav-in{max-width:1180px;margin:0 auto;display:flex;align-items:center;padding:10px 28px;gap:4px;flex-wrap:wrap;}
+.nav-logo{font-family:var(--head);font-size:13px;font-weight:800;color:white;margin-right:14px;letter-spacing:-.3px;text-decoration:none;}
+.nav-a{font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.38);text-decoration:none;padding:4px 9px;border-radius:3px;transition:all .12s;white-space:nowrap;}
+.nav-a:hover{background:rgba(255,255,255,.1);color:white;}
+.nav-a.current{background:rgba(255,255,255,.12);color:white;}
+
+.hero{background:var(--ink);color:white;position:relative;overflow:hidden;}
+.hero-stripe{height:5px;background:linear-gradient(90deg,var(--l1) 0 16.6%,var(--l2) 16.6% 33.3%,var(--l3) 33.3% 50%,var(--l4) 50% 66.6%,var(--l5) 66.6% 83.3%,var(--sec) 83.3% 100%);}
+.hero-in{max-width:1180px;margin:0 auto;padding:60px 28px 50px;}
+.hero-eye{font-family:var(--mono);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.28);margin-bottom:18px;}
+.hero h1{font-family:var(--head);font-size:clamp(32px,4.6vw,52px);font-weight:900;line-height:.95;letter-spacing:-1.5px;margin-bottom:18px;}
+.hero h1 .accent{color:#5ba3ff;}
+.hero-desc{font-family:var(--body);font-size:17px;font-style:italic;font-weight:300;color:rgba(255,255,255,.55);max-width:680px;line-height:1.6;}
+
+.layout{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:220px 1fr;}
+@media(max-width:900px){.layout{grid-template-columns:1fr;}}
+.sidebar{border-right:1px solid var(--rule);padding:28px 14px;position:sticky;top:48px;height:calc(100vh - 48px);overflow-y:auto;}
+@media(max-width:900px){.sidebar{display:none;}}
+.sb-hdr{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin-bottom:8px;padding-left:8px;margin-top:18px;}
+.sb-hdr:first-child{margin-top:0;}
+.sb-a{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:5px;font-family:var(--head);font-size:12px;font-weight:500;text-decoration:none;color:var(--ink2);}
+.sb-a:hover{background:var(--rule2);}
+.sb-a .num{font-family:var(--mono);font-size:10px;color:var(--ink3);width:18px;flex-shrink:0;}
+
+.content{padding:0 0 80px;min-width:0;}
+.chapter{padding:0 44px;}
+@media(max-width:680px){.chapter{padding:0 20px;}}
+.ch-hdr{padding:48px 0 22px;border-bottom:2px solid var(--ink);margin-bottom:28px;display:flex;align-items:flex-end;gap:16px;}
+.ch-n{font-family:var(--head);font-size:60px;font-weight:900;line-height:1;color:var(--rule);letter-spacing:-3px;flex-shrink:0;}
+.ch-title{font-family:var(--head);font-size:24px;font-weight:800;letter-spacing:-.5px;line-height:1.0;}
+.ch-sub{font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:1.5px;text-transform:uppercase;margin-top:5px;}
+
+h2{font-family:var(--head);font-size:18px;font-weight:800;letter-spacing:-.3px;margin:28px 0 12px;color:var(--ink);}
+h3{font-family:var(--head);font-size:14px;font-weight:700;margin:20px 0 8px;color:var(--ink);}
+p{margin-bottom:14px;color:var(--ink2);}
+p.lead{font-size:18px;color:var(--ink);font-weight:400;}
+
+pre{background:var(--ink);color:#e8e8e4;border-radius:8px;padding:16px 18px;overflow-x:auto;margin:12px 0 18px;font-family:var(--mono);font-size:12.5px;line-height:1.6;}
+pre code{background:none;padding:0;color:inherit;font-size:inherit;}
+code{font-family:var(--mono);font-size:13px;background:var(--rule2);padding:2px 6px;border-radius:3px;color:var(--l1);}
+
+table{width:100%;border-collapse:collapse;margin:14px 0 20px;font-family:var(--head);font-size:13px;border:1px solid var(--rule);border-radius:6px;overflow:hidden;}
+th{background:var(--rule2);text-align:left;padding:10px 12px;font-weight:700;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--ink3);border-bottom:2px solid var(--ink);}
+td{padding:10px 12px;border-bottom:1px solid var(--rule);color:var(--ink2);vertical-align:top;}
+tr:last-child td{border-bottom:none;}
+td code{font-size:12px;}
+
+.callout{border-left:4px solid;padding:14px 18px;margin:16px 0;border-radius:0 6px 6px 0;font-size:14.5px;line-height:1.6;}
+.callout strong{font-family:var(--head);font-weight:700;}
+.callout.tip{border-color:var(--l3);background:var(--l3-l);color:#0d3258;}
+.callout.warn{border-color:var(--warn);background:var(--warn-l);color:#7a2a22;}
+.callout.ok{border-color:var(--ok);background:var(--ok-l);color:#0e3d26;}
+.callout .lbl{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;font-weight:700;display:block;margin-bottom:4px;opacity:.75;}
+
+.branch-diagram{background:var(--ink);color:#c8c8c0;font-family:var(--mono);font-size:12px;line-height:1.7;padding:18px 22px;border-radius:8px;margin:14px 0 20px;white-space:pre;overflow-x:auto;}
+.branch-diagram .b-main{color:#7bcca0;}
+.branch-diagram .b-p1{color:#f0a860;}
+.branch-diagram .b-p2{color:#5ba3ff;}
+.branch-diagram .b-p3{color:#d4a4e8;}
+.branch-diagram .b-p4{color:#e8c060;}
+.branch-diagram .b-p5{color:#7bcca0;}
+.branch-diagram .b-cmt{color:#787870;}
+.branch-diagram .b-tag{color:#ffd060;}
+
+.commit{display:grid;grid-template-columns:56px 1fr;gap:14px;padding:12px 16px;border:1px solid var(--rule);border-radius:6px;margin-bottom:8px;background:white;}
+.commit:hover{background:var(--rule2);}
+.commit-ic{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:1px;padding:3px 0;text-align:center;color:white;border-radius:3px;align-self:start;}
+.commit-ic.feat{background:var(--l3);}
+.commit-ic.fix{background:var(--warn);}
+.commit-ic.docs{background:var(--l4);}
+.commit-ic.chore{background:var(--ink3);}
+.commit-ic.refactor{background:var(--l5);}
+.commit-ic.test{background:var(--l2);}
+.commit-ic.merge{background:var(--sec);}
+.commit-msg{font-family:var(--mono);font-size:13px;color:var(--ink);font-weight:500;margin-bottom:2px;}
+.commit-why{font-family:var(--body);font-size:13px;font-style:italic;color:var(--ink3);font-weight:300;}
+
+.bad{color:var(--warn);}
+.bad::before{content:'✕ ';font-weight:800;}
+.good{color:var(--ok);}
+.good::before{content:'✓ ';font-weight:800;}
+
+.receta{border:1px solid var(--rule);border-radius:8px;margin-bottom:16px;overflow:hidden;}
+.receta-hdr{background:var(--rule2);padding:12px 18px;border-bottom:1px solid var(--rule);font-family:var(--head);font-size:14px;font-weight:700;}
+.receta-hdr .badge{font-family:var(--mono);font-size:9px;letter-spacing:1px;text-transform:uppercase;padding:2px 8px;border-radius:10px;margin-left:8px;font-weight:600;}
+.receta-hdr .badge.done{background:var(--ok-l);color:var(--ok);}
+.receta-hdr .badge.next{background:var(--l3-l);color:var(--l3);}
+.receta-hdr .badge.pend{background:var(--rule);color:var(--ink3);}
+.receta-b{padding:14px 18px;}
+
+.mapa{display:grid;grid-template-columns:1fr;gap:8px;margin:16px 0;}
+.mapa-row{display:grid;grid-template-columns:100px 80px 1fr 80px;align-items:center;gap:12px;padding:10px 14px;border:1px solid var(--rule);border-radius:6px;font-family:var(--head);font-size:13px;}
+.mapa-row .stage{font-weight:700;}
+.mapa-row .tag{font-family:var(--mono);font-size:12px;color:var(--ink2);background:var(--rule2);padding:2px 8px;border-radius:3px;text-align:center;}
+.mapa-row .desc{font-family:var(--body);font-weight:300;color:var(--ink2);font-size:13.5px;}
+.mapa-row .status{font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;font-weight:700;text-align:center;padding:3px 0;border-radius:3px;}
+.mapa-row .status.done{background:var(--ok-l);color:var(--ok);}
+.mapa-row .status.wip{background:var(--l3-l);color:var(--l3);}
+.mapa-row .status.pend{background:var(--rule2);color:var(--ink3);}
+
+.checklist{list-style:none;padding:0;margin:10px 0 18px;}
+.checklist li{padding:8px 12px 8px 36px;position:relative;border-bottom:1px solid var(--rule);font-family:var(--head);font-size:13.5px;color:var(--ink2);}
+.checklist li:last-child{border-bottom:none;}
+.checklist li::before{content:'';position:absolute;left:12px;top:11px;width:14px;height:14px;border:2px solid var(--rule);border-radius:3px;}
+
+.trouble{border:1px solid var(--rule);border-radius:8px;margin-bottom:12px;overflow:hidden;}
+.trouble-q{background:var(--warn-l);padding:10px 16px;font-family:var(--mono);font-size:12px;color:var(--warn);font-weight:600;border-bottom:1px solid var(--rule);}
+.trouble-a{padding:12px 16px;}
+
+/* ---------- PROMPT ---------- */
+.prompt-wrap{position:relative;margin:18px 0 22px;}
+.prompt-bar{display:flex;align-items:center;justify-content:space-between;background:var(--sec);padding:10px 16px;border-radius:8px 8px 0 0;border-bottom:1px solid rgba(255,255,255,.1);}
+.prompt-bar-lbl{font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.55);}
+.prompt-bar-lbl strong{color:#7bcca0;font-weight:600;}
+.prompt-copy{font-family:var(--head);font-size:11.5px;font-weight:700;padding:6px 14px;border-radius:5px;border:1.5px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:white;cursor:pointer;transition:all .12s;letter-spacing:.2px;}
+.prompt-copy:hover{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.35);}
+.prompt-copy.done{background:#1a5c3a;border-color:#1a5c3a;}
+.prompt-block{background:var(--ink);color:#e8e8e4;font-family:var(--mono);font-size:12.5px;line-height:1.65;padding:20px 22px;border-radius:0 0 8px 8px;overflow-x:auto;white-space:pre;margin:0;}
+.prompt-block .k{color:#ffd060;}
+.prompt-block .h{color:#5ba3ff;font-weight:600;}
+.prompt-block .c{color:#787870;font-style:italic;}
+.prompt-block .r{color:#ff8a70;}
+
+.uso-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0 22px;}
+@media(max-width:780px){.uso-grid{grid-template-columns:1fr;}}
+.uso-card{border:1px solid var(--rule);border-radius:8px;padding:14px 16px;background:white;}
+.uso-card .tag{font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--l3);font-weight:700;margin-bottom:6px;display:block;}
+.uso-card .t{font-family:var(--head);font-size:13.5px;font-weight:700;margin-bottom:6px;color:var(--ink);}
+.uso-card .d{font-family:var(--body);font-size:13px;font-weight:300;color:var(--ink2);line-height:1.5;}
+
+footer{background:var(--ink);color:rgba(255,255,255,.28);padding:22px 28px;font-family:var(--mono);font-size:10px;text-align:center;}
+
+@media(max-width:680px){
+  .ch-n{font-size:40px;}
+  .ch-title{font-size:18px;}
+  .mapa-row{grid-template-columns:1fr;gap:6px;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-in">
+    <a class="nav-logo" href="index.html">SSEP</a>
+    <a class="nav-a" href="0-base.html">0 · Base</a>
+    <a class="nav-a" href="0.5-plan.html">0.5 · Plan</a>
+    <a class="nav-a" href="0.6-setup.html">0.6 · Setup</a>
+    <a class="nav-a" href="0.7-escalado.html">0.7 · Escalado</a>
+    <a class="nav-a" href="1-patron.html">1 · Patrón</a>
+    <a class="nav-a" href="2-implementacion.html">2 · Implementación</a>
+    <a class="nav-a" href="3-metalkube.html">3 · MetalKube</a>
+    <a class="nav-a current" href="git-workflow.html">Git</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-stripe"></div>
+  <div class="hero-in">
+    <div class="hero-eye">Git workflow</div>
+    <h1>Commits, ramas<br>y <span class="accent">tags que cuentan</span>.</h1>
+    <p class="hero-desc">Un gate superado = una rama mergeada + un tag. Si no hay commit que lo respalde, el gate no cuenta.</p>
+  </div>
+</div>
+
+<div class="layout">
+
+<div class="sidebar">
+  <div class="sb-hdr">Fundamentos</div>
+  <a class="sb-a" href="#ramas"><span class="num">1</span>Estructura de ramas</a>
+  <a class="sb-a" href="#commits"><span class="num">2</span>Convención de commits</a>
+  <a class="sb-a" href="#tags"><span class="num">3</span>Versionado (tags)</a>
+
+  <div class="sb-hdr">Operativa</div>
+  <a class="sb-a" href="#flujo"><span class="num">4</span>Flujo de un peldaño</a>
+  <a class="sb-a" href="#recetas"><span class="num">5</span>Recetas del proyecto</a>
+
+  <div class="sb-hdr">Referencia</div>
+  <a class="sb-a" href="#antipatrones"><span class="num">6</span>Qué NO hacer</a>
+  <a class="sb-a" href="#gitignore"><span class="num">7</span>.gitignore</a>
+  <a class="sb-a" href="#checklist"><span class="num">8</span>Checklist rápida</a>
+  <a class="sb-a" href="#mapa"><span class="num">9</span>Mapa de estados</a>
+  <a class="sb-a" href="#trouble"><span class="num">10</span>Troubleshooting</a>
+
+  <div class="sb-hdr">Prompt</div>
+  <a class="sb-a" href="#prompt"><span class="num">11</span>System prompt</a>
+</div>
+
+<div class="content">
+
+<!-- ============ 1. RAMAS ============ -->
+<div class="chapter" id="ramas">
+  <div class="ch-hdr">
+    <div class="ch-n">1</div>
+    <div>
+      <div class="ch-title">Estructura de ramas</div>
+      <div class="ch-sub">Una rama por peldaño · main siempre estable</div>
+    </div>
+  </div>
+
+  <p class="lead">Cada peldaño nace de <code>main</code>, vive en su propia rama y vuelve a <code>main</code> cuando el gate está superado. Sin excepciones, sin <code>develop</code>.</p>
+
+  <div class="branch-diagram"><span class="b-cmt">main ────●─────●─────────●─────────●─────────●─────────●──►</span>
+          <span class="b-cmt">         \   /         /         /         /         /</span>
+          <span class="b-p1">p1 ───────●───●</span>
+          <span class="b-p2">p2 ─────────────●───●───●</span>
+          <span class="b-p3">p3 ───────────────────────●───●</span>
+          <span class="b-p4">p4 ─────────────────────────────●───●</span>
+          <span class="b-p5">p5 ───────────────────────────────────●───●</span>
+
+          <span class="b-tag">           v0.2      v0.3      v0.4      v0.5      v0.6      v1.0</span></div>
+
+  <h3>Reglas</h3>
+  <table>
+    <tr><th style="width:180px">Regla</th><th>Detalle</th></tr>
+    <tr><td>Una rama por peldaño</td><td>Nunca trabajes dos peldaños en la misma rama</td></tr>
+    <tr><td><code>main</code> siempre estable</td><td>Solo recibe merges de gates cerrados (o parciales, con tag explícito)</td></tr>
+    <tr><td>No hay <code>develop</code></td><td>Cada rama nace de <code>main</code> y vuelve a <code>main</code></td></tr>
+    <tr><td>Ramas cortas</td><td>Vida útil = un peldaño. Al mergear, se borra</td></tr>
+  </table>
+
+  <h3>Naming</h3>
+  <table>
+    <tr><th>Patrón</th><th>Uso</th></tr>
+    <tr><td><code>pN-&lt;slug&gt;</code></td><td>Ramas de peldaño: <code>p1-modelo-real</code>, <code>p3-llm-real</code></td></tr>
+    <tr><td><code>feature/pN-&lt;slug&gt;</code></td><td>Variante para peldaños con varias sub-fases: <code>feature/p2-rag-real</code></td></tr>
+    <tr><td><code>hotfix/&lt;slug&gt;</code></td><td>Solo para corregir algo ya en <code>main</code></td></tr>
+  </table>
+</div>
+
+<!-- ============ 2. COMMITS ============ -->
+<div class="chapter" id="commits">
+  <div class="ch-hdr">
+    <div class="ch-n">2</div>
+    <div>
+      <div class="ch-title">Convención de commits</div>
+      <div class="ch-sub">Imperativo · tipo: descripción · máx 72 chars</div>
+    </div>
+  </div>
+
+  <h3>Formato</h3>
+  <pre><code>&lt;tipo&gt;: &lt;descripción corta en imperativo&gt;
+
+[cuerpo opcional: por qué, no qué]</code></pre>
+
+  <h3>Tipos permitidos</h3>
+  <div class="commit">
+    <div class="commit-ic feat">FEAT</div>
+    <div><div class="commit-msg">feat: capa1 ingestion con extractor de features</div><div class="commit-why">Añade funcionalidad nueva</div></div>
+  </div>
+  <div class="commit">
+    <div class="commit-ic fix">FIX</div>
+    <div><div class="commit-msg">fix: clasificador devuelve label vacío con input malformado</div><div class="commit-why">Corrige un bug</div></div>
+  </div>
+  <div class="commit">
+    <div class="commit-ic refactor">REF</div>
+    <div><div class="commit-msg">refactor: separa loader de classify en model.py</div><div class="commit-why">Reorganiza sin cambiar comportamiento</div></div>
+  </div>
+  <div class="commit">
+    <div class="commit-ic docs">DOCS</div>
+    <div><div class="commit-msg">docs: contratos A2 completados</div><div class="commit-why">Solo documentación</div></div>
+  </div>
+  <div class="commit">
+    <div class="commit-ic test">TEST</div>
+    <div><div class="commit-msg">test: 3 casos de abstención en capa3</div><div class="commit-why">Añade o modifica tests</div></div>
+  </div>
+  <div class="commit">
+    <div class="commit-ic chore">CHORE</div>
+    <div><div class="commit-msg">chore: .gitignore excluye creditcard.csv y __pycache__</div><div class="commit-why">Configuración, dependencias, infraestructura</div></div>
+  </div>
+  <div class="commit">
+    <div class="commit-ic merge">MERGE</div>
+    <div><div class="commit-msg">Merge branch 'p3-llm-real' - P3 LLM real</div><div class="commit-why">Lo genera git con <code>--no-ff</code>, no se escribe a mano</div></div>
+  </div>
+
+  <h3>Reglas de estilo</h3>
+  <ul class="checklist">
+    <li>Imperativo, no pasado: <code>añade capa2</code>, no <code>añadida capa2</code></li>
+    <li>Minúscula inicial, sin punto final</li>
+    <li>Máximo 72 caracteres en la primera línea</li>
+    <li>Sin acentos raros en el asunto (portabilidad CLI)</li>
+    <li>Cuerpo opcional separado por línea en blanco: explica el por qué</li>
+  </ul>
+
+  <h3>Ejemplos</h3>
+  <table>
+    <tr><th style="width:60px">Estado</th><th>Commit</th></tr>
+    <tr><td class="good">✓</td><td><code>feat: capa1 ingestion con extractor de features</code></td></tr>
+    <tr><td class="good">✓</td><td><code>fix: clasificador devuelve label vacío con input malformado</code></td></tr>
+    <tr><td class="good">✓</td><td><code>chore: .gitignore excluye creditcard.csv y __pycache__</code></td></tr>
+    <tr><td class="bad">✕</td><td><code>Añadida la capa 2.</code> — pasado + punto</td></tr>
+    <tr><td class="bad">✕</td><td><code>FEAT: Capa 2.</code> — mayúsculas + punto</td></tr>
+    <tr><td class="bad">✕</td><td><code>cambios varios</code> — no dice qué</td></tr>
+    <tr><td class="bad">✕</td><td><code>wip</code> — no es un commit, es un guardado</td></tr>
+  </table>
+</div>
+
+<!-- ============ 3. TAGS ============ -->
+<div class="chapter" id="tags">
+  <div class="ch-hdr">
+    <div class="ch-n">3</div>
+    <div>
+      <div class="ch-title">Versionado (tags)</div>
+      <div class="ch-sub">SemVer simplificado con sufijo de peldaño</div>
+    </div>
+  </div>
+
+  <h3>Formato</h3>
+  <pre><code>v&lt;major&gt;.&lt;minor&gt;[-&lt;estado&gt;]</code></pre>
+
+  <h3>Mapa de tags</h3>
+  <table>
+    <tr><th>Tag</th><th>Significado</th></tr>
+    <tr><td><code>v0.2</code></td><td>Fases A+B+C cerradas (base validada) — ✅ hecho</td></tr>
+    <tr><td><code>v0.3</code></td><td>P1 cerrado (modelo real)</td></tr>
+    <tr><td><code>v0.4</code></td><td>P2 cerrado (RAG real)</td></tr>
+    <tr><td><code>v0.4-p2-parcial</code></td><td>P2 mergeado pero con tareas pendientes del gate</td></tr>
+    <tr><td><code>v0.5</code></td><td>P3 cerrado (LLM real)</td></tr>
+    <tr><td><code>v0.6</code></td><td>P4 cerrado (observabilidad)</td></tr>
+    <tr><td><code>v1.0</code></td><td>P5 cerrado (evaluación con baseline)</td></tr>
+  </table>
+
+  <div class="callout warn">
+    <span class="lbl">Regla crítica</span>
+    <strong>No se tagea un gate parcial con el número limpio.</strong> O cierras todas las tareas del gate, o el tag lleva el sufijo <code>-parcial</code>. Tagear como cerrado algo que no lo está rompe la trazabilidad del proyecto.
+  </div>
+
+  <h3>Comando de tag anotado</h3>
+  <pre><code>git tag -a v0.3 -m "v0.3: P1 cerrado - modelo XGBoost ULB integrado"</code></pre>
+
+  <ul class="checklist">
+    <li>Siempre <code>-a</code> (anotado, no ligero)</li>
+    <li>Siempre <code>-m</code> con mensaje descriptivo</li>
+    <li>Nunca tag en un commit sin mergear a <code>main</code></li>
+  </ul>
+</div>
+
+<!-- ============ 4. FLUJO ============ -->
+<div class="chapter" id="flujo">
+  <div class="ch-hdr">
+    <div class="ch-n">4</div>
+    <div>
+      <div class="ch-title">Flujo completo de un peldaño</div>
+      <div class="ch-sub">Aplicable a P1, P2, P3, P4, P5 · ejemplo con P3</div>
+    </div>
+  </div>
+
+  <h3>4.1 Abrir la rama</h3>
+  <pre><code>git checkout main
+git pull origin main
+git checkout -b p3-llm-real
+git push -u origin p3-llm-real</code></pre>
+
+  <h3>4.2 Trabajar y commitear</h3>
+  <p>Commits pequeños y frecuentes. Cada commit debe dejar el repo ejecutable, aunque sea parcial.</p>
+  <pre><code>git add .
+git status                     # verificar qué entra
+git commit -m "feat: cliente Ollama para LLM local"
+
+git add .
+git commit -m "feat: prompt grounded con inyección de chunks"
+
+git add .
+git commit -m "feat: integración LLM en capa3 explanation"
+
+git push                       # subir progreso, no esperes al final</code></pre>
+
+  <h3>4.3 Verificar el gate</h3>
+  <table>
+    <tr><th>Peldaño</th><th>Gate</th><th>Verificación</th></tr>
+    <tr><td>P1</td><td>main.py + test_model.py con ULB real</td><td>ejecutar los 3 casos</td></tr>
+    <tr><td>P2</td><td>top-5 chunks relevantes, score &gt; 0.25</td><td>query de prueba manual</td></tr>
+    <tr><td>P3</td><td>faithfulness &gt; 0.7 en 10 queries</td><td>evaluación manual</td></tr>
+    <tr><td>P4</td><td>100% de requests con trace completo</td><td>abrir Langfuse</td></tr>
+    <tr><td>P5</td><td>faithfulness &gt; 0.8 en baseline</td><td>RAGAS</td></tr>
+  </table>
+
+  <div class="callout warn">
+    <span class="lbl">Si el gate no está cerrado</span>
+    <strong>No mergees como vX.Y limpio.</strong> Usa el sufijo <code>-parcial</code> en el tag y documenta qué falta en el mensaje.
+  </div>
+
+  <h3>4.4 Mergear a main</h3>
+  <pre><code>git checkout main
+git pull origin main
+
+# Ver qué va a entrar (siempre, antes de fusionar)
+git log --oneline main..p3-llm-real
+git diff --stat main..p3-llm-real
+
+# Fusionar preservando la topología
+git merge --no-ff p3-llm-real -m "Merge branch 'p3-llm-real' - P3 LLM real"</code></pre>
+
+  <div class="callout tip">
+    <span class="lbl">¿Por qué --no-ff?</span>
+    Fuerza un commit de merge explícito. Sin él, si la rama era lineal, git haría fast-forward y perderías el rastro de que existió una rama. Con <code>--no-ff</code> el <code>git log --graph</code> muestra claramente cada peldaño como una unidad.
+  </div>
+
+  <h3>4.5 Tagear el hito</h3>
+  <pre><code># Gate cerrado
+git tag -a v0.5 -m "v0.5: P3 cerrado - LLM grounded integrado"
+
+# Gate parcial
+git tag -a v0.5-p3-parcial -m "v0.5-p3-parcial: LLM integrado. Pendiente P3.2 (prompt grounded)"</code></pre>
+
+  <h3>4.6 Publicar y limpiar</h3>
+  <pre><code>git push origin main
+git push origin --tags
+
+# Borrar la rama ya fusionada (local y remoto)
+git branch -d p3-llm-real
+git push origin --delete p3-llm-real</code></pre>
+
+  <h3>4.7 Verificación final</h3>
+  <pre><code>git branch
+# → * main
+
+git log --oneline --graph -10
+# → *   &lt;sha&gt; Merge branch 'p3-llm-real' - P3 LLM real
+# → |\
+# → | * &lt;sha&gt; feat: integración LLM en capa3 explanation
+# → | * &lt;sha&gt; feat: prompt grounded con inyección de chunks
+# → | * &lt;sha&gt; feat: cliente Ollama para LLM local
+# → |/
+# → * &lt;sha&gt; (tag: v0.4) Merge branch 'feature/p2-rag-real'
+
+git tag -l
+# → v0.2
+# → v0.4
+# → v0.5
+
+git status
+# → On branch main
+# → Your branch is up to date with 'origin/main'.
+# → nothing to commit, working tree clean</code></pre>
+</div>
+
+<!-- ============ 5. RECETAS ============ -->
+<div class="chapter" id="recetas">
+  <div class="ch-hdr">
+    <div class="ch-n">5</div>
+    <div>
+      <div class="ch-title">Recetas específicas del proyecto</div>
+      <div class="ch-sub">Situaciones concretas del repo SSEP</div>
+    </div>
+  </div>
+
+  <div class="receta">
+    <div class="receta-hdr">5.1 Primer commit del repo <span class="badge done">Hecho</span></div>
+    <div class="receta-b">
+      <pre><code>git add .
+git status                       # verificar 24 archivos, sin archive.zip ni creditcard.csv
+git commit -m "Initial commit: IMR FraudeSSEP v0.2 - Fases A+B+C completadas"
+git tag -a v0.2 -m "v0.2: Fases A+B+C completadas"
+git remote add origin https://github.com/&lt;usuario&gt;/ssep-fraude.git
+git push -u origin main
+git push origin --tags</code></pre>
+    </div>
+  </div>
+
+  <div class="receta">
+    <div class="receta-hdr">5.2 Merge de P2 como parcial <span class="badge next">Siguiente</span></div>
+    <div class="receta-b">
+      <p style="font-size:14px;color:var(--ink3);font-style:italic;margin-bottom:10px;">La rama <code>feature/p2-rag-real</code> ya está pusheada. El gate está parcial: falta P2.1 (docs reales) y P2.4 (reranker bge).</p>
+      <pre><code>git checkout main
+git pull origin main
+
+git log --oneline main..feature/p2-rag-real
+git diff --stat main..feature/p2-rag-real
+
+git merge --no-ff feature/p2-rag-real -m "Merge branch 'feature/p2-rag-real' - P2 RAG (gate parcial)"
+
+git tag -a v0.4-p2-parcial -m "v0.4-p2-parcial: RAG integrado. Pendiente P2.1 (docs reales) y P2.4 (reranker bge)"
+
+git push origin main
+git push origin --tags
+
+git branch -d feature/p2-rag-real
+git push origin --delete feature/p2-rag-real</code></pre>
+    </div>
+  </div>
+
+  <div class="receta">
+    <div class="receta-hdr">5.3 Abrir P3 desde main actualizado</div>
+    <div class="receta-b">
+      <pre><code>git checkout main
+git pull origin main
+git checkout -b p3-llm-real
+git push -u origin p3-llm-real</code></pre>
+    </div>
+  </div>
+
+  <div class="receta">
+    <div class="receta-hdr">5.4 Añadir el CSV de ULB sin commitearlo</div>
+    <div class="receta-b">
+      <p>El <code>.gitignore</code> ya excluye <code>creditcard.csv</code> y <code>archive.zip</code>. <strong>Nunca</strong> hagas <code>git add -f</code> sobre ellos. El repo versiona código y docs, no datasets.</p>
+      <p style="margin-top:8px;">Si necesitas que el equipo tenga el CSV:</p>
+      <ul class="checklist">
+        <li>Documenta la fuente en <code>datos/README.md</code> (URL de Kaggle, hash del zip)</li>
+        <li>No lo subas al repo</li>
+        <li>Si es imprescindible, usa Git LFS (fuera del alcance de esta guía por ahora)</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 6. ANTIPATRONES ============ -->
+<div class="chapter" id="antipatrones">
+  <div class="ch-hdr">
+    <div class="ch-n">6</div>
+    <div>
+      <div class="ch-title">Qué NO hacer</div>
+      <div class="ch-sub">Anti-patrones que rompen la trazabilidad</div>
+    </div>
+  </div>
+
+  <table>
+    <tr><th style="width:280px">Anti-patrón</th><th>Por qué</th></tr>
+    <tr><td><code>git add -A</code> sin mirar <code>git status</code></td><td>Metes <code>__pycache__</code>, <code>.env</code>, CSVs</td></tr>
+    <tr><td><code>git commit -am "wip"</code></td><td>Commit sin sentido, no dice qué cambió</td></tr>
+    <tr><td><code>git push --force</code> a <code>main</code></td><td>Reescribe historia compartida</td></tr>
+    <tr><td>Tagear sin mergear a <code>main</code></td><td>El tag queda huérfano</td></tr>
+    <tr><td>Tagear un gate parcial como <code>vX.Y</code> limpio</td><td>Rompe la trazabilidad</td></tr>
+    <tr><td>Trabajar en <code>main</code> directamente</td><td>Sin rama no hay merge, sin merge no hay gate</td></tr>
+    <tr><td><code>git merge</code> sin <code>--no-ff</code></td><td>Pierdes la topología de la rama</td></tr>
+    <tr><td>Dejar ramas muertas tras merge</td><td>Confunde el <code>git branch</code> y el remoto</td></tr>
+  </table>
+</div>
+
+<!-- ============ 7. GITIGNORE ============ -->
+<div class="chapter" id="gitignore">
+  <div class="ch-hdr">
+    <div class="ch-n">7</div>
+    <div>
+      <div class="ch-title">.gitignore — referencia</div>
+      <div class="ch-sub">Contenido mínimo vigente</div>
+    </div>
+  </div>
+
+  <pre><code># Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Datasets (nunca versionar)
+creditcard.csv
+archive.zip
+*.csv
+*.zip
+
+# Entorno
+.env
+.env.*
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Langfuse local
+langfuse-data/</code></pre>
+
+  <h3>Verificación antes de cada commit</h3>
+  <pre><code>git status --short
+# No debe aparecer:
+#   ?? __pycache__/
+#   ?? creditcard.csv
+#   ?? archive.zip
+#   ?? .env</code></pre>
+</div>
+
+<!-- ============ 8. CHECKLIST ============ -->
+<div class="chapter" id="checklist">
+  <div class="ch-hdr">
+    <div class="ch-n">8</div>
+    <div>
+      <div class="ch-title">Checklist rápida</div>
+      <div class="ch-sub">Imprimir y tener al lado</div>
+    </div>
+  </div>
+
+  <h3>Antes de commitear</h3>
+  <ul class="checklist">
+    <li><code>git status</code> no muestra basura (<code>__pycache__</code>, CSV, <code>.env</code>)</li>
+    <li>El mensaje sigue la convención <code>&lt;tipo&gt;: &lt;descripción&gt;</code></li>
+    <li>El commit deja el repo ejecutable</li>
+  </ul>
+
+  <h3>Antes de mergear</h3>
+  <ul class="checklist">
+    <li>El gate del peldaño está cerrado (o decidido como parcial)</li>
+    <li><code>git log main..&lt;rama&gt;</code> muestra los commits esperados</li>
+    <li><code>git diff --stat main..&lt;rama&gt;</code> no incluye archivos inesperados</li>
+    <li><code>main</code> está actualizado (<code>git pull origin main</code>)</li>
+  </ul>
+
+  <h3>Después de mergear</h3>
+  <ul class="checklist">
+    <li><code>git log --oneline --graph</code> muestra el merge con <code>--no-ff</code></li>
+    <li>Tag creado con <code>-a</code> y mensaje descriptivo</li>
+    <li><code>git push origin main &amp;&amp; git push origin --tags</code></li>
+    <li>Rama borrada (local y remoto)</li>
+    <li><code>git status</code> → "working tree clean"</li>
+    <li>GitHub muestra el tag en <code>/tags</code> y el merge en <code>/commits/main</code></li>
+  </ul>
+</div>
+
+<!-- ============ 9. MAPA ============ -->
+<div class="chapter" id="mapa">
+  <div class="ch-hdr">
+    <div class="ch-n">9</div>
+    <div>
+      <div class="ch-title">Mapa de estados y tags</div>
+      <div class="ch-sub">Referencia visual del proyecto</div>
+    </div>
+  </div>
+
+  <div class="mapa">
+    <div class="mapa-row">
+      <span class="stage">Fases A+B+C</span>
+      <span class="tag">v0.2</span>
+      <span class="desc">Base validada · contratos, IMR mínimo, 3 casos</span>
+      <span class="status done">Hecho</span>
+    </div>
+    <div class="mapa-row">
+      <span class="stage">P1 modelo</span>
+      <span class="tag">v0.3</span>
+      <span class="desc">XGBoost ULB integrado en capa2</span>
+      <span class="status wip">En curso</span>
+    </div>
+    <div class="mapa-row">
+      <span class="stage">P2 RAG</span>
+      <span class="tag">v0.4</span>
+      <span class="desc">RAG real (parcial: falta P2.1 y P2.4)</span>
+      <span class="status wip">En curso</span>
+    </div>
+    <div class="mapa-row">
+      <span class="stage">P3 LLM</span>
+      <span class="tag">v0.5</span>
+      <span class="desc">LLM grounded con abstención</span>
+      <span class="status pend">Pendiente</span>
+    </div>
+    <div class="mapa-row">
+      <span class="stage">P4 observ.</span>
+      <span class="tag">v0.6</span>
+      <span class="desc">Langfuse self-hosted, trazas completas</span>
+      <span class="status pend">Pendiente</span>
+    </div>
+    <div class="mapa-row">
+      <span class="stage">P5 eval.</span>
+      <span class="tag">v1.0</span>
+      <span class="desc">RAGAS baseline, faithfulness &gt; 0.8</span>
+      <span class="status pend">Pendiente</span>
+    </div>
+  </div>
+
+  <div class="callout ok">
+    <span class="lbl">Cada ✅ requiere</span>
+    Rama cerrada + merge <code>--no-ff</code> a <code>main</code> + tag anotado + push de ambos.
+  </div>
+</div>
+
+<!-- ============ 10. TROUBLESHOOTING ============ -->
+<div class="chapter" id="trouble">
+  <div class="ch-hdr">
+    <div class="ch-n">10</div>
+    <div>
+      <div class="ch-title">Troubleshooting</div>
+      <div class="ch-sub">Los 6 problemas más frecuentes</div>
+    </div>
+  </div>
+
+  <div class="trouble">
+    <div class="trouble-q">"Your branch and 'origin/main' have diverged"</div>
+    <div class="trouble-a">
+      <pre><code>git pull --rebase origin main
+# Resolver conflictos, luego:
+git rebase --continue</code></pre>
+    </div>
+  </div>
+
+  <div class="trouble">
+    <div class="trouble-q">Merge conflict en X</div>
+    <div class="trouble-a">
+      <pre><code># Abrir el archivo, resolver, luego:
+git add X
+git merge --continue
+# O cancelar:
+git merge --abort</code></pre>
+    </div>
+  </div>
+
+  <div class="trouble">
+    <div class="trouble-q">Olvidé el tag y ya pusheé</div>
+    <div class="trouble-a">
+      <pre><code># Crear tag en el commit correcto (por SHA)
+git tag -a v0.3 -m "..." &lt;sha-del-merge&gt;
+git push origin v0.3</code></pre>
+    </div>
+  </div>
+
+  <div class="trouble">
+    <div class="trouble-q">Quiero deshacer el último commit (sin pushear)</div>
+    <div class="trouble-a">
+      <pre><code>git reset --soft HEAD~1     # deshace commit, mantiene cambios en staging
+git reset --mixed HEAD~1    # deshace commit, cambios sin stagear</code></pre>
+    </div>
+  </div>
+
+  <div class="trouble">
+    <div class="trouble-q">Quiero deshacer un tag</div>
+    <div class="trouble-a">
+      <pre><code>git tag -d v0.3                    # local
+git push origin --delete v0.3      # remoto</code></pre>
+    </div>
+  </div>
+
+  <div class="trouble">
+    <div class="trouble-q">Olvidé crear la rama y trabajé en main</div>
+    <div class="trouble-a">
+      <pre><code># Mover los commits a una rama nueva
+git branch p3-llm-real
+git reset --hard origin/main
+git checkout p3-llm-real</code></pre>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 11. SYSTEM PROMPT ============ -->
+<div class="chapter" id="prompt">
+  <div class="ch-hdr">
+    <div class="ch-n">11</div>
+    <div>
+      <div class="ch-title">System prompt</div>
+      <div class="ch-sub">Versión ejecutable · para LLM o agente</div>
+    </div>
+  </div>
+
+  <p class="lead">El resto de esta página es para <strong>humanos</strong>. Esta sección es para que un LLM opere el repo: valide commits, bloquee anti-patrones y ejecute el flujo de merge en orden. No reemplaza al HTML — lo ejecuta.</p>
+
+  <div class="callout tip">
+    <span class="lbl">Cómo se usa</span>
+    Pega el bloque completo como <em>system prompt</em> al iniciar una conversación, o guárdalo como <code>GIT-WORKFLOW.prompt.md</code> en el repo para cargarlo como contexto. Si cambias una regla aquí, actualiza también las secciones 1–10: son la misma verdad, en dos formatos.
+  </div>
+
+  <h3>Tres formas de consumirlo</h3>
+  <div class="uso-grid">
+    <div class="uso-card">
+      <span class="tag">Opción A</span>
+      <div class="t">System prompt</div>
+      <div class="d">Pégalo al inicio de una sesión con Claude, GPT o DeepSeek. El modelo adopta el rol de guardián del workflow.</div>
+    </div>
+    <div class="uso-card">
+      <span class="tag">Opción B</span>
+      <div class="t">Archivo del repo</div>
+      <div class="d">Guárdalo como <code>GIT-WORKFLOW.prompt.md</code> junto a este HTML. Sirve como contexto versionado.</div>
+    </div>
+    <div class="uso-card">
+      <span class="tag">Opción C</span>
+      <div class="t">CLAUDE.md / AGENTS.md</div>
+      <div class="d">Si usas Claude Code o un agente similar, este contenido va ahí y el agente lo aplica en cada sesión.</div>
+    </div>
+  </div>
+
+  <h3>Prompt</h3>
+  <div class="prompt-wrap">
+    <div class="prompt-bar">
+      <span class="prompt-bar-lbl">SSEP · <strong>git-guardian</strong> · v1</span>
+      <button class="prompt-copy" id="copyPrompt" onclick="copyPrompt()">Copiar prompt</button>
+    </div>
+    <pre class="prompt-block" id="promptText">Eres el guardián del git workflow del proyecto SSEP.
+Tu trabajo: validar y guiar commits, ramas, tags y merges.
+Nunca ejecutas comandos; propones y verificas.
+
+## Invariantes (no negociables)
+
+1. Una rama por peldaño. Nace de main, vuelve a main.
+2. main siempre estable. Solo recibe merges de gates cerrados.
+3. Un gate superado = rama mergeada con --no-ff + tag anotado + push.
+4. Si el gate está parcial, el tag lleva sufijo -parcial. Nunca tag limpio.
+5. Nunca se versionan datasets (creditcard.csv, archive.zip) ni .env.
+
+## Formato de commit
+
+&lt;tipo&gt;: &lt;descripción imperativa, minúscula, sin punto, ≤72 chars&gt;
+Tipos: feat | fix | refactor | docs | test | chore
+Cuerpo opcional separado por línea en blanco (explica el por qué).
+
+## Formato de tag
+
+v&lt;major&gt;.&lt;minor&gt;[-&lt;estado&gt;]
+- vX.Y solo si TODAS las tareas del gate están cerradas.
+- vX.Y-&lt;peldaño&gt;-parcial si falta alguna. El mensaje debe listar qué falta.
+
+## Flujo de merge (orden obligatorio)
+
+1. git checkout main &amp;&amp; git pull origin main
+2. git log --oneline main..&lt;rama&gt;          ← mostrar al usuario
+3. git diff --stat main..&lt;rama&gt;            ← mostrar al usuario
+4. git merge --no-ff &lt;rama&gt; -m "Merge branch '&lt;rama&gt;' - &lt;peldaño&gt;"
+5. git tag -a &lt;tag&gt; -m "&lt;mensaje&gt;"
+6. git push origin main &amp;&amp; git push origin --tags
+7. git branch -d &lt;rama&gt; &amp;&amp; git push origin --delete &lt;rama&gt;
+8. git status                              ← debe decir "working tree clean"
+
+## Rechaza y explica si el usuario pide
+
+- git push --force a main                    → reescribe historia compartida
+- git merge sin --no-ff                     → pierde topología
+- tag vX.Y con gate parcial                 → rompe trazabilidad
+- git add -A sin revisar git status         → mete basura
+- tag sin mergear a main                    → tag huérfano
+- trabajar directo en main                  → sin rama no hay gate
+- commit -am "wip" o "cambios varios"       → no describe nada
+- git add -f sobre CSV/zip/.env             → dataset en el repo
+
+## Cómo respondes
+
+- Si el usuario pide un commit: valida el mensaje contra el formato,
+  propón corrección si falla, no inventes commits.
+- Si pide merge: ejecuta el flujo de 8 pasos en orden, marcando qué
+  verificar en cada uno.
+- Si pide tag: pregunta primero "¿está cerrado el gate o es parcial?"
+  y aplica la regla.
+- Si pide algo de la lista de rechazo: bloquea, explica por qué,
+  ofrece la alternativa correcta.
+- Si pide troubleshooting: das el comando, no la teoría.
+
+## Estado actual del proyecto (actualizar cuando cambie)
+
+- Última versión: v0.2 (Fases A+B+C cerradas)
+- Ramas vivas: main, p1-modelo-real (mergeada),
+  feature/p2-rag-real (pusheada, gate parcial)
+- Próximo paso: merge de P2 como v0.4-p2-parcial → abrir p3-llm-real
+
+## Tono
+
+Directo, operativo, sin adornos. Si algo está mal, dilo primero
+y explica después.</pre>
+  </div>
+
+  <div class="callout warn">
+    <span class="lbl">Regla de sincronía</span>
+    El prompt y las secciones 1–10 son la <strong>misma verdad en dos formatos</strong>. Si cambias un tag, un formato de commit o una regla de merge, actualiza los dos. El HTML sin el prompt queda desactualizado para agentes; el prompt sin el HTML pierde el contexto humano (diagramas, troubleshooting, recetas).
+  </div>
+</div>
+
+</div>
+</div>
+
+<footer>
+  SSEP · Git Workflow · v0.2 → v1.0
+</footer>
+
+<script>
+function copyPrompt() {
+  var el = document.getElementById('promptText');
+  var btn = document.getElementById('copyPrompt');
+  if (!el || !btn) return;
+
+  var text = el.textContent;
+
+  function flash() {
+    btn.textContent = '✓ Copiado';
+    btn.classList.add('done');
+    setTimeout(function() {
+      btn.textContent = 'Copiar prompt';
+      btn.classList.remove('done');
+    }, 1800);
+  }
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(flash).catch(function() {
+      fallbackCopy(text, flash);
+    });
+  } else {
+    fallbackCopy(text, flash);
+  }
+}
+
+function fallbackCopy(text, cb) {
+  var ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.left = '-9999px';
+  document.body.appendChild(ta);
+  ta.select();
+  try {
+    document.execCommand('copy');
+    cb();
+  } catch(e) {
+    alert('No se pudo copiar. Selecciona el texto manualmente.');
+  }
+  document.body.removeChild(ta);
+}
+</script>
+
+</body>
+</html>
