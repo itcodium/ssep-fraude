@@ -1,17 +1,22 @@
 """
-P2.5 - Capa 3 con RAG real.
+P2.5 - Capa 3 con RAG real + P3 - Sintesis con LLM.
 
 Reemplaza el keyword matching por:
 - Embeddings multilingues (sentence-transformers)
 - Vector store (Chroma)
 - Reranker cross-encoder
-- Threshold 0.3
+- Threshold 0.25
+
+P3: _synthesize usa Ollama (llama3.2:3b) con prompt grounded
+en lugar de plantilla concatenada. El contrato de salida
+{explanation, sources, grounding_score, label} no cambia.
 
 Contrato de salida (sin cambios): {explanation, sources, grounding_score, label}
 """
 
 import math
 import chromadb
+import ollama
 from sentence_transformers import SentenceTransformer, CrossEncoder
 
 
@@ -22,6 +27,8 @@ _COLLECTION_NAME = "fraude_docs"
 _TOP_K = 20          # antes 10 → más candidatos al reranker
 _TOP_N = 3
 _THRESHOLD = 0.25    # antes 0.35 → permisivo
+
+_OLLAMA_MODEL = "llama3.2:3b"
 
 
 # Traducción de risk_factors a lenguaje natural
@@ -86,7 +93,7 @@ def _build_query(prediction):
 
 
 def explain(prediction):
-    """Genera una explicacion grounded usando RAG."""
+    """Genera una explicacion grounded usando RAG + LLM (P3)."""
     label = prediction["label"]
     query = _build_query(prediction)
 
@@ -150,15 +157,40 @@ def _abstain(label):
 
 
 def _synthesize(prediction, chunks):
+    """
+    P3: Genera explicacion con LLM (Ollama) usando prompt grounded.
+
+    El LLM recibe SOLO los chunks como contexto. Si no hay info suficiente,
+    debe decir "No hay información suficiente" en lugar de alucinar.
+    El contrato 3->Consumidor no cambia: explanation sigue siendo string.
+    """
     label = prediction["label"]
     confidence = prediction["confidence"]
     factors = ", ".join(prediction.get("risk_factors", [])) or "ninguno"
 
-    parts = [f"Prediccion: {label} (confianza {confidence:.2f}). Factores: {factors}."]
+    context = "\n\n".join(
+        f"[{c['source']} {c['section']}]\n{c['text']}"
+        for c in chunks
+    )
 
-    for c in chunks:
-        ref = c["source"] + (f" {c['section']}" if c["section"] else "")
-        snippet = c["text"][:200].replace("\n", " ").strip()
-        parts.append(f"Segun {ref}: {snippet}...")
+    prompt = f"""Eres un analista de fraude. Explica la predicción usando SOLO el contexto proporcionado.
 
-    return " ".join(parts)
+Predicción: {label}
+Confianza: {confidence:.2f}
+Factores de riesgo: {factors}
+
+Contexto:
+{context}
+
+Instrucciones:
+- Redacta una explicación en lenguaje natural, en 2-3 frases.
+- Integra las citas de forma natural dentro del texto, no las repitas al final de cada frase.
+- Usa el formato [archivo sección] solo una vez por fuente citada.
+- No inventes información que no esté en el contexto.
+- Si el contexto no responde a la pregunta, di "No hay información suficiente".
+- Responde en español.
+
+Explicación:"""
+
+    response = ollama.generate(model=_OLLAMA_MODEL, prompt=prompt)
+    return response["response"].strip()
