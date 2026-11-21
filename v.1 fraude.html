@@ -194,18 +194,18 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--rule2);padding:2p
 <div class="hero">
   <div class="hero-stripe"></div>
   <div class="hero-in">
-    <div class="hero-eye">FraudeSSEP · README · v0.5</div>
+    <div class="hero-eye">FraudeSSEP · README · v0.6</div>
     <h1>Implementación mínima<br>del patrón SSEP<br>en <span class="accent">fraude financiero</span>.
-      <span class="smaller">3 capas · 3 contratos · 3 reglas · pipeline RAG completo</span>
+      <span class="smaller">3 capas · 3 contratos · 3 reglas · pipeline RAG + LLM</span>
     </h1>
     <p class="hero-desc">
       Este proyecto materializa el patrón SSEP en un caso concreto: detección de fraude en transacciones con tarjeta. No es un sistema de producción — es la Implementación Mínima de Referencia (IMR) que valida que la arquitectura del patrón tiene sentido en este dominio.
     </p>
     <div class="hero-meta">
-      <div class="hm"><div class="hm-k">Estado</div><div class="hm-v">Fases A+B+C+P1+P2 <span>completadas</span></div></div>
-      <div class="hm"><div class="hm-k">Progreso</div><div class="hm-v">20 / 30 <span>tareas</span></div></div>
-      <div class="hm"><div class="hm-k">RAG</div><div class="hm-v">367 <span>chunks indexados</span></div></div>
-      <div class="hm"><div class="hm-k">Próximo</div><div class="hm-v">P3 <span>· LLM</span></div></div>
+      <div class="hm"><div class="hm-k">Estado</div><div class="hm-v">Fases A+B+C+P1+P2+P3 <span>completadas</span></div></div>
+      <div class="hm"><div class="hm-k">Progreso</div><div class="hm-v">23 / 30 <span>tareas</span></div></div>
+      <div class="hm"><div class="hm-k">RAG + LLM</div><div class="hm-v">367 chunks · <span>llama3.2:3b</span></div></div>
+      <div class="hm"><div class="hm-k">Próximo</div><div class="hm-v">P4 <span>· Observabilidad</span></div></div>
     </div>
   </div>
 </div>
@@ -275,8 +275,8 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--rule2);padding:2p
       <div class="pipe-node l3">
         <div class="pipe-node-n">3</div>
         <div>
-          <div class="pipe-node-t">Explicación (RAG)</div>
-          <div class="pipe-node-d">predicción → retrieval semántico + reranker + síntesis</div>
+          <div class="pipe-node-t">Explicación (RAG + LLM)</div>
+          <div class="pipe-node-d">predicción → retrieval semántico + reranker + Ollama</div>
         </div>
       </div>
       <div class="pipe-arrow">↓</div>
@@ -322,7 +322,7 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--rule2);padding:2p
     <div class="ch-n">03</div>
     <div>
       <div class="ch-title">Estado actual</div>
-      <div class="ch-sub">20 de 30 tareas · 67%</div>
+      <div class="ch-sub">23 de 30 tareas · 77%</div>
     </div>
   </div>
 
@@ -378,8 +378,19 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--rule2);padding:2p
       </div>
       <div class="phase-body">
         <div class="phase-title">367 chunks · 5 fuentes · retrieval validado</div>
-        <div class="phase-d"><strong>P2.1 completado:</strong> 2 documentos reales (PCI DSS Requisito 10 + paper arXiv 2010.06479) + 3 sintéticos = <strong>367 chunks</strong> indexados en Chroma. Embeddings multilingües <code>paraphrase-multilingual-MiniLM-L12-v2</code> + reranker <code>mmarco-mMiniLMv2-L12-H384-v1</code>. Threshold 0.25. <strong>P2.4 (reranker <code>bge</code>) deferido conscientemente</strong> — <code>mmarco</code> da grounding 0.89-0.93. Validado en <code>main.py</code>: CARD-4532 cita <code>reglas_banco.txt §3.2</code> (0.93); CARD-1024 cita <code>precedentes.txt Caso 2024-0341</code> + <code>reglas_banco.txt §3.2</code> (0.89); CARD-7891 se abstiene (regla 3).</div>
+        <div class="phase-d"><strong>P2.1 completado:</strong> 2 documentos reales (PCI DSS Requisito 10 + paper arXiv 2010.06479) + 3 sintéticos = <strong>367 chunks</strong> indexados en Chroma. Embeddings multilingües <code>paraphrase-multilingual-MiniLM-L12-v2</code> + reranker <code>mmarco-mMiniLMv2-L12-H384-v1</code>. Threshold 0.25. <strong>P2.4 (reranker <code>bge</code>) deferido conscientemente</strong> — <code>mmarco</code> da grounding 0.89-0.93.</div>
         <div class="phase-status"><span class="status done">✓ Completada (P2.4 deferido)</span></div>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="phase-n">
+        <div class="phase-num">P3</div>
+        <div class="phase-name">LLM real</div>
+      </div>
+      <div class="phase-body">
+        <div class="phase-title">Ollama + prompt grounded · gate 8/10</div>
+        <div class="phase-d"><code>llama3.2:3b</code> local. <code>_synthesize</code> en <code>rag/retriever.py</code> reemplazado por llamada a Ollama con prompt grounded (cita fuentes, no alucina). Gate de faithfulness: <strong>8/10 queries con citas</strong>, 2 abstenciones correctas, 0 alucinaciones. Contrato 3→Consumidor intacto.</div>
+        <div class="phase-status"><span class="status done">✓ Completada</span></div>
       </div>
     </div>
   </div>
@@ -393,18 +404,13 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--rule2);padding:2p
       <div>Estado</div>
     </div>
     <div class="tbl-row c3">
-      <div class="tbl-tech">P3 · LLM</div>
-      <div>Ollama local (<code>llama3.2:3b</code>) + prompt grounded → reemplaza <code>_synthesize</code> en <code>retriever.py</code></div>
+      <div class="tbl-tech">P4 · Observabilidad</div>
+      <div>Langfuse self-hosted + <code>@observe()</code> → 100% requests trazados</div>
       <div><span class="status pending">⏸ Próximo</span></div>
     </div>
     <div class="tbl-row c3">
-      <div class="tbl-tech">P4 · Observabilidad</div>
-      <div>Langfuse self-hosted + trazas</div>
-      <div><span class="status pending">⏸ Pendiente</span></div>
-    </div>
-    <div class="tbl-row c3">
       <div class="tbl-tech">P5 · Evaluación</div>
-      <div>RAGAS con 4 métricas</div>
+      <div>RAGAS 4 métricas + baseline faithfulness &gt;0.8</div>
       <div><span class="status pending">⏸ Pendiente</span></div>
     </div>
   </div>
@@ -439,11 +445,11 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--rule2);padding:2p
 │   ├── trans_fraude.txt
 │   └── <span class="ignored">creditcard.csv</span>        <span class="comment">← P1 dataset (gitignored)</span>
 │
-├── <b>rag/</b>                            <span class="comment">← P2: módulo de RAG</span>
+├── <b>rag/</b>                            <span class="comment">← P2/P3: módulo de RAG + LLM</span>
 │   ├── __init__.py                     <span class="comment">← re-exporta explain</span>
 │   ├── chunking.py                     <span class="comment">← P2.2: chunking semántico v4</span>
 │   ├── indexing.py                     <span class="comment">← P2.3: embeddings + Chroma</span>
-│   └── retriever.py                    <span class="comment">← P2.5: retrieval + reranker + síntesis</span>
+│   └── retriever.py                    <span class="comment">← P2.5 + P3: retrieval + reranker + Ollama</span>
 │
 ├── <b>Credit Card Fraud Detection (ULB)/</b>
 │   └── README.md                       <span class="comment">← instrucciones de descarga</span>
@@ -455,13 +461,14 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--rule2);padding:2p
 ├── <b>train_model.py</b>                  <span class="comment">← P1.2: entrena XGBoost</span>
 ├── <b>model.py</b>                        <span class="comment">← P1.3: loader + classify_ulb</span>
 ├── <b>test_model.py</b>                   <span class="comment">← P1.3: test con datos ULB reales</span>
+├── <b>test_gate_p3.py</b>                 <span class="comment">← P3: 10 queries para el gate</span>
 ├── <b>chunk_docs.py</b>                   <span class="comment">← P2.2: CLI wrapper</span>
 ├── <b>index_docs.py</b>                   <span class="comment">← P2.3: CLI wrapper</span>
 ├── <span class="ignored">model.pkl</span>                     <span class="comment">← gitignored</span>
 ├── <span class="ignored">chunks.json</span>                   <span class="comment">← gitignored (regenerable, 367 chunks)</span>
 └── <span class="ignored">chroma_db/</span>                    <span class="comment">← gitignored (regenerable)</span></div>
 
-  <p><strong>Versionados en git:</strong> 20 archivos · <strong>Ignorados:</strong> <code>creditcard.csv</code>, <code>model.pkl</code>, <code>chunks.json</code>, <code>chroma_db/</code>, <code>__pycache__/</code>, <code>.cache/</code>.</p>
+  <p><strong>Versionados en git:</strong> 21 archivos · <strong>Ignorados:</strong> <code>creditcard.csv</code>, <code>model.pkl</code>, <code>chunks.json</code>, <code>chroma_db/</code>, <code>__pycache__/</code>, <code>.cache/</code>.</p>
 </div>
 
 <!-- 05 EJECUTAR -->
@@ -480,11 +487,13 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--rule2);padding:2p
     <li>Fase A+B+C: sin dependencias externas</li>
     <li>P1: <code>pandas</code>, <code>scikit-learn</code>, <code>xgboost</code>, <code>joblib</code></li>
     <li>P2: <code>sentence-transformers</code>, <code>chromadb</code>, <code>pypdf</code></li>
+    <li>P3: <code>ollama</code> + Ollama runtime con <code>llama3.2:3b</code></li>
   </ul>
 
   <div class="code-block">
     <div class="code-hdr"><span>terminal</span><span>bash</span></div>
-    <div class="code-body"><span style="color:#999;">$ </span>pip install pandas scikit-learn xgboost joblib sentence-transformers chromadb pypdf</div>
+    <div class="code-body"><span style="color:#999;">$ </span>pip install pandas scikit-learn xgboost joblib sentence-transformers chromadb pypdf ollama
+<span style="color:#999;">$ </span>ollama pull llama3.2:3b</div>
   </div>
 
   <h4>Entrenar el modelo (P1)</h4>
@@ -500,7 +509,7 @@ F1:        0.8079
 Modelo guardado en model.pkl (0.3 MB)</div>
   </div>
 
-  <h4>Ejecutar el pipeline RAG (P2)</h4>
+  <h4>Ejecutar el pipeline RAG + LLM (P2 + P3)</h4>
   <div class="code-block">
     <div class="code-hdr"><span>terminal</span><span>bash</span></div>
     <div class="code-body"><span style="color:#999;"># 1. Generar chunks desde docs/</span>
@@ -509,7 +518,7 @@ Modelo guardado en model.pkl (0.3 MB)</div>
 <span style="color:#999;"># 2. Indexar chunks en Chroma con embeddings</span>
 <span style="color:#999;">$ </span>python index_docs.py
 
-<span style="color:#999;"># 3. Ejecutar pipeline completo con RAG</span>
+<span style="color:#999;"># 3. Ejecutar pipeline completo con RAG + Ollama</span>
 <span style="color:#999;">$ </span>python main.py</div>
   </div>
 
@@ -518,7 +527,7 @@ Modelo guardado en model.pkl (0.3 MB)</div>
     Si añades nuevos <code>.txt</code> a <code>docs/</code>, ejecuta <code>python chunk_docs.py</code> y <code>python index_docs.py</code>. Los embeddings se recalculan (~15s con el modelo ya descargado).
   </div>
 
-  <h4>Output real del IMR con RAG</h4>
+  <h4>Output real del IMR con RAG + LLM</h4>
   <div class="code-block">
     <div class="code-hdr"><span>output</span><span>text</span></div>
     <div class="code-body">=== CARD-7891 ===
@@ -535,7 +544,7 @@ Modelo guardado en model.pkl (0.3 MB)</div>
 [1] Transacción: 780.0€ · FR · 22h · electronics
 [2] Predicción: sospechosa (confianza 0.68, incertidumbre 0.32)
     Factores: ['high_amount', 'odd_hour', 'online_electronics', 'country_mismatch']
-[3] Explicación: Prediccion: sospechosa (confianza 0.68). ... Segun reglas_banco.txt §3.2: Patrón de riesgo alto: transacción en país distinto al habitual + horario nocturno + canal online...
+[3] Explicación: La predicción de sospechosa se basa en varios factores que indican un patrón de riesgo alto. En primer lugar, la transacción se realizó en un país diferente al habitual del usuario, lo que se considera un factor de riesgo según la regla §3.2 [reglas_banco.txt §3.2]...
     Fuentes: ['reglas_banco.txt §3.2']
     Grounding: 0.93
 
@@ -544,7 +553,7 @@ Modelo guardado en model.pkl (0.3 MB)</div>
 [1] Transacción: 2400.0€ · US · 03h · electronics
 [2] Predicción: fraude_confirmado (confianza 0.87, incertidumbre 0.13)
     Factores: ['high_amount', 'odd_hour', 'online_electronics', 'country_mismatch']
-[3] Explicación: Prediccion: fraude_confirmado (confianza 0.87). ... Segun precedentes.txt Caso 2024-0341... Segun reglas_banco.txt §3.2...
+[3] Explicación: La predicción de fraude confirmado se basa en varios factores de riesgo, que incluyen la transacción en un país distinto al habitual, el horario nocturno y el canal online. Según el contexto proporcionado, estos factores de riesgo están respaldados por la instrucción de la regla bancaria §3.2...
     Fuentes: ['precedentes.txt Caso 2024-0341', 'reglas_banco.txt §3.2']
     Grounding: 0.89</div>
   </div>
@@ -792,7 +801,7 @@ Modelo guardado en model.pkl (0.3 MB)</div>
     <div class="ch-n">09</div>
     <div>
       <div class="ch-title">Pipeline completo</div>
-      <div class="ch-sub">Capa 2 (adapter dual) + Capa 3 (RAG)</div>
+      <div class="ch-sub">Capa 2 (adapter dual) + Capa 3 (RAG + LLM)</div>
     </div>
   </div>
 
@@ -830,9 +839,9 @@ Modelo guardado en model.pkl (0.3 MB)</div>
     </div>
   </div>
 
-  <h3>Capa 3 — RAG real (P2)</h3>
+  <h3>Capa 3 — RAG + LLM (P2 + P3)</h3>
 
-  <p>Desde P2, <code>capa3_explanation.py</code> es una <strong>fachada fina</strong> que importa de <code>rag/retriever.py</code>. El retrieval ya no es keyword matching sino semántico.</p>
+  <p>Desde P2, <code>capa3_explanation.py</code> es una <strong>fachada fina</strong> que importa de <code>rag/retriever.py</code>. El retrieval es semántico (embeddings + Chroma + reranker). Desde P3, la síntesis usa <strong>Ollama (<code>llama3.2:3b</code>)</strong> con prompt grounded.</p>
 
   <div class="code-block">
     <div class="code-hdr"><span>capa3_explanation.py</span><span>python</span></div>
@@ -841,7 +850,7 @@ Modelo guardado en model.pkl (0.3 MB)</div>
 __all__ = [<span style="color:#c0390b;">"explain"</span>]</div>
   </div>
 
-  <h4>Pipeline de retrieval</h4>
+  <h4>Pipeline de retrieval + síntesis</h4>
 
   <div class="tbl">
     <div class="tbl-hdr c3">
@@ -872,18 +881,34 @@ __all__ = [<span style="color:#c0390b;">"explain"</span>]</div>
     <div class="tbl-row c3">
       <div class="tbl-tech">5. Threshold</div>
       <div>Filtrar scores &lt; 0.25</div>
-      <div>Abstención si nada pasa</div>
+      <div>Abstención si nada pasa (regla 3)</div>
     </div>
     <div class="tbl-row c3">
-      <div class="tbl-tech">6. Síntesis</div>
+      <div class="tbl-tech">6. Síntesis (P3)</div>
       <div>Genera explicación con fuentes citadas</div>
-      <div>Plantilla grounded (P3 cambiará a LLM)</div>
+      <div><code>ollama.generate()</code> + prompt grounded</div>
     </div>
   </div>
 
+  <div class="code-block">
+    <div class="code-hdr"><span>rag/retriever.py · _synthesize (P3)</span><span>python</span></div>
+    <div class="code-body"><span style="color:#999;">def</span> _synthesize(prediction, chunks):
+    context = <span style="color:#c0390b;">"\n\n"</span>.join(
+        f<span style="color:#c0390b;">"[{c['source']} {c['section']}]\n{c['text']}"</span>
+        <span style="color:#999;">for</span> c <span style="color:#999;">in</span> chunks
+    )
+    prompt = f<span style="color:#c0390b;">"""Eres un analista de fraude...
+    - Cita las fuentes usando el formato [archivo sección].
+    - No inventes información que no esté en el contexto.
+    - Si el contexto no responde, di "No hay información suficiente"."""</span>
+
+    response = ollama.generate(model=_OLLAMA_MODEL, prompt=prompt)
+    <span style="color:#999;">return</span> response[<span style="color:#c0390b;">"response"</span>].strip()</div>
+  </div>
+
   <div class="callout ok">
-    <span class="clbl">Validación P2.1 (367 chunks)</span>
-    <code>main.py</code> con el corpus real: <strong>CARD-4532</strong> cita <code>reglas_banco.txt §3.2</code> (grounding 0.93); <strong>CARD-1024</strong> cita <code>precedentes.txt Caso 2024-0341</code> + <code>reglas_banco.txt §3.2</code> (grounding 0.89); <strong>CARD-7891</strong> se abstiene (regla 3, sin fuentes relevantes para "normal"). Los docs reales (PCI DSS, paper) están indexados y disponibles; no se citan en estos 3 casos porque el query en español matchea mejor con los sintéticos. Un caso que pregunte "¿qué logs revisar?" o "¿cómo detectar concept drift?" sí los citaría.
+    <span class="clbl">Validación P3 (gate 8/10)</span>
+    <code>python test_gate_p3.py</code> con 10 queries: <strong>8/10 citan fuentes</strong>, <strong>2 abstenciones correctas</strong> (CARD-7891 y CARD-5004, sin docs relevantes), <strong>0 alucinaciones</strong>. Grounding medio 0.88 en casos con fuentes. Regla 2 intacta (label de salida = label de entrada). Regla 3 intacta (abstención sin fuentes).
   </div>
 </div>
 
@@ -932,19 +957,19 @@ __all__ = [<span style="color:#c0390b;">"explain"</span>]</div>
 
     <div class="rm-row">
       <div class="rm-n">P3</div>
-      <div class="rm-body"><b>LLM real</b> · Ollama local o API externa + prompt grounded</div>
-      <div class="rm-status">⏸ Próximo</div>
+      <div class="rm-body"><b>LLM real</b> · Ollama <code>llama3.2:3b</code> + prompt grounded · gate 8/10 con citas, 0 alucinaciones</div>
+      <div class="rm-status" style="color:var(--l2);font-weight:700;">✓ Hecha</div>
     </div>
 
     <div class="rm-row">
       <div class="rm-n">P4</div>
-      <div class="rm-body"><b>Observabilidad</b> · Langfuse self-hosted + @observe() · 100% requests trazados</div>
-      <div class="rm-status">⏸ Pendiente</div>
+      <div class="rm-body"><b>Observabilidad</b> · Langfuse self-hosted + <code>@observe()</code> · 100% requests trazados</div>
+      <div class="rm-status" style="color:var(--l5);font-weight:700;">⏸ Próximo</div>
     </div>
 
     <div class="rm-row">
       <div class="rm-n">P5</div>
-      <div class="rm-body"><b>Evaluación</b> · RAGAS 4 métricas + 20-100 queries de prueba + baseline</div>
+      <div class="rm-body"><b>Evaluación</b> · RAGAS 4 métricas + 20-100 queries de prueba + baseline faithfulness &gt;0.8</div>
       <div class="rm-status">⏸ Pendiente</div>
     </div>
   </div>
@@ -971,10 +996,17 @@ __all__ = [<span style="color:#c0390b;">"explain"</span>]</div>
 
   <h4>Lo que sí puede cambiar</h4>
   <ul>
-    <li>La implementación interna de cada capa (ej: <code>rag/retriever.py</code> evolucionará en P3)</li>
+    <li>La implementación interna de cada capa (ej: <code>rag/retriever.py</code> evolucionó en P3)</li>
     <li>El contenido de <code>docs/</code> (ampliable con más docs reales)</li>
     <li>El reranker (<code>mmarco</code> → <code>bge-reranker-base</code> si el retrieval falla)</li>
-    <li>El synthesizer (plantilla → LLM en P3)</li>
+    <li>El modelo LLM (<code>llama3.2:3b</code> → otro si se necesita más calidad)</li>
+  </ul>
+
+  <h4>Decisiones de alcance (v0.6)</h4>
+  <ul>
+    <li><strong>P3 cierra con LLM local, no API externa:</strong> Ollama <code>llama3.2:3b</code> es gratis, corre en portátil, y demuestra el patrón. API externa (Claude/GPT) queda para producción.</li>
+    <li><strong>Gate P3 con 10 queries, no RAGAS:</strong> el gate de faithfulness &gt;0.7 se validó manualmente con 10 queries (8/10 con citas, 0 alucinaciones). RAGAS formal llega en P5.</li>
+    <li><strong>Prompt grounded ajustado:</strong> la primera versión repetía citas al final de cada frase. Se ajustó para integrarlas naturalmente (una cita por fuente).</li>
   </ul>
 
   <div class="pq">
@@ -985,14 +1017,15 @@ __all__ = [<span style="color:#c0390b;">"explain"</span>]</div>
   <ul>
     <li>Archivos de diseño: <code>A2.Contratos.*.md</code> (prefijo de tarea + tipo)</li>
     <li>Capas: <code>capaN_nombre.py</code> (N = número de capa)</li>
-    <li>Módulos: <code>rag/</code> (P2), <code>llm/</code> (P3), <code>observability/</code> (P4), <code>evaluation/</code> (P5)</li>
+    <li>Módulos: <code>rag/</code> (P2/P3), <code>observability/</code> (P4), <code>evaluation/</code> (P5)</li>
     <li>Datos de prueba: <code>trans_*.txt</code></li>
     <li>CLI wrappers: <code>chunk_docs.py</code>, <code>index_docs.py</code> (delegan a módulos)</li>
+    <li>Tests: <code>test_model.py</code> (P1), <code>test_gate_p3.py</code> (P3 gate)</li>
   </ul>
 
   <h4>Ramas git</h4>
   <ul>
-    <li><code>main</code> — estable, con tag <code>v0.4-p2</code></li>
+    <li><code>main</code> — estable, con tags <code>v0.2</code>, <code>v0.3-p1</code>, <code>v0.4</code>, <code>v0.5</code></li>
     <li><code>feature/pN-descripcion</code> — trabajo de cada peldaño</li>
     <li><code>hotfix/descripcion</code> — bugs urgentes sobre main</li>
   </ul>
@@ -1007,6 +1040,17 @@ __all__ = [<span style="color:#c0390b;">"explain"</span>]</div>
       <div class="ch-sub">Histórico de versiones</div>
     </div>
   </div>
+
+  <h3>v0.6 — P3 cerrado (LLM real)</h3>
+  <ul>
+    <li>✅ P3.1: Ollama instalado + <code>llama3.2:3b</code> descargado (local, gratis)</li>
+    <li>✅ P3.2: <code>_synthesize</code> en <code>rag/retriever.py</code> reemplazado por llamada a Ollama con prompt grounded</li>
+    <li>✅ P3.3: contrato 3→Consumidor intacto (<code>explanation</code> string, <code>sources</code> lista, <code>grounding_score</code> float, <code>label</code> string)</li>
+    <li>✅ Gate P3: 8/10 queries con citas, 2 abstenciones correctas, 0 alucinaciones</li>
+    <li>✅ <code>test_gate_p3.py</code> con 10 queries (incluye variaciones de factors y abstención)</li>
+    <li>✅ Prompt ajustado: citas integradas naturalmente, sin repetición por frase</li>
+    <li>📝 README actualizado a v0.6 con estado P3 detallado</li>
+  </ul>
 
   <h3>v0.5 — P2 cerrado (RAG real con 367 chunks)</h3>
   <ul>
@@ -1039,7 +1083,7 @@ __all__ = [<span style="color:#c0390b;">"explain"</span>]</div>
 </div>
 
 <footer>
-  <div>SSEP · FraudeSSEP · v0.5</div>
+  <div>SSEP · FraudeSSEP · v0.6</div>
   <div class="ft-dots">
     <div class="ft-dot" style="background:var(--l1)"></div>
     <div class="ft-dot" style="background:var(--l2)"></div>
