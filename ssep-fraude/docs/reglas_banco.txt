@@ -17,3 +17,7 @@ electrónica o viajes.
 
 §3.4: Patrón de riesgo bajo: transacción en país habitual,
 horario comercial, categoría recurrente.
+
+§3.5: Excepción por viaje declarado: transacción en país distinto al habitual con aviso de viaje vigente no constituye patrón de riesgo.
+§3.6: Excepción por operativa habitual: importe elevado o compra online nocturna en el país habitual del titular en comercios recurrentes se clasifica como transacción normal.
+§3.7: Evidencia insuficiente: si la transacción no coincide con ningún patrón o regla definida, no emitir diagnóstico de riesgo y solicitar revisión manual.
