@@ -1,0 +1,17 @@
+# Core
+ragas>=0.2.0
+datasets>=2.0.0
+numpy>=1.24
+
+# Providers (ambos instalados, se usan según SYNTH_PROVIDER/JUDGE_PROVIDER)
+langchain-ollama>=0.2.0
+langchain-huggingface>=0.1.0
+langchain-openai>=0.2.0        # para JUDGE_PROVIDER=openai
+ollama>=0.4.0
+openai>=1.50.0
+sentence-transformers>=3.0.0
+chromadb>=0.5.0
+
+# Utilidades
+python-dotenv>=1.0.0           # para cargar .env automáticamente
+
